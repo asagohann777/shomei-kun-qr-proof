@@ -1,0 +1,55 @@
+{
+  "creator_name": "おじいちゃんコンビニ",
+  "github_id": "asagohann777",
+  "attribution_source": "User request on 2026-09-25",
+  "status": "work in progress",
+  "saved_date": "2026-09-25",
+  "source_directory": "/Users/takagi.shoichi/Downloads",
+  "files": [
+    {
+      "file": "S__32833552.jpg",
+      "bytes": 283188,
+      "sha256": "52f30f6acd99a811ac0c610a1b0209b44bcea7c08c085e6f09bb3c1727811eea"
+    },
+    {
+      "file": "S__32833551.jpg",
+      "bytes": 285097,
+      "sha256": "8c704df0ec9323da15b87aa70e60b9e09e942fdbeb618031e2fce07136dc5628"
+    },
+    {
+      "file": "S__32833545.jpg",
+      "bytes": 219323,
+      "sha256": "7ee24dd43eeb75d963bf23dad82c03f91047b051be1d190155188cad0e89d993"
+    },
+    {
+      "file": "S__32833544.jpg",
+      "bytes": 221468,
+      "sha256": "64b32da21c371d461c2255b999d4abacb1d5f6a1abb485e3b2a4a2a702bad40d"
+    },
+    {
+      "file": "S__32833543.jpg",
+      "bytes": 336317,
+      "sha256": "62216af5388fa36a4ea6e6ad791ab94aecb38a021fb1e980be206b6accad4b8f"
+    },
+    {
+      "file": "S__32833542.jpg",
+      "bytes": 355762,
+      "sha256": "3e8be46142b9d7cff2df75ab528c7283be97938f94130efd1c5280a481b2b45a"
+    },
+    {
+      "file": "S__32833541.jpg",
+      "bytes": 320850,
+      "sha256": "c741bc232d99fd8fd742f5ff1b9343983ad7cc48c7e803c0d662d6fcc761fbb6"
+    },
+    {
+      "file": "S__32833539.jpg",
+      "bytes": 417596,
+      "sha256": "f6d5f9272f999ce5791db34c638945611dfbecf7551ee9331520449b7996a959"
+    },
+    {
+      "file": "S__32833538.jpg",
+      "bytes": 321854,
+      "sha256": "fc02dff6043840d471a0e2975d6b1a5588b2147974c7592619ee4f85bd2a17c3"
+    }
+  ]
+}

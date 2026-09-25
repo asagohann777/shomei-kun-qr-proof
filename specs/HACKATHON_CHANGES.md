@@ -157,3 +157,13 @@ Node.js 22.23.1、Playwright 1.61.1を使用した。`npm run build` が成功�
 - [WebKit・320pxの模擬カメラ](assets/ui-mock/webkit-camera-320.png)、[WebKit・390pxの登録](assets/ui-mock/webkit-registration-390.png)、[430pxの公開確認](assets/ui-mock/owner-430.png)、[英語・320px](assets/ui-mock/english-320.png)
 
 操作中のアプリのコンソールエラーは0件。WebKitの撮影ツール由来のCSP警告72件は別記録した。公開直後のアセット比較で一度不一致が出たため、配信内容を再取得して確認し、一致した状態で全検証を完了した。文書の参照先・要件ID・空白、JavaScriptの構文も確認した。
+
+## 2026-09-25: おじいちゃんコンビニのデザイン制作途中の成果物を保存
+
+ユーザーが、おじいちゃんコンビニ、GitHub ID `asagohann777` の制作途中の成果物として画像9点とChatGPT共有会話の保存を指定した。制作日時と大会期間との対応は未確認。
+
+- Codexが [画像9点](assets/asagohann777/2026-09-25/README.md)を元のファイル名・内容のままコピーし、作者情報、出典、SHA-256を記録した。元画像と保存先9点のバイト単位の一致を確認した。
+- Codexが [プロンプトの出典記録](../docs/prompts/asagohann777-design-2026-09-25.md)を手動作成した。共有URLはブラウザでも読み込めず、本文は未取得。保存依頼のhook記録と外部会話の本文を区別した。
+- 画像は制作途中として保存した。採用判断、画像編集、アプリへの反映は行っていない。各画像のAI使用範囲・ライセンスは未確認。
+
+その後、ユーザーが会話本文を貼り付けた。Codexが対応するhook JSONから [会話抜粋の原文](../docs/prompts/asagohann777-design-2026-09-25-transcript.txt)を抽出して保存した。ユーザー指示とChatGPT回答が混在する本文を編集せず、hook記録の該当部分と完全一致することを確認した。共有URL自体の取得失敗は解消していない。
