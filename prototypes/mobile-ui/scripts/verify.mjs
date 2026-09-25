@@ -22,7 +22,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
   const screenshot = async (path) => {
     await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     takingScreenshot = true;
-    try { await page.screenshot({ path, animations: 'allow', caret: 'initial' }); }
+    try { await page.screenshot({ path, fullPage: true, animations: 'allow', caret: 'initial' }); }
     finally { takingScreenshot = false; }
   };
   const requests = [];
@@ -41,7 +41,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     await page.waitForFunction(() => [...document.images].every((image) => image.complete && image.naturalWidth > 0));
     await screenshot(`artifacts/${name}-${label}.png`);
     await page.evaluate(() => scrollTo(0, document.body.scrollHeight));
-    assert(await page.evaluate(() => document.querySelector('.page').lastElementChild.getBoundingClientRect().bottom <= document.querySelector('.bottom-actions').getBoundingClientRect().top), `${label}: content cannot scroll above footer`);
+    assert(await page.evaluate(() => { const footer = document.querySelector('.bottom-actions'); return !footer || document.querySelector('.page').getBoundingClientRect().bottom <= footer.getBoundingClientRect().top; }), `${label}: actions overlap content`);
     await screenshot(`artifacts/${name}-${label}-bottom.png`);
     await page.evaluate(() => scrollTo(0, 0));
   };
@@ -49,11 +49,17 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
   assert.equal(await action('scan').count(), 0);
   await action('open-camera').click();
   await layout('390-camera');
+  for (const control of ['photos', 'help', 'flash']) {
+    await action(control).click();
+    await page.locator('#help-dialog[open]').waitFor();
+    await page.locator('#help-dialog form button').click();
+  }
   await action('close-camera').click();
   await action('open-camera').click();
   await action('scan').click();
-  await action('details').waitFor();
-  assert.equal((await state()).card, 'registered');
+  await action('start-register').waitFor();
+  assert.equal((await state()).card, 'unregistered');
+  await goto('registered');
   await action('details').click();
   await page.locator('#details-dialog[open]').waitFor();
   await page.waitForFunction(() => document.querySelector('#details-dialog').innerText.includes('80002'));
@@ -76,12 +82,21 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
   await goto('unregistered');
   await action('start-register').click();
   assert(await action('confirm').isDisabled());
+  await action('clear-nickname').click();
+  assert.equal(await page.locator('#nickname').inputValue(), '');
+  assert(await action('confirm').isDisabled());
   await page.locator('#nickname').fill('相談用 <テスト>');
   await action('connect').click();
   await action('connect-sample').click();
-  await page.locator('#consent').check();
   await layout('390-registration');
   await action('confirm').click();
+  assert(await action('register-reviewed').isDisabled());
+  await layout('390-review');
+  await action('edit-review').click();
+  assert.equal(await page.locator('#nickname').inputValue(), '相談用 <テスト>');
+  await action('confirm').click();
+  await page.locator('#consent').check();
+  await action('register-reviewed').click();
   await layout('390-approval');
   await action('approve').click();
   const attempt = (await state()).attempt;
@@ -90,18 +105,22 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
   await page.waitForFunction(() => JSON.parse(sessionStorage.getItem('shomei.mobile-mock.v1')).view === 'success');
   assert(await page.locator('#scenarios-dialog').evaluate((dialog) => dialog.open));
   await page.locator('#scenarios-dialog form button').click();
-  await action('view-public').waitFor();
+  await page.locator('.result-page').waitFor();
   assert.equal((await state()).attempt, attempt);
   await layout('390-success');
-  await action('view-public').click();
-  assert.equal(await page.locator('h1').innerText(), '相談用 <テスト>');
+  await action('details').click();
+  await page.waitForFunction(() => document.querySelector('#details-dialog').innerText.includes('相談用 <テスト>'));
+  assert.match(await page.locator('#details-dialog').innerText(), /相談用 <テスト>/);
+  await page.locator('#details-dialog form button').click();
+  assert.match(await page.locator('.record-table').innerText(), /相談用 <テスト>/);
   await page.reload();
-  assert.equal(await page.locator('h1').innerText(), '相談用 <テスト>');
+  assert.match(await page.locator('.record-table').innerText(), /相談用 <テスト>/);
   assert.equal(await action('start-register').count(), 0);
+  await action('scenarios').click();
   await action('language').click();
   await page.reload();
   assert.equal(await page.locator('html').getAttribute('lang'), 'en');
-  assert.equal(await page.locator('h1').innerText(), '相談用 <テスト>');
+  assert.match(await page.locator('.record-table').innerText(), /相談用 <テスト>/);
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 844 });
     await goto('registered');
@@ -110,8 +129,12 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     await layout(`${width}-english-register`);
     assert(await action('confirm').isDisabled());
     await action('fix-wallet').click();
-    await page.locator('#consent').check();
     await action('confirm').click();
+    await layout(`${width}-english-review`);
+    await page.reload();
+    assert.equal((await state()).view, 'review');
+    await page.locator('#consent').check();
+    await action('register-reviewed').click();
     await action('reject').click();
     assert.equal((await state()).attempt, null);
   }
@@ -119,7 +142,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
   const unknownAttempt = (await state()).attempt;
   assert.equal(await action('approve').count(), 0);
   await action('recheck').click();
-  await action('view-public').waitFor();
+  await page.locator('.result-page').waitFor();
   assert.equal((await state()).attempt, unknownAttempt);
   await goto('failed');
   await action('edit-again').click();
@@ -143,7 +166,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     await freshPage.goto(`${base}/?scenario=registered`);
     await freshPage.locator('h1').waitFor();
     assert.equal(await freshPage.locator('html').getAttribute('lang'), expected);
-    assert.equal(await freshPage.locator('h1').innerText(), 'おじいちゃんコンビニ');
+    assert.match(await freshPage.locator('.record-table').innerText(), /おじいちゃんコンビニ/);
     await fresh.close();
   }
   results.push({ browser: name, version: browser.version(), status: 'passed', requests: requests.length, consoleErrors: errors, playwrightScreenshotCspWarnings: screenshotWarnings.length });

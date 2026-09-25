@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T20:59:07.236636+00:00",
+  "session_id": "01a0d8d4-ba22-7360-aac5-8461d75f59e2",
+  "turn_id": "01a0da5d-5a1d-7501-8874-92cddda00df9",
+  "prompt": "カード右下のQRを読み取る　削除　$unslop",
+  "model": "gpt-6-astra"
+}

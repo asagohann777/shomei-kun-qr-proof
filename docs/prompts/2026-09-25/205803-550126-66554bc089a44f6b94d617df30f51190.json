@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T20:58:03.550126+00:00",
+  "session_id": "01a0d8d4-ba22-7360-aac5-8461d75f59e2",
+  "turn_id": "01a0da5c-6084-7162-b2b1-144525c77900",
+  "prompt": "ウォレットで承認　の画面って技術的な仕様的に必要なんでしたっけ",
+  "model": "gpt-6-astra"
+}
