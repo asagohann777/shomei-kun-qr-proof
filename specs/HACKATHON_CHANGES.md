@@ -308,3 +308,7 @@ Node.js 22.22.3でビルド成功。ローカルのChromium 149.0.7827.55とWebK
 ユーザーが、Curvegrid Testnetへの実接続、所有者登録コントラクトの新規作成、自由入力の名前、通常ブラウザからMetaMaskへの接続を選択した。その後、UIを並行実装するため担当を分け、計画保存・詳細設計・ユーザー確認・実装の順に進めるよう指示した。大会期間との対応は未確認。
 
 Codexが専用worktreeと `feat/curvegrid-integration-backend` ブランチを作り、[計画](CURVEGRID_INTEGRATION_PLAN.md) と [会話の選択記録](../docs/prompts/curvegrid-integration-decisions.md)を作成した。対応する3件のhook JSONを元の作業場所から同一内容でコピーした。この段階は計画資料の保存だけで、コード・依存関係・デプロイ設定は変更していない。
+
+計画保存コミット `23bf058` で [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) を作成した。その後Codexが [詳細設計](CURVEGRID_INTEGRATION_DESIGN.md) と [OpenSpec change](../openspec/changes/curvegrid-testnet-integration/proposal.md) の提案・要件・設計・タスクを作成した。MultiBaas公式資料の調査は読取り専用の補助エージェントを使用し、親エージェントがAPI、ABI、CLI再開、UIとの担当境界、試験計画へ反映した。AI使用範囲はこれらの文書と本変更記録である。
+
+`openspec validate curvegrid-testnet-integration --strict` が成功した。新しい計画文書のローカルリンクと空白、3件のプロンプト原本とのバイト一致を確認した。実装タスクは全件未完了。コントラクト・API・CLIのコード変更、実環境への接続、アプリ試験、デプロイは行っていない。ユーザーの詳細設計確認後に実装を開始する。

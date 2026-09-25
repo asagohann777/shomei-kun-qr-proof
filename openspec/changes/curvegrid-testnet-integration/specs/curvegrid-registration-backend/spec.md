@@ -1,0 +1,141 @@
+# Curvegrid登録バックエンド
+
+## Purpose
+
+UI開発と独立したAPIでCurvegrid TestnetとMultiBaasへ接続し、発行者が許可したウォレットによるカード所有者登録と、その記録の再確認を行う。既存モックの互換性を維持し、実環境の成功と未検証の状態を区別する。
+
+## ADDED Requirements
+
+### Requirement: 設計承認と担当分離
+実装担当はユーザーの明示的な詳細設計承認を受けるまで、実装コード・依存関係・デプロイ設定を変更してはならない（MUST NOT）。画面・ブラウザ側のウォレット操作はUI担当とし、API・コントラクト・発行者CLIをバックエンド担当が所有しなければならない（MUST）。
+
+#### Scenario: 設計artifactが揃ったが未承認
+- **WHEN** 計画・要件・設計・タスクが作成され、ユーザーの設計承認がない
+- **THEN** Draft PRで設計を提示して停止し、artifactの完成を実装許可と扱わない
+
+### Requirement: 明示的な接続先とモード
+システムはmock/liveを明示しなければならない（MUST）。liveは配置設定で指定したCurvegrid Testnetとコントラクトだけを扱い、障害時にmockへ切り替えてはならない（MUST NOT）。
+
+#### Scenario: live設定が不足
+- **WHEN** liveが選択されているが接続に必要な設定値がない
+- **THEN** APIは503 CONFIGURATION_MISSINGと不足項目名だけを返し、固定成功データを返さない
+
+#### Scenario: モード指定が不正
+- **WHEN** BACKEND_MODEが未指定またはmock/live以外
+- **THEN** 設定エラーとして扱い、接続処理を開始しない
+
+#### Scenario: 接続先のチェーンが異なる
+- **WHEN** MultiBaas・RPC・期待するchain IDが一致しない
+- **THEN** 接続確認と登録準備は503 CONNECTION_MISMATCHになり、取引を渡さない
+
+### Requirement: UIへ渡す接続状態
+接続確認APIは取得済みのチェーン・最新ブロック・配置先・公開Web3設定を返さなければならない（MUST）。サーバー用APIキーや管理キーを返してはならない（MUST NOT）。
+
+#### Scenario: 接続確認に成功
+- **WHEN** 設定、認証、チェーン、RPC、配置先・ABI・発行者の照合が成功
+- **THEN** mode=live、status=readyと公開ネットワーク・registry・latestBlockを返す
+
+#### Scenario: 上流の認証拒否
+- **WHEN** MultiBaasが401または403を返す
+- **THEN** 503 MULTIBAAS_AUTH_FAILEDを返し、上流の本文やキーを出力しない
+
+### Requirement: 発行者による一度限りの発行
+コントラクトは固定の発行者だけにカードIDと非ゼロの許可ウォレットの発行を許可しなければならない（MUST）。発行済みIDや許可先を上書きしてはならない（MUST NOT）。
+
+#### Scenario: 正常な発行
+- **WHEN** 発行者が有効な未発行IDと許可ウォレットを発行
+- **THEN** カードは未登録になり、発行イベントを記録する
+
+#### Scenario: 重複・無権限・不正ID
+- **WHEN** 既発行ID、別発行者、範囲外のID、ゼロの許可ウォレットで発行を試す
+- **THEN** コントラクトは拒否し、元のカードを変更しない
+
+### Requirement: 許可された本人による所有者登録
+コントラクトは発行済み・未登録・許可ウォレット本人の条件を満たす取引だけを登録しなければならない（MUST）。ownerとnicknameを同一取引に結び付け、再登録・移転・取消し・上書きを提供してはならない（MUST NOT）。
+
+#### Scenario: 許可ウォレットで登録
+- **WHEN** 許可された本人が有効なニックネームでregisterを送る
+- **THEN** ownerと名前を保存し、カードと所有者・名前を結び付けたイベントを記録する
+
+#### Scenario: 競合またはなりすまし
+- **WHEN** 同じカードへ複数取引、未発行ID、許可外の送信者、登録済みカードへの再登録を試す
+- **THEN** 条件に合う最初の登録だけが成立し、他は拒否される
+
+### Requirement: 自由入力と未署名取引
+live APIはニックネームをUTF-8で1〜96バイトの入力として扱い、勝手に正規化してはならない（MUST NOT）。登録準備は署名・送信を行わず、接続先とABI内容を照合した未署名取引だけを返さなければならない（MUST）。
+
+#### Scenario: 正常な準備
+- **WHEN** 未登録カードに許可アドレス・正しいchain ID・範囲内の名前を指定
+- **THEN** registerのcardIdと名前、from/to/chain/valueが照合された取引を返し、チェーン状態は変わらない
+
+#### Scenario: 無効な入力
+- **WHEN** 名前が空・96バイト超過・不正Unicode、本文超過、未知フィールド、別chain、別walletを送る
+- **THEN** 定義された400/413/422で拒否し、未署名取引を渡さない
+
+#### Scenario: MultiBaasの応答が意図と異なる
+- **WHEN** submitted=true、宛先・呼出し・引数の不一致、または不正な応答形式を受信
+- **THEN** 成功応答へ変換せず503とする
+
+### Requirement: 未接続の公開読取り
+APIはウォレット未接続でもカード状態と所有者を取得できなければならない（MUST）。未発行、未登録、証跡待ち、通信失敗を区別しなければならない（MUST）。
+
+#### Scenario: 未発行カード
+- **WHEN** 正常なコントラクト読取りがexists=falseを示す
+- **THEN** 404 CARD_NOT_FOUNDとし、自動発行しない
+
+#### Scenario: 証跡の検索同期が遅れている
+- **WHEN** 登録済みownerを取得し、正常に完了したイベント検索が空
+- **THEN** ownerを保持してevidence=pendingを返す
+
+#### Scenario: MultiBaasの不明な404または通信障害
+- **WHEN** 上流の不存在仕様を確認できない404、失敗、不正応答を受信
+- **THEN** 503とし、未登録や取引不存在に変換しない
+
+### Requirement: 取引と現在の記録の照合
+APIは取引、ABI引数、receipt、正規ブロックのログ、現在のカード記録が一致した場合だけconfirmedを返さなければならない（MUST）。
+
+#### Scenario: 正しい登録取引
+- **WHEN** 対象カードの成功取引・正しいイベント・現在ownerと名前・blockHashが一致
+- **THEN** confirmed、owner、登録hash、blockNumberを返す
+
+#### Scenario: 異なる記録
+- **WHEN** cardId、関数、送信者、宛先、名前、イベント発行元、hash、blockのいずれかが不一致
+- **THEN** unknown/RECORD_MISMATCHを返し、confirmedにしない
+
+#### Scenario: 確認中と失敗
+- **WHEN** 対象register取引のisPending=true、または対象取引の失敗receiptを確認
+- **THEN** 前者はpending、後者はrevertedとし、通信失敗と区別する
+
+#### Scenario: 再確認
+- **WHEN** 送信済みhashの照会を繰り返す
+- **THEN** その時点の記録を再照合し、新しい取引を送信しない
+
+### Requirement: CLIの再開と鍵の分離
+発行者CLIは署名鍵をローカルで扱い、送信前に再開用情報を保存しなければならない（MUST）。再開で別の取引を自動生成してはならない（MUST NOT）。
+
+#### Scenario: 配置後のリンクで中断
+- **WHEN** 配置取引が成功し、ABIリンク前にCLIが中断
+- **THEN** resumeは既存配置を確認してリンクだけを再開し、startingBlockを元の配置ブロックへ設定する
+
+#### Scenario: 同じカードの再発行コマンド
+- **WHEN** 同じID・許可walletの発行を再実行
+- **THEN** 取引を送らず既存状態を返し、walletが異なれば失敗する
+
+#### Scenario: 曖昧な送信結果
+- **WHEN** 送信後の通信障害で結果を確認できない
+- **THEN** 保存済みhashを照会し、通信失敗だけで再送せず、秘密鍵・署名済みraw txを公開しない
+
+### Requirement: 別URLとUI互換性
+バックエンドは既存UIモックと異なるWorkerへ配置しなければならない（MUST）。許可したUI OriginだけへCORSを付与し、既存mockの3 APIと固定シナリオを維持しなければならない（MUST）。
+
+#### Scenario: UIの別Originから要求
+- **WHEN** 設定済みUI OriginからAPIまたはpreflightを要求
+- **THEN** 対応するCORSを返し、許可外Originには403を返す
+
+#### Scenario: 既存mockを利用
+- **WHEN** mockモードで既存19シナリオを実行
+- **THEN** 既存の固定応答を返し、外部APIへ接続しない
+
+#### Scenario: 実環境が未設定
+- **WHEN** コードのローカル試験だけが成功し実環境設定やスマホ検証が未実施
+- **THEN** 実環境の疎通・署名試験を合格と記録しない

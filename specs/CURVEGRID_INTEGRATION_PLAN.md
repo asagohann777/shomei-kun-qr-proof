@@ -2,6 +2,8 @@
 
 状態: 2026-09-26 JST、計画保存を承認済み。詳細設計はレビュー前。実装開始の承認ではない。
 
+[詳細設計](CURVEGRID_INTEGRATION_DESIGN.md) / [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1)
+
 ## 目的
 
 UI検討用とは別URLで、Curvegrid Testnetへの接続、本人ウォレットによるカード所有者登録、登録情報の再取得を試せる状態にする。MultiBaas APIを中心に、既存の固定モックAPIを実接続へ拡張する。今回はその計画と詳細設計をPRで確認する。
