@@ -1,10 +1,10 @@
 # QR起点・現在登録所有者確認の仕様
 
-状態: 2026-09-25の合意を反映した仕様。実接続アプリ・コントラクトは未実装で、受け入れ試験は未実施。相談用のUIモックは別途 [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) に記録する。
+状態: 2026-09-25の合意を反映した仕様。Curvegrid向けAPI・コントラクト・CLIは実装済み。実環境の受け入れ試験とスマホ結合は未実施。相談用のUIモックは別途 [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) に記録する。
 
 ## 目的と対象
 
-2026-09-26 JSTに、実接続前の [Web API詳細設計](BACKEND_DESIGN.md) と [OpenAPI定義](openapi.yaml) を追加した。MultiBaas・署名・送信を固定モックにする設計であり、以下の実接続要件を満たした実装とは扱わない。固定モックAPIの実装と試験は [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md) に記録する。
+2026-09-26 JSTに、実接続前の [Web API詳細設計](BACKEND_DESIGN.md) と [OpenAPI定義](openapi.yaml) を追加した。MultiBaas・署名・送信を固定モックにする設計であり、以下の実接続要件を満たした実装とは扱わない。固定モックAPIの実装と試験は [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md) に記録する。追加したCurvegrid連携の範囲と未達条件は [CURVEGRID_INTEGRATION_IMPLEMENTATION.md](CURVEGRID_INTEGRATION_IMPLEMENTATION.md) を参照。
 
 天地愛プロジェクトの「証明くん」は、個人が自分の記録を登録し、必要な相手へ証明情報を提示する「証明の民主化」を目指す既存プロジェクトである。個人向けPoCがハッカソン以前から存在する。
 

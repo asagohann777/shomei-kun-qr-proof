@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T21:03:35.646629+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0da61-75d3-7671-a10a-00e39a29dc6c",
+  "prompt": "大丈夫そうですこのままこのPRで実装お願いします",
+  "model": "gpt-6-astra"
+}

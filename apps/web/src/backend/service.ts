@@ -43,7 +43,7 @@ export async function getCard({
   gateway: RegistrationGateway;
 }): Promise<Card> {
   const card = await requireCard(gateway, cardId);
-  if (card.cardId !== cardId || gateway.registry.chainId !== sample.chainId) {
+  if (card.cardId !== cardId || (gateway.mode !== "live" && gateway.registry.chainId !== sample.chainId)) {
     throw new ApiError(503, "UPSTREAM_UNAVAILABLE", "Gateway returned an invalid card");
   }
   const common = {
@@ -72,7 +72,7 @@ export async function prepareRegistration({
   gateway: RegistrationGateway;
 }): Promise<PreparedRegistration> {
   const card = await requireCard(gateway, cardId);
-  if (card.cardId !== cardId || gateway.registry.chainId !== sample.chainId) {
+  if (card.cardId !== cardId || (gateway.mode !== "live" && gateway.registry.chainId !== sample.chainId)) {
     throw new ApiError(503, "UPSTREAM_UNAVAILABLE", "Gateway returned an invalid card");
   }
   if (card.kind === "registered") {
@@ -84,7 +84,7 @@ export async function prepareRegistration({
   if (!sameHex(input.walletAddress, card.allowedWallet)) {
     throw new ApiError(422, "WALLET_NOT_ALLOWED", "Wallet not allowed");
   }
-  if (input.nickname !== sample.nickname) {
+  if (gateway.mode !== "live" && input.nickname !== sample.nickname) {
     throw new ApiError(422, "MOCK_SAMPLE_UNSUPPORTED", "Only the sample nickname is available");
   }
   const transaction = await gateway.buildRegistrationTransaction({
@@ -119,7 +119,7 @@ export async function getRegistrationTransaction({
     status: "unknown",
     reason,
   });
-  if (card.cardId !== cardId || gateway.registry.chainId !== sample.chainId) {
+  if (card.cardId !== cardId || (gateway.mode !== "live" && gateway.registry.chainId !== sample.chainId)) {
     return unknown("RECORD_MISMATCH");
   }
   const transaction = await gateway.getTransaction(txHash);
@@ -134,11 +134,18 @@ export async function getRegistrationTransaction({
   ) {
     return unknown("RECORD_MISMATCH");
   }
+  if (gateway.mode === "live" && (
+    !transaction.registration || transaction.registration.cardId !== cardId ||
+    (card.kind === "registered" && transaction.registration.nickname !== card.owner.nickname)
+  )) return unknown("RECORD_MISMATCH");
+  if (transaction.pending === true) {
+    return { cardId, transactionHash: txHash.toLowerCase(), status: "pending" };
+  }
   const receipt = await gateway.getReceipt(txHash);
   if (receipt === null) {
     return { cardId, transactionHash: txHash.toLowerCase(), status: "pending" };
   }
-  if (!sameHex(receipt.transactionHash, txHash)) {
+  if (!sameHex(receipt.transactionHash, txHash) || receipt.canonical === false) {
     return unknown("RECORD_MISMATCH");
   }
   if (receipt.status === "reverted") {

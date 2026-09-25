@@ -17,9 +17,13 @@
     "build:worker": "opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare preview",
     "test:http": "node scripts/verify-http.mjs next",
-    "test:worker": "node scripts/verify-http.mjs worker"
+    "test:worker": "node scripts/verify-http.mjs worker",
+    "build:integration": "opennextjs-cloudflare build --config wrangler.integration.jsonc",
+    "test:http:live": "node scripts/verify-http.mjs next-live",
+    "test:worker:live": "node scripts/verify-http.mjs worker-live"
   },
   "dependencies": {
+    "ethers": "6.17.0",
     "next": "16.3.6",
     "react": "19.3.0",
     "react-dom": "19.3.0"

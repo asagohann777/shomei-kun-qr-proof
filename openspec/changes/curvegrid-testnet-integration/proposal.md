@@ -10,7 +10,7 @@
 - 設定からチェーン・コントラクトを選び、自由入力のニックネームを本人取引で記録する。
 - 発行者を固定した一度限りの所有者登録コントラクトと、配置・発行・照会CLIを新規設計する。
 - 別Workerで公開するAPIとUI担当の画面・MetaMask接続の境界を定義する。
-- 計画保存、Draft PR、詳細設計、ユーザー承認、実装の順に進める。今回の変更は文書のみ。承認前はコード・依存・デプロイ設定に触れない。
+- 計画保存、Draft PR、詳細設計、ユーザー承認、実装の順に進める。文書だけのPRを先に作成し、明示的な設計承認後にコードを追加する。
 
 ## Capabilities
 
@@ -26,4 +26,4 @@
 
 設計本文は [計画](../../../specs/CURVEGRID_INTEGRATION_PLAN.md) と [詳細設計](../../../specs/CURVEGRID_INTEGRATION_DESIGN.md) に置く。将来のコード変更対象は `apps/web/src/backend`、API Route Handler、OpenAPI、コントラクト・CLI、Workers構成。ブラウザ画面・MetaMask SDKはUI担当。
 
-Amoyの80002固定をlive配置設定に置き換えるが、mockの既存応答値は変更しない。Curvegrid Testnetは独立した公開RPCによる検証の受け入れ条件を満たしたとは扱わない。実接続値・APIキーは未設定。マージ・公開・コード実装は今回行わない。
+Amoyの80002固定をlive配置設定に置き換えるが、mockの既存応答値は変更しない。Curvegrid Testnetは独立した公開RPCによる検証の受け入れ条件を満たしたとは扱わない。実接続値・APIキーは未設定。コード実装は承認済み。マージ・公開は別途の指示に従う。

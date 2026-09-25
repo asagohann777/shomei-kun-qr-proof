@@ -69,7 +69,7 @@ test("B11 runtime rejects unset mode and live mock headers", async () => {
   await withMode("live", async () => {
     const response = await handleCardRequest(new Request(url, { headers: { "X-Mock-Scenario": "registered" } }), sample.cardId);
     assert.equal(response.status, 400);
-    assert.equal((await handleCardRequest(new Request(url), sample.cardId)).status, 500);
+    assert.equal((await handleCardRequest(new Request(url), sample.cardId)).status, 503);
   });
 });
 test("B01 precedence: input, scenario, card, outage, then hash", async () => {

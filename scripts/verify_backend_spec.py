@@ -46,9 +46,9 @@ for path, methods in document["paths"].items():
             for example in media["examples"].values():
                 value = resolve(example)["value"]
                 validator.validate(value)
-                assert value["meta"]["mode"] == "mock"
+                assert value["meta"]["mode"] in ("mock", "live")
                 example_count += 1
-        for scenario, outcome in operation["x-mock-scenarios"].items():
+        for scenario, outcome in operation.get("x-mock-scenarios", {}).items():
             assert scenario in scenario_names
             media = operation["responses"][str(outcome["status"])]["content"]["application/json"]
             assert outcome["example"] in media["examples"]
@@ -60,6 +60,7 @@ for path, methods in document["paths"].items():
             assert media["example"] == {key: sample[key] for key in ("walletAddress", "chainId", "nickname")}
 
 assert operations == {
+    "getConnection": ("get", "/api/v1/connection"),
     "getCard": ("get", "/api/v1/cards/{cardId}"),
     "prepareRegistration": ("post", "/api/v1/cards/{cardId}/registration/prepare"),
     "getRegistrationTransaction": ("get", "/api/v1/cards/{cardId}/transactions/{txHash}"),
@@ -72,7 +73,7 @@ for name in ("registered", "unregistered", "evidence-pending"):
     assert card["registry"] == {key: sample[key] for key in ("chainId", "contractAddress", "issuer")}
     assert card["playerName"] == sample["playerName"]
 for value in examples.values():
-    if "data" in value:
+    if "data" in value and "cardId" in value["data"]:
         assert value["data"]["cardId"] == sample["cardId"]
         if "transactionHash" in value["data"]:
             assert value["data"]["transactionHash"] == sample["transactionHash"]

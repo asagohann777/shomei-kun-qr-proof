@@ -312,3 +312,11 @@ Codexが専用worktreeと `feat/curvegrid-integration-backend` ブランチを�
 計画保存コミット `23bf058` で [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) を作成した。その後Codexが [詳細設計](CURVEGRID_INTEGRATION_DESIGN.md) と [OpenSpec change](../openspec/changes/curvegrid-testnet-integration/proposal.md) の提案・要件・設計・タスクを作成した。MultiBaas公式資料の調査は読取り専用の補助エージェントを使用し、親エージェントがAPI、ABI、CLI再開、UIとの担当境界、試験計画へ反映した。AI使用範囲はこれらの文書と本変更記録である。
 
 `openspec validate curvegrid-testnet-integration --strict` が成功した。新しい計画文書のローカルリンクと空白、3件のプロンプト原本とのバイト一致を確認した。実装タスクは全件未完了。コントラクト・API・CLIのコード変更、実環境への接続、アプリ試験、デプロイは行っていない。ユーザーの詳細設計確認後に実装を開始する。
+
+## 2026-09-26 JST: Curvegrid連携の実装承認とリベース
+
+ユーザーが [同じPRでの実装を承認](../docs/prompts/2026-09-25/210335-646629-78b744b43cdc4d82a0eb1b3135d6a539.json)した。承認対象の詳細設計は `453387e0fac95e097ad85e5ea75e97ffc4395d6f`。続く [最新UIへのリベース指示](../docs/prompts/2026-09-25/210422-768494-7d8a0873b7584160a109075cfd53f25a.json)に従い、`git pull --rebase origin main` で `cdb1ffe` を取り込んだ。変更記録の競合は両方の追記を保持して解消した。設計コミットは `b537e04` に変わったが、設計本文は同一。PR #1へ旧HEADを指定したforce-with-leaseで反映した。
+
+元のUI作業場所は変更せず、専用worktreeで実装する。実環境の設定・配置・UI結合試験はまだ行っていない。大会期間との対応は未確認。
+
+Codexが `contracts/` のSolidity・CLI・試験・ABI、`apps/web/` のlive Gateway・HTTP・接続API・型/validator生成物・試験・専用Worker設定、`specs/openapi.yaml`、OpenAPI検証スクリプト、OpenSpecタスクと設計状態、SPEC・ARCHITECTUREの実装状態、[起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md)、[実装・検証記録](CURVEGRID_INTEGRATION_IMPLEMENTATION.md)を作成・更新した。既存mock 19シナリオを維持した。検証結果と残る依存監査指摘は実装記録を参照。実環境のキーは未設定で、実疎通・公開・スマホ結合試験は未実施。

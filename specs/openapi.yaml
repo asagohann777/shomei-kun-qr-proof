@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: 証明くん Web API
-  version: 0.1.0
-  description: 固定モックAPIの契約。apps/webに参照実装がある。固定サンプルを返すモックを対象とし、署名・送信・保存は行わない。例のアドレス、ハッシュ、ブロック番号は模擬値であり実証跡ではない。
+  version: 0.2.0
+  description: 固定mockとCurvegrid Testnet向けlive APIの契約。liveはMultiBaas経由で読取り・未署名取引の準備・記録の照合を行う。登録者本人がウォレットで署名・送信する。応答例は合成データであり実証跡ではない。
 servers:
 - url: /
   description: API配置先と同一オリジン。既存の静的UIモックはこのAPIに未接続。
@@ -83,6 +83,14 @@ paths:
               examples:
                 UPSTREAM_UNAVAILABLE:
                   $ref: '#/components/examples/UPSTREAM_UNAVAILABLE'
+                CONNECTION_MISMATCH:
+                  $ref: "#/components/examples/CONNECTION_MISMATCH"
+                MULTIBAAS_AUTH_FAILED:
+                  $ref: "#/components/examples/MULTIBAAS_AUTH_FAILED"
+                UPSTREAM_TIMEOUT:
+                  $ref: "#/components/examples/UPSTREAM_TIMEOUT"
+                CONFIGURATION_MISSING:
+                  $ref: "#/components/examples/CONFIGURATION_MISSING"
         '500':
           description: INTERNAL_ERROR
           headers:
@@ -97,6 +105,21 @@ paths:
               examples:
                 INTERNAL_ERROR:
                   $ref: '#/components/examples/INTERNAL_ERROR'
+        "403":
+          description: API response
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                pattern: (^|,\s*)no-store(\s*,|$)
+              description: Responses must not be stored.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                ORIGIN_NOT_ALLOWED:
+                  $ref: "#/components/examples/ORIGIN_NOT_ALLOWED"
       x-mock-scenarios:
         default:
           status: 200
@@ -244,6 +267,14 @@ paths:
               examples:
                 UPSTREAM_UNAVAILABLE:
                   $ref: '#/components/examples/UPSTREAM_UNAVAILABLE'
+                CONNECTION_MISMATCH:
+                  $ref: "#/components/examples/CONNECTION_MISMATCH"
+                MULTIBAAS_AUTH_FAILED:
+                  $ref: "#/components/examples/MULTIBAAS_AUTH_FAILED"
+                UPSTREAM_TIMEOUT:
+                  $ref: "#/components/examples/UPSTREAM_TIMEOUT"
+                CONFIGURATION_MISSING:
+                  $ref: "#/components/examples/CONFIGURATION_MISSING"
         '500':
           description: INTERNAL_ERROR
           headers:
@@ -258,6 +289,21 @@ paths:
               examples:
                 INTERNAL_ERROR:
                   $ref: '#/components/examples/INTERNAL_ERROR'
+        "403":
+          description: API response
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                pattern: (^|,\s*)no-store(\s*,|$)
+              description: Responses must not be stored.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                ORIGIN_NOT_ALLOWED:
+                  $ref: "#/components/examples/ORIGIN_NOT_ALLOWED"
       x-mock-scenarios:
         default:
           status: 200
@@ -361,6 +407,14 @@ paths:
               examples:
                 UPSTREAM_UNAVAILABLE:
                   $ref: '#/components/examples/UPSTREAM_UNAVAILABLE'
+                CONNECTION_MISMATCH:
+                  $ref: "#/components/examples/CONNECTION_MISMATCH"
+                MULTIBAAS_AUTH_FAILED:
+                  $ref: "#/components/examples/MULTIBAAS_AUTH_FAILED"
+                UPSTREAM_TIMEOUT:
+                  $ref: "#/components/examples/UPSTREAM_TIMEOUT"
+                CONFIGURATION_MISSING:
+                  $ref: "#/components/examples/CONFIGURATION_MISSING"
         '500':
           description: INTERNAL_ERROR
           headers:
@@ -375,6 +429,21 @@ paths:
               examples:
                 INTERNAL_ERROR:
                   $ref: '#/components/examples/INTERNAL_ERROR'
+        "403":
+          description: API response
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                pattern: (^|,\s*)no-store(\s*,|$)
+              description: Responses must not be stored.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                ORIGIN_NOT_ALLOWED:
+                  $ref: "#/components/examples/ORIGIN_NOT_ALLOWED"
       x-mock-scenarios:
         default:
           status: 200
@@ -400,6 +469,76 @@ paths:
         unavailable:
           status: 503
           example: UPSTREAM_UNAVAILABLE
+  /api/v1/connection:
+    get:
+      operationId: getConnection
+      summary: 設定したMultiBaasとRPCの接続確認
+      responses:
+        "200":
+          description: API response
+          headers: &a1
+            Cache-Control:
+              schema:
+                type: string
+                pattern: (^|,\s*)no-store(\s*,|$)
+              description: Responses must not be stored.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectionResponse"
+              examples:
+                connection-mock:
+                  $ref: "#/components/examples/connection-mock"
+                connection-live:
+                  $ref: "#/components/examples/connection-live"
+        "400":
+          description: API response
+          headers: *a1
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                INVALID_MOCK_SCENARIO:
+                  $ref: "#/components/examples/INVALID_MOCK_SCENARIO"
+        "403":
+          description: API response
+          headers: *a1
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                ORIGIN_NOT_ALLOWED:
+                  $ref: "#/components/examples/ORIGIN_NOT_ALLOWED"
+        "500":
+          description: API response
+          headers: *a1
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                INTERNAL_ERROR:
+                  $ref: "#/components/examples/INTERNAL_ERROR"
+        "503":
+          description: API response
+          headers: *a1
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                CONFIGURATION_MISSING:
+                  $ref: "#/components/examples/CONFIGURATION_MISSING"
+                CONNECTION_MISMATCH:
+                  $ref: "#/components/examples/CONNECTION_MISMATCH"
+                MULTIBAAS_AUTH_FAILED:
+                  $ref: "#/components/examples/MULTIBAAS_AUTH_FAILED"
+                UPSTREAM_TIMEOUT:
+                  $ref: "#/components/examples/UPSTREAM_TIMEOUT"
+                UPSTREAM_UNAVAILABLE:
+                  $ref: "#/components/examples/UPSTREAM_UNAVAILABLE"
 components:
   parameters:
     CardId:
@@ -458,7 +597,7 @@ components:
           enum:
           - mock
           - live
-      description: 今回はmockのみ返す。liveは将来の実接続用。mockの場合、実ウォレットへの引渡しと外部取引リンクを禁止する。
+      description: mockは模擬操作、liveは設定したチェーンの実記録。mockの取引は実送信不可。
     Owner:
       type: object
       additionalProperties: false
@@ -481,7 +620,8 @@ components:
       properties:
         chainId:
           type: integer
-          const: 80002
+          minimum: 1
+          maximum: 9007199254740991
         contractAddress:
           $ref: '#/components/schemas/Address'
         issuer:
@@ -588,9 +728,11 @@ components:
         chainId:
           type: integer
           minimum: 1
+          maximum: 9007199254740991
         nickname:
           type: string
           minLength: 1
+          description: liveでは1〜96 UTF-8バイト、不正Unicodeを拒否する。trim・正規化なし。mockは固定サンプルだけ受理。
     UnsignedTransaction:
       type: object
       additionalProperties: false
@@ -603,7 +745,8 @@ components:
       properties:
         chainId:
           type: integer
-          const: 80002
+          minimum: 1
+          maximum: 9007199254740991
         from:
           $ref: '#/components/schemas/Address'
         to:
@@ -756,29 +899,150 @@ components:
         meta:
           $ref: '#/components/schemas/Meta'
         error:
-          type: object
-          additionalProperties: false
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: string
-              enum:
-              - INVALID_INPUT
-              - INVALID_MOCK_SCENARIO
-              - CARD_NOT_FOUND
-              - ALREADY_REGISTERED
-              - WALLET_NOT_ALLOWED
-              - CHAIN_MISMATCH
-              - MOCK_SAMPLE_UNSUPPORTED
-              - UPSTREAM_UNAVAILABLE
-              - INTERNAL_ERROR
-              - PAYLOAD_TOO_LARGE
-              - UNSUPPORTED_MEDIA_TYPE
-            message:
-              type: string
-              minLength: 1
+          oneOf:
+          - type: object
+            additionalProperties: false
+            required:
+            - code
+            - message
+            properties:
+              code:
+                type: string
+                enum:
+                - INVALID_INPUT
+                - INVALID_MOCK_SCENARIO
+                - CARD_NOT_FOUND
+                - ALREADY_REGISTERED
+                - WALLET_NOT_ALLOWED
+                - CHAIN_MISMATCH
+                - MOCK_SAMPLE_UNSUPPORTED
+                - UPSTREAM_UNAVAILABLE
+                - INTERNAL_ERROR
+                - PAYLOAD_TOO_LARGE
+                - UNSUPPORTED_MEDIA_TYPE
+                - ORIGIN_NOT_ALLOWED
+                - CONNECTION_MISMATCH
+                - MULTIBAAS_AUTH_FAILED
+                - UPSTREAM_TIMEOUT
+              message:
+                type: string
+                minLength: 1
+          - type: object
+            additionalProperties: false
+            required:
+            - code
+            - message
+            - details
+            properties:
+              code:
+                type: string
+                const: CONFIGURATION_MISSING
+              message:
+                type: string
+                minLength: 1
+              details:
+                type: object
+                additionalProperties: false
+                required:
+                - missingSettings
+                properties:
+                  missingSettings:
+                    type: array
+                    items:
+                      type: string
+                    minItems: 1
+    ConnectionResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - meta
+      - data
+      properties:
+        meta:
+          $ref: "#/components/schemas/Meta"
+        data:
+          oneOf:
+          - type: object
+            additionalProperties: false
+            required:
+            - status
+            - registry
+            properties:
+              status:
+                type: string
+                const: mock
+              registry:
+                $ref: "#/components/schemas/Registry"
+          - type: object
+            additionalProperties: false
+            required:
+            - status
+            - network
+            - registry
+            - latestBlock
+            - nicknameMaxUtf8Bytes
+            properties:
+              status:
+                type: string
+                const: ready
+              network:
+                type: object
+                additionalProperties: false
+                required:
+                - name
+                - chainId
+                - nativeCurrency
+                - rpcUrls
+                properties:
+                  name:
+                    type: string
+                    const: Curvegrid Testnet
+                  chainId:
+                    type: integer
+                    minimum: 1
+                    maximum: 9007199254740991
+                  nativeCurrency:
+                    type: object
+                    additionalProperties: false
+                    required:
+                    - name
+                    - symbol
+                    - decimals
+                    properties:
+                      name:
+                        type: string
+                        const: Ether
+                      symbol:
+                        type: string
+                        const: ETH
+                      decimals:
+                        type: integer
+                        const: 18
+                  rpcUrls:
+                    type: array
+                    minItems: 1
+                    maxItems: 1
+                    items:
+                      type: string
+                      pattern: ^https://
+              registry:
+                $ref: "#/components/schemas/Registry"
+              latestBlock:
+                type: object
+                additionalProperties: false
+                required:
+                - number
+                - hash
+                properties:
+                  number:
+                    type: integer
+                    minimum: 0
+                    maximum: 9007199254740991
+                  hash:
+                    $ref: "#/components/schemas/TransactionHash"
+              nicknameMaxUtf8Bytes:
+                type: integer
+                const: 96
   examples:
     registered:
       value:
@@ -967,6 +1231,77 @@ components:
         error:
           code: UNSUPPORTED_MEDIA_TYPE
           message: Use application/json.
+    ORIGIN_NOT_ALLOWED:
+      value:
+        meta:
+          mode: live
+        error:
+          code: ORIGIN_NOT_ALLOWED
+          message: Origin is not allowed.
+    CONNECTION_MISMATCH:
+      value:
+        meta:
+          mode: live
+        error:
+          code: CONNECTION_MISMATCH
+          message: Configured network or registry does not match.
+    MULTIBAAS_AUTH_FAILED:
+      value:
+        meta:
+          mode: live
+        error:
+          code: MULTIBAAS_AUTH_FAILED
+          message: MultiBaas authentication failed.
+    UPSTREAM_TIMEOUT:
+      value:
+        meta:
+          mode: live
+        error:
+          code: UPSTREAM_TIMEOUT
+          message: Upstream request timed out.
+    CONFIGURATION_MISSING:
+      value:
+        meta:
+          mode: live
+        error:
+          code: CONFIGURATION_MISSING
+          message: Required configuration is missing.
+          details:
+            missingSettings:
+            - MULTIBAAS_BASE_URL
+    connection-mock:
+      value:
+        meta:
+          mode: mock
+        data:
+          status: mock
+          registry:
+            chainId: 80002
+            contractAddress: "0x3333333333333333333333333333333333333333"
+            issuer: "0x4444444444444444444444444444444444444444"
+    connection-live:
+      value:
+        meta:
+          mode: live
+        data:
+          status: ready
+          network:
+            name: Curvegrid Testnet
+            chainId: 2017
+            nativeCurrency:
+              name: Ether
+              symbol: ETH
+              decimals: 18
+            rpcUrls:
+            - https://rpc.example/public-web3-key
+          registry:
+            chainId: 2017
+            contractAddress: "0x3333333333333333333333333333333333333333"
+            issuer: "0x4444444444444444444444444444444444444444"
+          latestBlock:
+            number: 100
+            hash: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          nicknameMaxUtf8Bytes: 96
 x-mock-sample:
   cardId: SK-2026-001
   playerName: 証明一郎

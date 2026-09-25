@@ -4,7 +4,7 @@
 
 背景は [proposal](proposal.md) を参照。現在のAPIはmockのみで、固定のAmoy chain IDを返す。実接続の設定値は未提供。UIは別担当が並行開発する。
 
-詳細なAPI形式、ABI、設定、エラー、CLI手順、試験条件は [詳細設計](../../../specs/CURVEGRID_INTEGRATION_DESIGN.md) を正とする。この文書は構成上の判断を記録する。設計は未承認であり、artifactの完成は実装開始の許可を意味しない。
+詳細なAPI形式、ABI、設定、エラー、CLI手順、試験条件は [詳細設計](../../../specs/CURVEGRID_INTEGRATION_DESIGN.md) を正とする。この文書は構成上の判断を記録する。ユーザーは詳細設計 `453387e` と同じPRでの実装を承認した。承認の出典は詳細設計から参照できる。
 
 ## Goals / Non-Goals
 

@@ -1,8 +1,8 @@
 # QR登録機能のアーキテクチャ
 
-状態: 2026-09-25の追加指示により、MultiBaas API中心・Polygon Amoyへ改訂した設計。以下の実接続構成は未実装。接続環境の確認・互換性検証も未実施。相談用UIモックの構成は [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) を参照する。
+状態: 2026-09-25の追加指示により、MultiBaas API中心・Polygon Amoyへ改訂した設計。Amoyに先行してCurvegrid Testnet向けのAPI・コントラクト・CLIを実装した。実接続環境の確認は未実施。相談用UIモックの構成は [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) を参照する。
 
-固定モックAPIは [apps/web](../apps/web/README.md) に実装した。MultiBaas・署名・送信は模擬し、既存UIへの接続と実接続構成の実装は後続とする。検証結果は [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md) を参照する。
+固定モックAPIは [apps/web](../apps/web/README.md) に実装した。mockは固定応答を維持する。追加したlive構成は [Curvegrid詳細設計](CURVEGRID_INTEGRATION_DESIGN.md) と [実装記録](CURVEGRID_INTEGRATION_IMPLEMENTATION.md) を参照。画面・MetaMask接続はUI担当が実装する。検証結果は [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md) を参照する。
 
 ## 構成と責務
 
@@ -64,7 +64,7 @@ QRは発行単位とカードを特定できる公開ページURLを指す。URL
 
 ## 最小インターフェース
 
-以下は実接続時の責務と入出力の定義である。Web APIの固定モック契約は [BACKEND_DESIGN.md](BACKEND_DESIGN.md) と [openapi.yaml](openapi.yaml) に定義した。ABI・Gatewayの実接続型・CLIコマンド名は後続の設計で確定する。
+以下は実接続時の責務と入出力の定義である。Web APIの固定モック契約は [BACKEND_DESIGN.md](BACKEND_DESIGN.md) と [openapi.yaml](openapi.yaml) に定義した。ABI・Gatewayの実接続型・CLIコマンドはCurvegrid詳細設計と実装に定義した。
 
 | 操作 | 入力 | 結果・制約 |
 | --- | --- | --- |

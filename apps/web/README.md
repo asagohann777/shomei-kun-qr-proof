@@ -1,6 +1,6 @@
-# 固定モックAPIを動かす
+# 証明くんAPIを動かす
 
-Next.js・TypeScriptによる、カード取得・登録準備・登録確認のAPIです。MultiBaas、ウォレット署名、Amoyへの送信はモックです。登録結果は保存しません。相談用の[静的UI](../../prototypes/mobile-ui/README.md)は独立しており、このAPIへ接続していません。
+Next.js・TypeScriptによる、カード取得・登録準備・登録確認のAPIです。`mock` は固定応答、`live` はMultiBaas経由でCurvegrid Testnetの記録を扱います。署名・送信は本人のウォレットで行います。以下の起動例はmock用です。相談用の[静的UI](../../prototypes/mobile-ui/README.md)は独立しており、このAPIへ接続していません。
 
 ## 起動
 
@@ -13,7 +13,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-`BACKEND_MODE=mock` が必須です。未指定・`live`・未知の値では起動しません。APIキーや秘密鍵は不要です。ルート `/` に画面はありません。
+`BACKEND_MODE=mock` を指定します。未指定・未知の値では起動しません。mockにはAPIキーや秘密鍵は不要です。liveの設定手順は末尾のリンクを参照してください。ルート `/` に画面はありません。
 
 ## カード取得
 
@@ -76,3 +76,7 @@ npm test
 生成先は `src/generated/` です。型、サンプル・シナリオ、スキーマ検証関数をGitへ含めます。ビルドは生成物が古い場合に失敗します。検証関数はAjvで事前生成し、Workers上で `eval` や `new Function` を呼びません。
 
 [実装と検証の記録](../../specs/BACKEND_IMPLEMENTATION.md)に試験の対応を記載します。実際の署名・Amoy・MultiBaasの試験とは区別してください。
+
+## Curvegrid Testnetの実接続
+
+`BACKEND_MODE=live`、接続確認API、MultiBaas Gateway、専用Worker構成を追加した。設定・UI接続・検証の手順は [Curvegrid連携の起動手順](../../specs/CURVEGRID_INTEGRATION_RUNBOOK.md) を参照。既存mockの固定応答は維持する。実環境のキーと配置先を設定するまでは接続成功にならない。

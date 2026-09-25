@@ -1,10 +1,10 @@
 # Curvegrid Testnet連携の詳細設計
 
-状態: **レビュー待ち。未承認・未実装。** 2026-09-26 JST。計画保存と設計作成は承認済みだが、この設計に基づくコード変更はユーザーの確認後に開始する。
+状態: **実装済み・実環境の接続確認待ち。** 2026-09-26 JST。承認対象は `453387e`。リベース後の同一設計は `b537e04`。承認の出典は [変更記録](HACKATHON_CHANGES.md) を参照。
 
 [計画](CURVEGRID_INTEGRATION_PLAN.md) / [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) / [既存モック設計](BACKEND_DESIGN.md)
 
-## 1. レビュー対象と現状
+## 1. レビュー対象と設計時点の現状
 
 ユーザーが決めたのは、Curvegrid Testnet、実際の登録・書込み、新規の所有者登録コントラクト、自由入力のニックネーム、通常ブラウザからMetaMaskへの接続、API・コントラクト・CLIとUIの担当分離である。本書のABI、設定名、エラー、制限値、CLI操作はこれらを具体化した提案で、設計承認まで確定扱いにしない。
 
@@ -104,7 +104,7 @@ MultiBaasのchain ID、RPCの `eth_chainId`、期待設定を比較する。Mult
 
 既存の `cardId` の英数字・`_`・`-`、1〜64文字を維持する。住所・ハッシュの形式も維持し、16進値だけを小文字へ正規化する。カード名は今回「証明一郎」のアプリ側表示値とし、別選手・画像管理のAPIは追加しない。
 
-登録準備の必須JSONは `walletAddress`、`chainId`、`nickname` の3フィールドだけ。本文上限は既存どおり16 KiB。自由入力はliveだけに導入し、UTF-8で1〜96バイト、空白除去・Unicode正規化なしとする。JSONの孤立サロゲートを400にし、エンコード時の置換文字による変化を防ぐ。OpenAPIにmaxLengthとUTF-8制約の説明を追加し、バイト長は境界で検証する。
+登録準備の必須JSONは `walletAddress`、`chainId`、`nickname` の3フィールドだけ。本文上限は既存どおり16 KiB。自由入力はliveだけに導入し、UTF-8で1〜96バイト、空白除去・Unicode正規化なしとする。JSONの孤立サロゲートを400にし、エンコード時の置換文字による変化を防ぐ。OpenAPIにliveのUTF-8制約を記載し、バイト長とUnicodeの妥当性はHTTP境界で検証する。mockの既存入力契約は維持する。
 
 形式・サイズ、liveのシナリオヘッダー、設定、上流取得、未発行、登録済み、チェーン、許可ウォレットの順で判定する。サーバーでのアドレス一致は取引準備の条件であり、本人確認済みとはしない。
 
@@ -272,7 +272,7 @@ C10/C11の実測記録にはchain ID、contract、cardId、登録hash、block、
 - ローカル暗号化キーストア、再開用state、配置・発行CLIの操作。
 - 既存mock互換性と、ユーザー承認後にだけ実装・実接続検証へ進む手順。
 
-承認状態は「未承認」。承認時はこの設計を含むPRコミットSHAとユーザーの確認への参照を変更記録へ残す。OpenSpecのartifactが揃っていても承認済みにしない。
+承認済みのPRコミットSHAとユーザーの確認への参照は変更記録に保存した。OpenSpecのartifactが揃っていても承認済みにしない。
 
 ## 12. 根拠と未取得の環境情報
 
@@ -292,3 +292,9 @@ C10/C11の実測記録にはchain ID、contract、cardId、登録hash、block、
 - [Library登録](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/BaseContract.md)
 - [リンクと開始ブロック](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/LinkAddressContractRequest.md)
 - [会話の選択と出典](../docs/prompts/curvegrid-integration-decisions.md)
+
+## 13. 実装への参照
+
+[起動・UI接続手順](CURVEGRID_INTEGRATION_RUNBOOK.md)、[SolidityとCLI](../contracts/README.md)、[OpenAPI](openapi.yaml) を参照。ABIはコンパイル成果物をAPIとCLIで共有する。MultiBaasのABIリンクはaddress取得のcontractsで確認し、Libraryのラベル・バージョンとABIも照合する。
+
+本書のC10/C11/C12は実環境・UI担当との結合確認として残る。ローカル試験を実疎通の実績には数えない。

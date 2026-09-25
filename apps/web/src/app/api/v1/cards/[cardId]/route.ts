@@ -4,3 +4,5 @@ export async function GET(request: Request, context: { params: Promise<{ cardId:
   const { cardId } = await context.params;
   return handleCardRequest(request, cardId);
 }
+
+export const OPTIONS = GET;
