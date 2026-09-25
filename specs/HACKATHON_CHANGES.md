@@ -217,3 +217,17 @@ Node.js 22.22.3でビルド成功。Chromium 149.0.7827.55とWebKit 26.5で検�
 撮影画像を目視して図案との構成を確認した。`git diff --check`、JavaScriptの構文、追加文書のリンクも確認した。実機・カメラ・実ウォレット・API接続は今回の検証対象外。バックエンドは変更していない。公開URLは前回版のまま。
 
 2026-09-26の追加指示で、スキャン入口の「カード右下のQRを読み取る」と対応する英語文言を削除した。Codexが表示要素、翻訳キー、専用CSSを削除した。
+
+## 2026-09-26: UIワイヤーの公開
+
+ユーザーのcommit・push・デプロイ指示により、画像保存コミット `164a180` とUI変更コミット `43adc92` を `origin/main` へpushした。両コミットにおじいちゃんコンビニ、GitHub ID `asagohann777` を共同著者として記載した。
+
+`prototypes/mobile-ui` でNode.js 22.22.3を使い `npm run deploy` を実行した。既存Worker `shomei-kun-ui-mock` を更新し、バージョン `d5e84b0c-9153-48eb-9c5e-9325947732cd` を公開した。バックエンドのデプロイは行っていない。前節の未コミット・未push・未デプロイという記述は公開前の作業時点を示す。
+
+公開先は [UIモック](https://shomei-kun-ui-mock.dptr.workers.dev/)。公開版に対して `MOCK_BASE_URL=https://shomei-kun-ui-mock.dptr.workers.dev npm run verify` を実行し、Chromium 149.0.7827.55・WebKit 26.5とも成功した。日英、320・390・430pxとPC幅、登録・修正・同意・承認・完了・再読込・異常時の操作を確認した。7アセットはローカルのビルドとバイト単位・SHA-256で一致した。アプリのコンソールエラーは0件。WebKit撮影ツール由来のCSP警告78件は既存の条件に従い別記録した。
+
+Chromeでも公開ページを開き、日英切替と「カード右下のQRを読み取る」の削除を確認した。公開版も操作モックで、実登録は行わない。背景・カードは仮素材のまま。独立したウォレット承認画面は模擬操作として残しており、削除の実装指示は受けていない。
+
+- [公開版の検証結果](assets/ui-wireframe-2026-09-26/live-results.json)
+- [公開版のスキャン入口](assets/ui-wireframe-2026-09-26/live-scan-entry.png)
+- [公開指示のhook記録](../docs/prompts/2026-09-25/205941-947650-e23f000083874e1e9462c37e4acf41d8.json)
