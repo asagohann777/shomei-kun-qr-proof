@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T21:15:54.577823+00:00",
+  "session_id": "01a0d8d4-ba22-7360-aac5-8461d75f59e2",
+  "turn_id": "01a0da6c-b75b-78f1-abbc-4d74a7205448",
+  "prompt": "登録中のアニメーション凝ってほしいです　画像参照",
+  "model": "gpt-6-astra"
+}

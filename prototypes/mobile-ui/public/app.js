@@ -3,12 +3,16 @@ import { messages } from './messages.js';
 const root = document.querySelector('#app');
 const sessionKey = 'shomei.mobile-mock.v1';
 const localeKey = 'shomei.mobile-mock.locale';
-const scenarios = ['registered', 'unregistered', 'not-found', 'wrong-wallet', 'wrong-chain', 'rejected', 'failed', 'unknown', 'evidence-pending', 'unavailable'];
-const scenarioKeys = ['registered', 'unregistered', 'notFound', 'wrongWallet', 'wrongChain', 'rejected', 'failed', 'unknown', 'evidencePending', 'unavailable'];
-const views = ['scan', 'card', 'register', 'review', 'approval', 'sent', 'confirming', 'success', 'rejected', 'failed', 'unknown'];
+const scenarios = ['registered', 'unregistered', 'not-found', 'wrong-wallet', 'wrong-chain', 'rejected', 'failed', 'unknown', 'evidence-pending', 'unavailable', 'registering'];
+const scenarioKeys = ['registered', 'unregistered', 'notFound', 'wrongWallet', 'wrongChain', 'rejected', 'failed', 'unknown', 'evidencePending', 'unavailable', 'registering'];
+const views = ['scan', 'card', 'register', 'review', 'approval', 'sent', 'confirming', 'success', 'rejected', 'failed', 'unknown', 'processing-preview'];
 const cardStates = ['registered', 'unregistered', 'not-found', 'evidence-pending', 'unavailable'];
 const walletStates = ['disconnected', 'valid', 'wrong-wallet', 'wrong-chain'];
 const icons = {
+  flash: '<path d="m13.5 2-9 12h6L9.5 22l10-13h-6z" fill="currentColor" stroke-width="1"/>',
+  photo: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="15.5" cy="8.5" r="1.5"/><path d="m3 17 6-6 5 5 3-3 4 4"/>',
+  cube: '<path d="m12 2 9 5v10l-9 5-9-5V7zm0 10 9-5M12 12 3 7m9 5v10m-4-17 9 5v6"/>',
+  link: '<path d="m10 14 4-4m-5 6-2 2a4 4 0 0 1-5-5l5-5a4 4 0 0 1 5 0m0 8a4 4 0 0 0 5 0l5-5a4 4 0 0 0-5-5l-2 2"/>',
   check: '<path d="m5 12 4 4L19 6"/>',
   qr: '<path d="M3 3h6v6H3zm12 0h6v6h-6zM3 15h6v6H3zm12 0h2v2h-2zm4 0h2v6h-6v-2"/>',
   arrow: '<path d="m9 5 7 7-7 7"/>',
@@ -35,7 +39,7 @@ let state = restore();
 
 function fixture(scenario = 'registered', entry = null) {
   const card = cardStates.includes(scenario) ? scenario : 'unregistered';
-  const view = ['wrong-wallet', 'wrong-chain'].includes(scenario) ? 'register' : ['rejected', 'failed', 'unknown'].includes(scenario) ? scenario : 'card';
+  const view = scenario === 'registering' ? 'processing-preview' : ['wrong-wallet', 'wrong-chain'].includes(scenario) ? 'register' : ['rejected', 'failed', 'unknown'].includes(scenario) ? scenario : 'card';
   return { version: 1, entry, scenario, view, card, wallet: ['wrong-wallet', 'wrong-chain'].includes(scenario) ? scenario : 'disconnected', nickname: 'おじいちゃんコンビニ', consent: false, attempt: ['failed', 'unknown'].includes(scenario) ? 'sample-attempt' : null, submittedAt: null };
 }
 
@@ -76,7 +80,7 @@ function footer(action, label, extra = '', disabled = false, secondary = false) 
 }
 function scanView() {
   if (!cameraOpen) return `<section class="page entry-page"><h1 class="page-title">${lines('scanTitle')}</h1><div class="scan-intro">${tradingCard()}</div></section>${footer('open-camera', `${icon('qr')}${t('openCamera')}`)}`;
-  return `<section class="page camera-page"><button class="flash-button" data-action="flash">${icon('info')}${t('flash')}</button><div class="scanner" aria-label="${t('scanHint')}"><div class="scan-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div><img class="scan-center" src="./card-qr.svg" alt="${t('qrAlt')}"></div><h1 class="scan-status">${icon('qr')}${t('cameraTitle')}</h1><div class="scan-tools"><button class="round-tool" data-action="photos">${icon('card')}<span>${t('fromPhotos')}</span></button><button class="round-tool" data-action="help">${icon('info')}<span>${t('help')}</span></button></div></section>${footer('scan', `${scanning ? '<span class="loading loading-spinner loading-xs"></span>' : ''}${t(scanning ? 'scanLoading' : 'scanButton')}`, '', scanning)}`;
+  return `<section class="page camera-page"><button class="flash-button" data-action="flash">${icon('flash')}<span>${t('flash')}</span></button><div class="scanner" aria-label="${t('scanHint')}"><div class="scan-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div><img class="scan-center" src="./card-qr.svg" alt="${t('qrAlt')}"><div class="scan-light-track" aria-hidden="true"><div class="scan-sweep"></div></div></div><h1 class="scan-status"><span class="scan-status-ring" aria-hidden="true"></span>${t('cameraTitle')}</h1><div class="scan-tools"><button class="round-tool" data-action="photos">${icon('photo')}<span>${t('fromPhotos')}</span></button><button class="round-tool" data-action="help">${icon('info')}<span>${t('help')}</span></button></div></section>${footer('scan', `${scanning ? '<span class="loading loading-spinner loading-xs"></span>' : ''}${t(scanning ? 'scanLoading' : 'scanButton')}`, '', scanning)}`;
 }
 function detailTable(includeOwner = true) {
   const rows = includeOwner ? [['cardName', `${t('player')} / ${t('cardType')}`], ['cardId', 'TC-001'], ['ownerLabel', state.nickname], ['wallet', t('simulatedAddress')], ['registeredAt', state.submittedAt ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(state.submittedAt) : t('sampleDate')]] : [['nickname', state.nickname], ['wallet', t('simulatedAddress')], ['cardId', 'TC-001']];
@@ -101,11 +105,14 @@ function registerView() {
 function reviewView() {
   return `<section class="page review-page"><h1 class="page-title">${t('confirmTitle')}</h1>${tradingCard()}<div class="info-panel"><h2 class="panel-title">${t('confirmHeading')}</h2>${detailTable(false)}<label class="consent-label"><input type="checkbox" class="consent-checkbox" id="consent" ${state.consent ? 'checked' : ''}><span>${t('consent')}</span></label><button class="btn btn-primary panel-primary" data-action="register-reviewed" ${state.consent && ready() ? '' : 'disabled'}>${t('registerNow')}${icon('arrow')}</button><button class="btn btn-outline edit-button" data-action="edit-review">${icon('back')}${t('edit')}</button></div></section>`;
 }
+function registrationScene() {
+  return `<div class="registration-scene" aria-hidden="true"><div class="network-orbit"><span class="orbit-tracer"></span></div><div class="network-cube cube-top">${icon('cube')}</div><div class="network-cube cube-left">${icon('cube')}</div><div class="network-cube cube-right">${icon('cube')}</div><div class="registration-card">${tradingCard()}</div><div class="connection-beam"></div><div class="scene-platform"><span></span><span></span><span></span></div><div class="scene-terminal terminal-qr">${icon('qr')}</div><div class="scene-terminal terminal-wallet">${icon('wallet')}</div></div><div class="registration-indicator" aria-hidden="true"><div class="indicator-orbit"></div><div class="indicator-center">${icon('link')}</div></div>`;
+}
 function processView() {
   const view = state.view;
   if (view === 'success') return registeredView(true);
-  const active = ['sent', 'confirming'].includes(view);
-  if (active) return `<section class="page processing-page">${tradingCard()}<div class="status-symbol progress-symbol"><span class="loading loading-spinner loading-lg"></span></div><h1 class="page-title" aria-live="polite">${t(view + 'Title')}</h1><p class="process-copy">${t(view + 'Copy')}</p></section>`;
+  const active = ['sent', 'confirming', 'processing-preview'].includes(view);
+  if (active) return `<section class="page processing-page" aria-busy="true">${registrationScene()}<h1 class="page-title" role="status">${t('confirmingTitle')}</h1><p class="process-copy">${t(view === 'sent' ? 'sentCopy' : 'confirmingCopy')}</p></section>`;
   const config = { approval: ['wallet', '', 'approvalTitle', 'approvalCopy'], rejected: ['close', '', 'rejectedTitle', 'rejectedCopy'], failed: ['close', 'error', 'failedTitle', 'failedCopy'], unknown: ['info', 'warning', 'unknownTitle', 'unknownCopy'] }[view];
   return `<section class="page"><div class="status-symbol ${config[1]}">${icon(config[0])}</div><h1 class="page-title">${t(config[2])}</h1><p class="process-copy">${t(config[3])}</p>${view === 'approval' ? `<div class="info-panel">${detailTable(false)}</div><button class="btn btn-ghost home-link" data-action="reject">${t('reject')}</button>` : ''}</section>${footer(view === 'approval' ? 'approve' : view === 'unknown' ? 'recheck' : 'edit-again', t(view === 'approval' ? 'approve' : view === 'unknown' ? 'recheck' : 'editAgain'))}`;
 }

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T21:42:35.545477+00:00",
+  "session_id": "01a0d8d4-ba22-7360-aac5-8461d75f59e2",
+  "turn_id": "01a0da85-26b0-72f3-850f-12aa291b9bf9",
+  "prompt": "commit と pushをしておいてください",
+  "model": "gpt-6-astra"
+}

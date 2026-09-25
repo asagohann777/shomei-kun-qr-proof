@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T21:26:43.209774+00:00",
+  "session_id": "01a0d8d4-ba22-7360-aac5-8461d75f59e2",
+  "turn_id": "01a0da76-9cd9-77b3-8ecc-d64704b02a25",
+  "prompt": "QRコードを読み取り中　写真から　使い方のボタンの質感をデザインに寄せる　スキャンの枠とかもアニメーションつける　ライト　アイコンつける",
+  "model": "gpt-6-astra"
+}

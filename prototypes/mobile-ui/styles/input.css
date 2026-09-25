@@ -59,19 +59,80 @@
   .trading-card { width: 56%; max-width: 205px; position: relative; margin: 24px auto; }
   .trading-card > img:first-child { width: 100%; height: auto; border: 2px solid white; border-radius: 10px; }
   .card-qr { position: absolute; width: 24%; right: 6%; bottom: 13%; border: 2px solid white; }
-  .info-panel { background: #ffffffd9; border: 1px solid white; border-radius: 20px; padding: 20px 16px; }
+  .info-panel {
+    border-radius: 20px;
+    padding: 20px 16px;
+    background: radial-gradient(ellipse at 16% 0%, #ffffffc9, transparent 58%), linear-gradient(135deg, #f5faffb3, #dbeaff80 52%, #f5faffbf);
+    border: 1px solid #fffffff2;
+    box-shadow: inset 0 1px 3px #fff, inset 0 -1px 4px #c3dcf766, 0 4px 14px #467aaa12;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
   .card-summary { text-align: center; margin: 0 16px; }
   .card-summary h2 { font-size: 23px; font-weight: 800; }
   .card-summary p { font-size: 16px; color: #36587b; margin-top: 5px; }
-  .registration-badge { display: inline-block; color: #1261b3; background: white; border-radius: 28px; margin-top: 12px; padding: 5px 24px; font-weight: 700; }
+  .registration-badge {
+    display: inline-block;
+    color: #1261b3;
+    background: linear-gradient(170deg, #fff 10%, #ffffffde 60%, #edf5ffeb);
+    border: 1px solid #fffffff2;
+    border-radius: 28px;
+    margin-top: 12px;
+    padding: 5px 24px;
+    font-weight: 700;
+    box-shadow: inset 0 1px 2px #fff, inset 0 -1px 3px #c9dff547, 0 1px 3px #5b90c00a;
+  }
   .bottom-actions { padding: 20px 40px 0; }
   .btn { box-shadow: none; }
   .bottom-actions .btn, .panel-primary { width: 100%; min-height: 54px; height: auto; padding: 12px 18px; font-size: 20px; border-radius: 30px; display: flex; justify-content: center; gap: 14px; }
-  .btn-primary { background: #0068f5; color: white; border-color: #0068f5; }
-  .btn-primary:disabled { background: #d9e3ef; color: #65768d; border-color: #d9e3ef; }
-  .btn-outline { color: #1261b3; border-color: #9bbde6; background: white; }
+  .btn-primary {
+    background: linear-gradient(180deg, #006cdb 0%, #0055ed 100%);
+    color: #fff;
+    border: 1px solid #76c9ff;
+    box-shadow: inset 0 1px 1px #ffffff70, inset 0 -2px 3px #0045b538, 0 4px 10px #0063d51a;
+    text-shadow: 0 1px 1px #0043a838;
+  }
+  .bottom-actions .btn-primary, .panel-primary {
+    position: relative;
+    background: linear-gradient(180deg, #008cf5 0%, #0075fc 42%, #0055ed 100%);
+    border-color: #bcefff;
+    box-shadow: inset 0 1px 1px #ffffff85, inset 0 -2px 4px #0045ce38, 0 0 0 1px #ffffff8c, 0 0 17px #5bdfff5c, 0 7px 15px #0072db24;
+  }
+  .bottom-actions [data-action="start-register"], .bottom-actions [data-action="confirm"], .panel-primary { padding-inline: 48px; }
+  .bottom-actions [data-action="start-register"] .icon, .bottom-actions [data-action="confirm"] .icon, .panel-primary .icon { position: absolute; right: 22px; width: 26px; height: 26px; }
+  .btn-outline {
+    color: #1261b3;
+    border: 1px solid #90b8ea;
+    background: linear-gradient(160deg, #fff 15%, #edf5ff 100%);
+    box-shadow: inset 0 1px 0 #fff, inset 0 0 0 1px #ffffffb3, 0 2px 5px #3e77ae0d;
+  }
+  .round-button, .round-tool {
+    background: linear-gradient(145deg, #fff 25%, #f2f7ff 100%);
+    border: 1px solid #ffffffeb;
+    box-shadow: inset 0 1px 2px #fff, 0 3px 8px #447faa12;
+  }
+  .btn-primary:enabled:active, .btn-outline:enabled:active, .round-button:enabled:active, .round-tool:enabled:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 5px #003a7a26;
+  }
+  .btn-primary:disabled, .btn-outline:disabled {
+    background: #d9e3ef;
+    color: #65768d;
+    border-color: #d9e3ef;
+    box-shadow: none;
+    text-shadow: none;
+  }
+  .round-button:disabled { box-shadow: none; }
+  .btn:focus-visible, .round-button:focus-visible, .round-tool:focus-visible { outline: 3px solid #080e48; outline-offset: 4px; }
   .status-symbol { width: 50px; height: 50px; margin: 0 auto 16px; display: grid; place-items: center; border-radius: 50%; background: #0068f5; color: white; }
   .status-symbol .icon { width: 30px; height: 30px; }
+  .read-page .status-symbol {
+    background: radial-gradient(circle at 32% 22%, #44c6ff 0%, #0799f3 32%, #0071e4 65%, #0055c3 100%);
+    border: 1px solid #eaffff;
+    box-shadow: inset 0 2px 5px #c5faff99, inset 0 -2px 4px #0046bb4d, 0 0 0 2px #ffffff73, 0 0 15px #5edbff6b, 0 3px 8px #006ed52b;
+  }
+  .read-page .status-symbol .icon { stroke-width: 3.2; filter: drop-shadow(0 1px 1px #0076cd40); }
+
   .status-symbol.success { background: #16804a; width: 68px; height: 68px; }
   .status-symbol.error { background: #b42332; }
   .status-symbol.warning { background: #916200; }
@@ -103,27 +164,60 @@
   .recorded-note strong { font-size: 16px; }
   .recorded-note p { font-size: 11px; margin-top: 3px; }
   .home-link { display: flex; margin: 12px auto 0; min-height: 44px; }
-  .processing-page { padding-top: 54px; }
-  .processing-page .trading-card { width: 59%; }
-  .progress-symbol { width: 92px; height: 92px; margin: 32px auto 20px; border: 8px solid #bce1ff; }
+  .processing-page { padding-top: 16px; overflow: hidden; }
+  .registration-scene { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1.17; margin: 0 auto; isolation: isolate; }
+  .network-orbit { position: absolute; inset: 13% 5% 13%; border: 1px solid #b5f7ff; border-radius: 50%; box-shadow: 0 0 9px #4eceff6b, inset 0 0 8px #4eceff2b; }
+  .orbit-tracer { position: absolute; inset: -1px; border-radius: 50%; animation: orbit-turn 8s linear infinite; }
+  .orbit-tracer::before { content: ""; position: absolute; width: 7px; height: 7px; left: calc(50% - 3px); top: -3px; background: white; border-radius: 50%; box-shadow: 0 0 7px 3px #57dfff, 0 0 18px #0068f5; }
+  .registration-card { position: absolute; z-index: 3; top: 19%; left: 25%; width: 50%; animation: card-hover 4.8s ease-in-out infinite; }
+  .registration-card .trading-card { width: 100%; max-width: none; margin: 0; filter: drop-shadow(0 0 8px #6de2ff8c); }
+  .registration-card .trading-card > img:first-child { border-color: #efffff; box-shadow: 0 0 0 1px #b4edff, inset 0 0 4px white; }
+  .network-cube { position: absolute; z-index: 4; width: 15%; aspect-ratio: 1; display: grid; place-items: center; color: #efffff; background: radial-gradient(ellipse, #42d5ffba 5%, #0875f542 50%, transparent 72%); filter: drop-shadow(0 0 5px #00aaff); animation: cube-glow 3.6s ease-in-out infinite; }
+  .network-cube .icon { width: 87%; height: 87%; stroke-width: .9; fill: #008dff33; }
+  .cube-top { top: 1%; left: 42.5%; }
+  .cube-left { left: 0; top: 43%; animation-delay: -1.2s; }
+  .cube-right { right: 0; top: 43%; animation-delay: -2.4s; }
+  .connection-beam { position: absolute; z-index: 1; width: 20%; height: 44%; left: 40%; bottom: 7%; background: linear-gradient(90deg, transparent, #66dcff33 30%, #ffffffb3 50%, #66dcff33 70%, transparent); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); animation: beam-glow 3.6s ease-in-out infinite; }
+  .scene-platform { position: absolute; left: 8%; right: 8%; bottom: 5%; height: 15%; border-radius: 50%; background: radial-gradient(ellipse, #eaffff 0%, #98dcff80 28%, #b2cbe766 57%, #ffffffd9 63%, #9bc4e78c 68%, transparent 71%); }
+  .scene-platform span { position: absolute; inset: 15% 7%; border: 1px solid #f2ffff; border-radius: 50%; box-shadow: 0 0 9px #48caff5c; }
+  .scene-platform span:nth-child(2) { inset: 28% 24%; }
+  .scene-platform span:nth-child(3) { inset: 38% 35%; background: #ffffffa6; box-shadow: 0 0 18px #06baff; }
+  .scene-terminal { position: absolute; z-index: 4; bottom: 13%; width: 19%; aspect-ratio: 1; display: grid; place-items: center; color: white; border: 1px solid #d7fbff; border-radius: 9px; background: linear-gradient(145deg, #36c8ffcc, #0875eff0 65%, #0052cd); box-shadow: inset 0 0 0 3px #ffffff21, inset 0 1px 8px #efffff91, 0 0 14px #3acbff80; }
+  .scene-terminal .icon { width: 60%; height: 60%; stroke-width: 1.3; }
+  .terminal-qr { left: 2%; transform: perspective(240px) rotateY(15deg); }
+  .terminal-wallet { right: 2%; transform: perspective(240px) rotateY(-15deg); }
+  .registration-indicator { position: relative; width: 124px; height: 124px; margin: 0 auto 22px; border-radius: 50%; border: 1px solid #b9f7ff; background: #0075f5; box-shadow: 0 0 0 5px #fff9, 0 0 23px #45c9ff73; }
+  .indicator-orbit { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, #9dfaff, #26ccff 24%, #006df5 25%, #0743c8 67%, #052a8c 88%, #9dfaff); animation: orbit-turn 3.6s linear infinite; }
+  .indicator-center { position: absolute; inset: 13px; border: 2px solid #dbffff; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 38% 25%, #116cde, #073ab8 62%, #04236f); box-shadow: 0 0 8px #65e7ff, inset 0 0 9px #18b0ff; color: white; }
+  .indicator-center .icon { width: 44px; height: 44px; stroke-width: 2.6; }
+  .processing-page .process-copy { margin-top: 8px; }
+
   .process-copy { text-align: center; font-size: 14px; color: #47617d; line-height: 1.8; margin-top: 14px; }
   .page > .process-copy + .info-panel { margin-top: 24px; }
   .entry-page .scan-intro { text-align: center; padding-block: 18px; }
   .scan-intro .trading-card { width: 60%; }
   .camera-page { position: relative; padding-top: 55px; }
-  .flash-button { position: absolute; right: 24px; top: 0; display: flex; align-items: center; gap: 5px; font-size: 12px; min-height: 44px; }
-  .scanner { position: relative; width: 78%; aspect-ratio: 1; margin: 24px auto; display: grid; place-items: center; background: #ffffff99; border-radius: 16px; }
-  .scan-corners { position: absolute; inset: 0; }
-  .scan-corners span { position: absolute; width: 32px; height: 32px; border: 4px solid #0068f5; border-radius: 6px; }
+  .flash-button { position: absolute; right: 24px; top: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-size: 12px; font-weight: 700; min-width: 48px; min-height: 52px; border-radius: 12px; }
+  .flash-button .icon { width: 27px; height: 27px; }
+  .flash-button:active { background: #ffffff80; }
+  .scanner { position: relative; width: 78%; aspect-ratio: 1; margin: 30px auto; display: grid; place-items: center; background: linear-gradient(145deg, #ffffffd9, #e4f0ffa6 52%, #ffffffb3); border: 1px solid #ffffffed; border-radius: 16px; box-shadow: inset 0 1px 3px #fff, inset 0 -2px 8px #aaccef40, 0 7px 18px #407ab51a; isolation: isolate; }
+  .scan-light-track { position: absolute; z-index: 2; inset: 16% 12%; overflow: hidden; pointer-events: none; }
+  .scan-sweep { height: 100%; animation: scan-pass 3.6s ease-in-out infinite alternate; }
+  .scan-sweep::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #63edff 10%, #fff 50%, #63edff 90%, transparent); box-shadow: 0 0 5px #fff, 0 0 10px 2px #31d8ff, 0 -6px 16px 3px #1fbeff40; }
+  .scan-corners { position: absolute; inset: 14%; z-index: 3; animation: scan-frame-glow 3.6s ease-in-out infinite alternate; }
+  .scan-corners span { position: absolute; width: 27px; height: 27px; border: 5px solid #0085f5; border-radius: 9px; filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px #37d5ff8c); }
   .scan-corners span:nth-child(1) { top: 0; left: 0; border-right: 0; border-bottom: 0; }
   .scan-corners span:nth-child(2) { top: 0; right: 0; border-left: 0; border-bottom: 0; }
   .scan-corners span:nth-child(3) { bottom: 0; left: 0; border-right: 0; border-top: 0; }
   .scan-corners span:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
-  .scan-center { width: 75%; height: 75%; }
-  .scan-status { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 18px; font-weight: 700; background: #ffffffc9; padding: 14px 10px; border-radius: 30px; text-align: center; }
+  .scan-center { width: 58%; height: 58%; }
+  .scan-status { display: flex; align-items: center; justify-content: center; gap: 13px; font-size: 18px; font-weight: 700; background: linear-gradient(155deg, #fffffff2, #ffffff99 50%, #e4f0ffbf); border: 1px solid #fffffff5; box-shadow: inset 0 1px 3px white, inset 0 -2px 6px #bedbfa47, 0 3px 12px #4f93cc14; padding: 14px 12px; border-radius: 36px; text-align: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .scan-status-ring { width: 25px; height: 25px; flex-shrink: 0; border-radius: 50%; border: 3px solid #badfff; border-top-color: #0068f5; border-right-color: #4cc3ff; border-bottom-color: #edf8ff; animation: orbit-turn 1.8s linear infinite; }
   .scan-tools { display: flex; justify-content: space-between; margin: 28px 18px 0; gap: 16px; }
-  .round-tool { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 84px; height: 84px; background: white; border-radius: 50%; gap: 6px; font-size: 12px; }
-  .round-tool .icon { color: #0068f5; }
+  .round-tool { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 84px; height: 84px; border-radius: 50%; gap: 6px; font-size: 12px; }
+  .scan-tools .round-tool { width: 88px; height: 88px; background: linear-gradient(145deg, #fffffff5 20%, #ffffffb3 60%, #e4f0ffcc); border: 1px solid #fffffff5; box-shadow: inset 0 2px 4px white, inset 0 -3px 7px #bedbfa47, 0 4px 12px #538bc21a; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-weight: 700; }
+  .scan-tools .round-tool:active { transform: translateY(1px); box-shadow: inset 0 2px 5px #3572aa26; }
+  .round-tool .icon { color: #0068f5; width: 30px; height: 30px; stroke-width: 1.8; }
   .modal { padding: 16px; }
   .modal-box { width: 100%; max-width: 432px; padding: 24px; max-height: 85svh; }
   .modal-box .btn { min-height: 44px; height: auto; }
@@ -147,4 +241,19 @@
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+@keyframes orbit-turn { to { transform: rotate(360deg); } }
+@keyframes card-hover { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes cube-glow { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
+@keyframes beam-glow { 0%, 100% { opacity: .45; } 50% { opacity: .9; } }
+@media (prefers-reduced-motion: reduce) {
+  .orbit-tracer, .registration-card, .network-cube, .connection-beam, .indicator-orbit { animation: none; }
+}
+
+@keyframes scan-pass { from { transform: translateY(3%); } to { transform: translateY(96%); } }
+@keyframes scan-frame-glow { from { opacity: .72; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .scan-sweep, .scan-corners, .scan-status-ring { animation: none; }
+  .scan-sweep { transform: translateY(50%); }
 }

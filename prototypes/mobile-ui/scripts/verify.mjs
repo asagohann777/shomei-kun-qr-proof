@@ -49,6 +49,13 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
   assert.equal(await action('scan').count(), 0);
   await action('open-camera').click();
   await layout('390-camera');
+  assert.equal(await page.locator('.scan-sweep').evaluate((element) => getComputedStyle(element).animationName), 'none');
+  assert.equal(await page.locator('.scan-status-ring').evaluate((element) => getComputedStyle(element).animationName), 'none');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const scanTransform = await page.locator('.scan-sweep').evaluate((element) => getComputedStyle(element).transform);
+  await page.waitForFunction((before) => getComputedStyle(document.querySelector('.scan-sweep')).transform !== before, scanTransform);
+  await layout('390-camera-motion');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   for (const control of ['photos', 'help', 'flash']) {
     await action(control).click();
     await page.locator('#help-dialog[open]').waitFor();
@@ -78,6 +85,24 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
       }
     }
   }
+  for (const width of [320, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+    await goto('registering');
+    await layout(`${width}-registering`);
+  }
+  assert.equal((await state()).view, 'processing-preview');
+  assert.equal((await state()).attempt, null);
+  await page.reload();
+  assert.equal((await state()).view, 'processing-preview');
+  assert.equal(await page.locator('.indicator-orbit').evaluate((element) => getComputedStyle(element).animationName), 'none');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const initialTransform = await page.locator('.indicator-orbit').evaluate((element) => getComputedStyle(element).transform);
+  await page.waitForFunction((before) => getComputedStyle(document.querySelector('.indicator-orbit')).transform !== before, initialTransform);
+  assert.equal(await page.locator('.registration-card').evaluate((element) => getComputedStyle(element).animationName), 'card-hover');
+  await layout('430-registering-motion');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await action('home').click();
+  assert.equal((await state()).view, 'scan');
   await page.setViewportSize({ width: 390, height: 844 });
   await goto('unregistered');
   await action('start-register').click();

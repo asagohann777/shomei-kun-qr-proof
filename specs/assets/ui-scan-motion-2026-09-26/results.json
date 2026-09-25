@@ -1,0 +1,31 @@
+{
+  "base": "http://127.0.0.1:4173",
+  "verifiedAt": "2026-09-25T21:29:15.948Z",
+  "results": [
+    {
+      "browser": "chromium",
+      "version": "149.0.7827.55",
+      "status": "passed",
+      "requests": 462,
+      "consoleErrors": [],
+      "playwrightScreenshotCspWarnings": 0
+    },
+    {
+      "browser": "webkit",
+      "version": "26.5",
+      "status": "passed",
+      "requests": 466,
+      "consoleErrors": [],
+      "playwrightScreenshotCspWarnings": 0
+    }
+  ],
+  "assetHashes": {
+    "index.html": "f9165c9f4eaf9fdd0b23bce97aacad7cccd984b1809bd6730bc177ddd79f594a",
+    "app.js": "a9786f0ed731f92fdd70021b6e2f5522f29f98ea1a6e421d85863c56a3c40d19",
+    "messages.js": "15575c40c9c7c5798749e45540abe9b74e8b30e2169c8c4763ec1eaaa09f4444",
+    "style.css": "381a81efbe338f73f3426fefe1bfeea4233f93fc399a842793184e37a003a2e3",
+    "player.svg": "aa03e96d73f0154f740133fdfda2cc41a01b52fde8b9f5481e2e42a30cf45acf",
+    "card-qr.svg": "b119694135df0a67a8ca3cf79d9309a955524fe660a8e02f3faa6d5a02b19d03",
+    "favicon.svg": "32c8afa370fd7e9dab50bbdd3e40d97b1a349bebae05f9b5c96bbd0c11c669ae"
+  }
+}

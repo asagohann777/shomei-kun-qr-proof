@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T21:35:00.951987+00:00",
+  "session_id": "01a0d8d4-ba22-7360-aac5-8461d75f59e2",
+  "turn_id": "01a0da7e-36f0-7f80-beb8-d295fed17fd8",
+  "prompt": "QRコードを読み取りました　画面　チェックアイコンの表示の質感、証明一郎って書いてあるカードの質感　未登録ラベルの質感 修正してください",
+  "model": "gpt-6-astra"
+}

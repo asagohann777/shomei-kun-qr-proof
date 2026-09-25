@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T21:06:06.402653+00:00",
+  "session_id": "01a0d8d4-ba22-7360-aac5-8461d75f59e2",
+  "turn_id": "01a0da63-bf3d-74a3-935e-aa0f55102b8d",
+  "prompt": "次にボタンの質感とか寄せれますか",
+  "model": "gpt-6-astra"
+}
