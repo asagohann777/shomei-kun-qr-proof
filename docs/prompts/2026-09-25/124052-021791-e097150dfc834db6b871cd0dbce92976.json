@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T12:40:52.021791+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0d895-3327-7301-9e4a-998418fed9fb",
+  "prompt": "ドキュメント読んでて気づいたんだけど Curvegrid testnetでは公開チェーンじゃないみたいだから amoyでやらないとダメそう\nただ、MultiBaasのAPIが同じならそこは意識しなくていいのかな",
+  "model": "gpt-6-astra"
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T12:42:38.516565+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0d896-d330-7f32-9a08-6e4a32a4a2c5",
+  "prompt": "Multibass api中心でお願いします、誤解があってすみません\nあとamoyを利用する前提にしましょうか",
+  "model": "gpt-6-astra"
+}
