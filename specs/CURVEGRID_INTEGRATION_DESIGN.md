@@ -130,7 +130,7 @@ GET connectionの例: 未設定なら503とmissingSettings、認証失敗なら5
 
 ## 5. MultiBaas Gateway
 
-ブラウザからMultiBaas管理RESTを直接呼ばない。WorkerのfetchでベースURLと固定パスを組み立て、Bearerキーを付ける。URLリダイレクトは拒否する。1回の上流呼出しは10秒、1 API全体は30秒で打ち切り、自動再送・自動リトライは行わない。ログには操作とエラー分類だけを残す。
+ブラウザからMultiBaas管理RESTを直接呼ばない。WorkerのfetchでベースURLと固定パスを組み立て、Bearerキーを付ける。fetchのredirectはmanualにし、3xxを上流エラーとして拒否する。1回の上流呼出しは10秒、1 API全体は30秒で打ち切り、自動再送・自動リトライは行わない。ログには操作・エラー分類・サービス種別・HTTP status・例外名だけを残す。
 
 | Gateway操作 | API・変換方針 |
 | --- | --- |
@@ -150,7 +150,7 @@ MultiBaasは参照関数の `result.output` を任意型として定義してい
 
 MultiBaasの一般的な404は、未発行カードや未取得取引と同じ意味ではない。カード未発行は `getCard` の正常応答 `exists=false` だけで判断する。取引不存在を明示する正常応答・確認済みの上流エラー仕様がない場合は503にする。実環境の404を無条件で200 unknownやpendingに変えない。
 
-イベント一覧にcardId専用のフィルターはない。`contract_address` と `event_signature` を指定し、limit=100とoffsetで最大10ページを読む。カードキーは取得後に検証する。上限か時間切れまでに探索を完了できなければ503にし、未登録や証跡なしと断定しない。イベント内の取引hashは `transaction.txHash` を使う。
+イベント一覧にcardId専用のフィルターはない。`contract_address` と `event_signature` を指定し、limit=10とoffsetで最大10ページを読む。カードキーは取得後に検証する。上限か時間切れまでに探索を完了できなければ503にし、未登録や証跡なしと断定しない。イベント内の取引hashは `transaction.txHash` を使う。
 
 公開カードのownerはコントラクト状態から取得する。登録証跡はイベント検索で候補を得たあと、その取引レシートのログと状態を照合して返す。正常な検索結果が空なら `evidence:pending` としてownerを保持する。検索通信が失敗した場合は503。配置先・カードが違う候補を登録証跡にしない。
 

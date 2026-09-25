@@ -59,13 +59,17 @@ export class MultiBaasGateway implements RegistrationGateway {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), Math.min(10_000, remaining));
     try {
-      const response = await this.fetcher(url, { ...init, redirect: "error", signal: controller.signal });
+      const response = await this.fetcher(url, { ...init, redirect: "manual", signal: controller.signal });
       if (response.status === 401 || response.status === 403) throw new ApiError(503, "MULTIBAAS_AUTH_FAILED", "Upstream authentication failed");
-      if (!response.ok) throw unavailable();
+      if (!response.ok) {
+        console.error("upstream_http_error", { service: url.startsWith(this.config.baseUrl + "/") ? "multibaas" : "rpc", status: response.status });
+        throw unavailable();
+      }
       return await response.json();
     } catch (error) {
       if (controller.signal.aborted) throw new ApiError(503, "UPSTREAM_TIMEOUT", "Upstream request timed out");
       if (error instanceof ApiError) throw error;
+      console.error("upstream_request_error", { service: url.startsWith(this.config.baseUrl + "/") ? "multibaas" : "rpc", kind: error instanceof Error ? error.name : "unknown" });
       throw unavailable();
     } finally { clearTimeout(timeout); }
   }
@@ -184,9 +188,9 @@ export class MultiBaasGateway implements RegistrationGateway {
   async findRegistrationEvent(cardId: string): Promise<RegistrationEvent | null> {
     await this.checkConnection();
     for (let page = 0; page < 10; page++) {
-      const query = new URLSearchParams({ contract_address: this.config.address, event_signature: eventSignature, limit: "100", offset: String(page * 100) });
+      const query = new URLSearchParams({ contract_address: this.config.address, event_signature: eventSignature, limit: "10", offset: String(page * 10) });
       const entries = await this.api(`/events?${query}`);
-      if (!Array.isArray(entries) || entries.length > 100) throw unavailable();
+      if (!Array.isArray(entries) || entries.length > 10) throw unavailable();
       for (const entry of entries) {
         const result = object(entry); const event = object(result.event);
         if (hex(object(event.contract).address, 20) !== this.config.address || event.signature !== eventSignature) continue;
@@ -201,7 +205,7 @@ export class MultiBaasGateway implements RegistrationGateway {
         const matching = receipt.events.find((item) => item.cardId === cardId && item.owner === transaction.from && item.nickname === transaction.registration?.nickname);
         if (matching) return matching;
       }
-      if (entries.length < 100) return null;
+      if (entries.length < 10) return null;
     }
     throw unavailable();
   }

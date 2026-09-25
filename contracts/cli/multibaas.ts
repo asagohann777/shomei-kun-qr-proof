@@ -45,7 +45,7 @@ export class MultiBaas implements RegistryApi {
       if (new Interface(fragments).formatJson() !== new Interface(artifact.abi).formatJson() || bin.replace(/^0x/, '') !== artifact.bytecode.slice(2)) throw new Error('Existing Library ABI or bytecode differs');
       return;
     }
-    await this.request(`/contracts/${encodeURIComponent(this.config.label)}`, { label: this.config.label, contractName: artifact.contractName, version: this.config.version, rawAbi: JSON.stringify(artifact.abi), bin: artifact.bytecode.slice(2) });
+    await this.request(`/contracts/${encodeURIComponent(this.config.label)}`, { label: this.config.label, contractName: artifact.contractName, version: this.config.version, rawAbi: JSON.stringify(artifact.abi), bin: artifact.bytecode });
   }
   private method(contract: string, method: string, args: string[], from?: string) {
     return this.request(`/chains/ethereum/addresses/${contract}/contracts/${encodeURIComponent(this.config.label)}/methods/${method}`, { args, signAndSubmit: false, ...(from ? { from } : {}), formatInts: 'as_strings' });

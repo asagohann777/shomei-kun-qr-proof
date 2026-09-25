@@ -68,3 +68,19 @@ test('card reads reject unknown tuple shape and inconsistent registration state'
     assert.deepEqual(await api.getCard(contract, 'one'), { exists: true, allowedWallet: contract, registered: true, owner: contract, nickname: 'Alice' });
   } finally { globalThis.fetch = original; }
 });
+
+test('Library creation sends 0x-prefixed bytecode required by the real API', async () => {
+  const original = globalThis.fetch;
+  let created = false;
+  globalThis.fetch = async (_url, init) => {
+    if (init?.method !== 'POST') return Response.json({ status: 200, result: [] });
+    const body = JSON.parse(String(init.body));
+    assert.equal(body.bin, artifact.bytecode);
+    assert.match(body.bin, /^0x[0-9a-f]+$/);
+    assert.deepEqual(JSON.parse(body.rawAbi), artifact.abi);
+    created = true;
+    return Response.json({ status: 200, result: {} });
+  };
+  try { await new MultiBaas(config).ensureLibrary(); assert.equal(created, true); }
+  finally { globalThis.fetch = original; }
+});

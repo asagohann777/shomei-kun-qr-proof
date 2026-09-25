@@ -1,0 +1,77 @@
+{
+  "status": 200,
+  "message": "success",
+  "result": [
+    {
+      "triggeredAt": "2026-09-25T21:48:58Z",
+      "event": {
+        "name": "CardRegistered",
+        "signature": "CardRegistered(bytes32,string,address,string)",
+        "inputs": [
+          {
+            "name": "cardKey",
+            "value": "0x8c8d221f3d18cabc6dc87f8c07213104a82c581d6d8eca8c37a1771a6ba94b5b",
+            "hashed": false,
+            "type": "bytes32"
+          },
+          {
+            "name": "cardId",
+            "value": "connectivity-20260926-001",
+            "hashed": false,
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "value": "0xf12904Ef7aBfD79b68dcCdc7b30cFDE2D6BEeeb8",
+            "hashed": false,
+            "type": "address"
+          },
+          {
+            "name": "nickname",
+            "value": "おじいちゃんコンビニ",
+            "hashed": false,
+            "type": "string"
+          }
+        ],
+        "rawFields": "{\"address\":\"0xe226abd4e3866568c7bd53a57f2ca4b619efb47e\",\"topics\":[\"0x1912d3b7192739a7883d24018473f20dce6d0b592ca0676710fcb5e9a6efdeea\",\"0x8c8d221f3d18cabc6dc87f8c07213104a82c581d6d8eca8c37a1771a6ba94b5b\",\"0x000000000000000000000000f12904ef7abfd79b68dccdc7b30cfde2d6beeeb8\"],\"data\":\"0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000019636f6e6e65637469766974792d32303236303932362d30303100000000000000000000000000000000000000000000000000000000000000000000000000001ee3818ae38198e38184e381a1e38283e38293e382b3e383b3e38393e3838b0000\",\"blockNumber\":\"0x4950\",\"transactionHash\":\"0x83f7601a0eae1123029e0f407ecd5e72ebd4d9b34e5181363bf8cabab6a9cb12\",\"transactionIndex\":\"0x0\",\"blockHash\":\"0xb893e832b70678a0c24f0345e13820a8cc3f822743719264c3c4bc0dc118e570\",\"blockTimestamp\":\"0x0\",\"logIndex\":\"0x0\",\"removed\":false}",
+        "contract": {
+          "address": "0xE226ABd4e3866568C7bd53a57f2CA4b619EFB47e",
+          "addressAlias": "",
+          "name": "OwnershipRegistry",
+          "label": "shomeikuncardregistry"
+        },
+        "indexInLog": 0
+      },
+      "transaction": {
+        "from": "0xf12904Ef7aBfD79b68dcCdc7b30cFDE2D6BEeeb8",
+        "txData": "0x3ffbd47f000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000019636f6e6e65637469766974792d32303236303932362d30303100000000000000000000000000000000000000000000000000000000000000000000000000001ee3818ae38198e38184e381a1e38283e38293e382b3e383b3e38393e3838b0000",
+        "txHash": "0x83f7601a0eae1123029e0f407ecd5e72ebd4d9b34e5181363bf8cabab6a9cb12",
+        "txIndexInBlock": 0,
+        "blockHash": "0xb893e832b70678a0c24f0345e13820a8cc3f822743719264c3c4bc0dc118e570",
+        "blockNumber": 18768,
+        "contract": {
+          "address": "0xE226ABd4e3866568C7bd53a57f2CA4b619EFB47e",
+          "addressAlias": "",
+          "name": "OwnershipRegistry",
+          "label": "shomeikuncardregistry"
+        },
+        "method": {
+          "name": "register",
+          "signature": "register(string,string)",
+          "inputs": [
+            {
+              "name": "cardId",
+              "value": "connectivity-20260926-001",
+              "type": "string"
+            },
+            {
+              "name": "nickname",
+              "value": "おじいちゃんコンビニ",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "method": "eth_call",
+  "tests": [
+    {
+      "test": "issue",
+      "result": "CALL_EXCEPTION",
+      "revert": null
+    },
+    {
+      "test": "register",
+      "result": "CALL_EXCEPTION",
+      "revert": null
+    }
+  ]
+}

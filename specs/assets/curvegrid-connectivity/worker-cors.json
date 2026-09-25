@@ -1,0 +1,12 @@
+[
+  {
+    "origin": "https://shomei-kun-ui-mock.dptr.workers.dev",
+    "status": 204,
+    "allowOrigin": "https://shomei-kun-ui-mock.dptr.workers.dev"
+  },
+  {
+    "origin": "https://untrusted.example",
+    "status": 403,
+    "allowOrigin": null
+  }
+]

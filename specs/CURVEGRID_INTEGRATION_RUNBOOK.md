@@ -89,4 +89,12 @@ BACKEND_MODE=live npm run build:integration
 npm run test:worker:live
 ```
 
-MultiBaas応答を用いた試験は公式SDKの形式に沿った合成データであり、実環境の取得記録ではない。設定提供後の疎通・スマホ署名・別端末確認は [実装タスク](../openspec/changes/curvegrid-testnet-integration/tasks.md) 6章で追跡する。
+`live-gateway.test.ts` は合成応答、`live-recorded.test.ts` は今回のTestnetで取得したMultiBaas応答を使う。RPCのchain/codeは後者でも合成応答。設定提供後の疎通・スマホ署名・別端末確認は [実装タスク](../openspec/changes/curvegrid-testnet-integration/tasks.md) 6章で追跡する。
+
+## 実接続の設定とビルド
+
+`build:integration` と `build:worker` はOpenNextが取り込んだローカル環境値をビルド後に除去する。接続設定はWorkerの実行時bindingから供給する。生成物のキー・RPC値の検査に失敗した場合はデプロイしない。
+
+Workerに設定するのは `MULTIBAAS_BASE_URL`、アプリ用 `MULTIBAAS_API_KEY`、`CHAIN_ID`、`REGISTRY_ADDRESS`、`REGISTRY_CONTRACT_LABEL`、`REGISTRY_CONTRACT_VERSION`、`REGISTRY_DEPLOYMENT_BLOCK`、`REGISTRY_ISSUER`、`CURVEGRID_PUBLIC_WEB3_RPC_URL`、`PUBLIC_API_ORIGIN`、`ALLOWED_UI_ORIGINS`。`.env.local` 全体をbulk登録しない。`MULTIBAAS_ADMIN_API_KEY`、キーストア、パスワードはCLI側だけで使用する。
+
+実測カードと再現コマンド、残る確認は [疎通試験記録](CURVEGRID_CONNECTIVITY_REPORT.md) を参照。

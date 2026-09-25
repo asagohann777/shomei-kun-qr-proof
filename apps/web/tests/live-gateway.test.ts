@@ -67,7 +67,7 @@ test("connection validates live chain, ABI, issuer and bytecode and exposes only
   const connection = await gateway.checkConnection();
   assert.equal(connection.status, "ready"); assert.equal(connection.registry.chainId, 2017);
   assert.ok(!JSON.stringify(connection).includes(env.MULTIBAAS_API_KEY));
-  assert.ok(calls.every((call) => call.init?.redirect === "error"));
+  assert.ok(calls.every((call) => call.init?.redirect === "manual"));
   await gateway.readCard(cardId);
   assert.equal(calls.filter((call) => call.path.endsWith("/status")).length, 1);
 });
@@ -159,9 +159,12 @@ test("candidate hashes and canonical receipt must agree before exposing evidence
 });
 test("event scan limit fails instead of claiming no evidence", async () => {
   const irrelevant = { event: { signature: "CardRegistered(bytes32,string,address,string)", contract: { address }, inputs: [{ name: "cardId", value: "other" }, { name: "cardKey", value: id("other") }] } };
-  const { gateway, calls } = syntheticGateway((path) => path.startsWith("/api/v0/events?") ? Array.from({ length: 100 }, () => irrelevant) : undefined);
+  const { gateway, calls } = syntheticGateway((path) => path.startsWith("/api/v0/events?") ? Array.from({ length: 10 }, () => irrelevant) : undefined);
   await assert.rejects(gateway.findRegistrationEvent(cardId), code("UPSTREAM_UNAVAILABLE"));
-  assert.equal(calls.filter((call) => call.path.startsWith("/api/v0/events?")).length, 10);
+  const pages = calls.filter((call) => call.path.startsWith("/api/v0/events?"));
+  assert.equal(pages.length, 10);
+  assert.deepEqual(pages.map(call => new URL(call.path, "https://test.example").searchParams.get("limit")), Array(10).fill("10"));
+  assert.deepEqual(pages.map(call => new URL(call.path, "https://test.example").searchParams.get("offset")), ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90"]);
 });
 test("30-second request budget prevents another upstream call", async (context) => {
   context.mock.timers.enable({ apis: ["Date"], now: 1_000 });
@@ -175,4 +178,12 @@ test("30-second request budget prevents another upstream call", async (context) 
 test("unpaired surrogate from upstream cannot become a public nickname", async () => {
   const { gateway } = syntheticGateway((path) => path.endsWith("/getCard") ? { output: [true, wallet, true, wallet, "\ud800"] } : undefined);
   await assert.rejects(gateway.readCard(cardId), code("UPSTREAM_UNAVAILABLE"));
+});
+
+
+test("redirect responses are rejected without forwarding credentials", async () => {
+  const { gateway, calls } = syntheticGateway(() => new Response(null, { status: 302, headers: { Location: "https://untrusted.example" } }));
+  await assert.rejects(gateway.checkConnection(), code("UPSTREAM_UNAVAILABLE"));
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0]?.init?.redirect, "manual");
 });

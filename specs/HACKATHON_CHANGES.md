@@ -326,3 +326,7 @@ Codexが `contracts/` のSolidity・CLI・試験・ABI、`apps/web/` のlive Gat
 ユーザーの疎通試験・課題整理とリベースの指示を受け、Codexが最新mainを取得し、ローカルlive APIを起動してHTTP応答を確認した。MultiBaas設定は未提供で503 CONFIGURATION_MISSING。外部ネットワーク権限でCloudflareの専用Worker不存在も確認した。結果と対応案は [疎通試験レポート](CURVEGRID_CONNECTIVITY_REPORT.md) に保存した。実環境の認証失敗とは判断していない。
 
 Codexが設定項目名だけの確認、HTTP検証、課題整理・文書作成を担当した。接続情報の場所をユーザーに確認中。チェーン書込み・Worker公開は未実施。大会期間との対応は未確認。
+
+ユーザーの設定提供後、実MultiBaasのチェーン状態・ブロック・Library一覧を読み取った。管理RESTの疎通に成功し、chain ID `2017072401` を確認した。新規の `shomeikuncardregistry` / `1.0.0` をLibraryへ登録したが、チェーンへの配置は行っていない。binの0x接頭辞を除いていたCLIの不具合を実APIの400から特定し、修正と回帰試験を追加した。機密情報を除いた実測JSONと課題の更新は疎通試験レポートを参照。公開RPCと試験ウォレットの指定を確認中。
+
+- 2026-09-26: Curvegrid TestnetにRegistryを配置し、専用カードを発行・本人試験鍵で登録。APIのconfirmedと公開所有者・証跡を実測。bytecode接頭辞、イベント取得件数、開発バンドラー、OpenNextの環境値埋込みを修正。API66件・CLI/contract16件と実応答fixtureで検証。Secret保存は自動承認拒否後にユーザーが明示許可し完了。Workersのredirect指定を修正し、公開Workerで接続・所有者・登録取引・再読込・二重登録拒否に成功。スマホUI結合は未実施。AIが実装・操作・試験・記録、人間が接続設定・Faucet入金・試験鍵作成方針を担当。大会期間との対応は未確認。詳細は `CURVEGRID_CONNECTIVITY_REPORT.md`。

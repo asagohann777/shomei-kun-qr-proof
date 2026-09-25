@@ -1,0 +1,47 @@
+{
+  "capturedAt": "2026-09-25T21:36:33.948Z",
+  "source": "actual MultiBaas deployment; credentials and deployment URL omitted",
+  "results": [
+    {
+      "path": "/chains/ethereum/status",
+      "http": 200,
+      "apiStatus": 200,
+      "result": {
+        "chainID": 2017072401,
+        "networkID": 2017072401,
+        "blockNumber": 18763
+      }
+    },
+    {
+      "path": "/chains/ethereum/blocks/latest",
+      "http": 200,
+      "apiStatus": 200,
+      "result": {
+        "number": "18763",
+        "hash": "0xab297ed15474a2396179df0c498e0914e9e8112dfe5b9d4e80e4daba8cf31161"
+      }
+    },
+    {
+      "path": "/contracts/shomeikuncardregistry/versions",
+      "http": 200,
+      "apiStatus": 200,
+      "result": {
+        "versions": [
+          "1.0.0"
+        ]
+      }
+    },
+    {
+      "path": "/contracts/shomeikuncardregistry/1.0.0",
+      "http": 200,
+      "apiStatus": 200,
+      "result": {
+        "label": "shomeikuncardregistry",
+        "version": "1.0.0",
+        "contractName": "OwnershipRegistry",
+        "abiEntries": 16,
+        "bytecodeHas0x": true
+      }
+    }
+  ]
+}
