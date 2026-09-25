@@ -320,3 +320,9 @@ Codexが専用worktreeと `feat/curvegrid-integration-backend` ブランチを�
 元のUI作業場所は変更せず、専用worktreeで実装する。実環境の設定・配置・UI結合試験はまだ行っていない。大会期間との対応は未確認。
 
 Codexが `contracts/` のSolidity・CLI・試験・ABI、`apps/web/` のlive Gateway・HTTP・接続API・型/validator生成物・試験・専用Worker設定、`specs/openapi.yaml`、OpenAPI検証スクリプト、OpenSpecタスクと設計状態、SPEC・ARCHITECTUREの実装状態、[起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md)、[実装・検証記録](CURVEGRID_INTEGRATION_IMPLEMENTATION.md)を作成・更新した。既存mock 19シナリオを維持した。検証結果と残る依存監査指摘は実装記録を参照。実環境のキーは未設定で、実疎通・公開・スマホ結合試験は未実施。
+
+## 2026-09-26 JST: 実環境疎通の前提を確認
+
+ユーザーの疎通試験・課題整理とリベースの指示を受け、Codexが最新mainを取得し、ローカルlive APIを起動してHTTP応答を確認した。MultiBaas設定は未提供で503 CONFIGURATION_MISSING。外部ネットワーク権限でCloudflareの専用Worker不存在も確認した。結果と対応案は [疎通試験レポート](CURVEGRID_CONNECTIVITY_REPORT.md) に保存した。実環境の認証失敗とは判断していない。
+
+Codexが設定項目名だけの確認、HTTP検証、課題整理・文書作成を担当した。接続情報の場所をユーザーに確認中。チェーン書込み・Worker公開は未実施。大会期間との対応は未確認。

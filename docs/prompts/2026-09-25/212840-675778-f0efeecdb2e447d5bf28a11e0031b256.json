@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T21:28:40.675778+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0da77-6a64-7b01-bfd2-324d7b59d75d",
+  "prompt": "origin mainは進んでるのでリベースもしてください",
+  "model": "gpt-6-astra"
+}
