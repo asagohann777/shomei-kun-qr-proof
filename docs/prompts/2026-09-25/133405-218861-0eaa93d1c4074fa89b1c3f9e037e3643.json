@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T13:34:05.218861+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0d8a8-a178-77a0-b899-8deaede49ea9",
+  "prompt": "<send_user_message_question_reply>\n[{\"answer\":\"カメラ画面への遷移だけを模擬する\",\"question\":\"今回のUIモックでは、スキャンボタンの後に実際のスマホカメラを起動しますか？\",\"questionItemId\":\"[\\\"request_user_input_async\\\",\\\"call_Nsym7tuYzyseAhK2GwrpLmtH\\\",0]\"}]\n</send_user_message_question_reply>",
+  "model": "gpt-6-astra"
+}

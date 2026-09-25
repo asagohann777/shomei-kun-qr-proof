@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "shomei-kun-ui-mock",
+  "account_id": "462e0d1a6670d5cb4a109817527aad3b",
+  "compatibility_date": "2026-09-25",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./dist"
+  }
+}

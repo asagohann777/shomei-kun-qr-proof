@@ -2,7 +2,11 @@
 
 状態: 2026-09-25の採用計画と、その後の改訂を手動保存した記録。hookによる回答の自動収集ではない。初版のCurvegrid Testnet・RPC中心の設計は、同日の追加指示でMultiBaas API中心・Polygon Amoyに変更した。
 
-計画の承認は文書作成を対象とする。アプリ実装、コミット、push、提出、デプロイはこの作業に含めない。現行の仕様は [SPEC.md](SPEC.md)、設計は [ARCHITECTURE.md](ARCHITECTURE.md)、実施結果は [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md) に記録する。
+この初版計画の承認は文書作成を対象とする。アプリ実装、コミット、push、提出、デプロイはこの作業に含めない。現行の仕様は [SPEC.md](SPEC.md)、設計は [ARCHITECTURE.md](ARCHITECTURE.md)、実施結果は [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md) に記録する。
+
+## 追加の採用計画: スマホUIモック
+
+その後のUI作成依頼と実行指示により、スマホ縦画面だけの操作可能なモックを作る。QRスキャンを含む4画面、daisyUIとTailwind CSS、公開プレビューを採用した。範囲・判断・検証手順は [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) に保存する。以下の「文書だけ」という記録は当時の作業範囲を示す。
 
 ## 現行の変更点: MultiBaas API中心・Polygon Amoy
 

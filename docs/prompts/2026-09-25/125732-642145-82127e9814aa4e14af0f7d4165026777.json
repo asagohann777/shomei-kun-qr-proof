@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T12:57:32.642145+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0d8a4-77df-7aa1-ba65-18ec18e11268",
+  "prompt": "画面割だけどQRコードスキャンする画面はどこ？",
+  "model": "gpt-6-astra"
+}

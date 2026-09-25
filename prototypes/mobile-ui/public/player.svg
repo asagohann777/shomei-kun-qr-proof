@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 336" role="img" aria-label="架空の野球選手のカードイラスト">
+  <defs><pattern id="pinstripes" width="14" height="14" patternUnits="userSpaceOnUse"><path d="M0 0v14" stroke="#d2dcec" stroke-width="1"/></pattern><clipPath id="card"><rect x="5" y="5" width="230" height="326" rx="12"/></clipPath></defs>
+  <rect width="240" height="336" rx="16" fill="#fff"/>
+  <g clip-path="url(#card)">
+    <path fill="#dbe8fa" d="M5 5h230v326H5z"/>
+    <path fill="#2457d6" d="m5 5 230 165v73L5 78z"/>
+    <path fill="#98b6eb" d="m5 228 230-97v43L5 273z"/>
+    <circle cx="183" cy="60" r="49" fill="#f7faff" opacity=".8"/>
+    <path d="M12 294Q115 229 237 290v60H12" fill="#88a88e"/>
+    <path d="m120 160-25 68-41 60h38l40-48 28-58" fill="#f7fafc"/>
+    <path d="m144 178 16 54 22 57h34l-22-62-5-70" fill="#f7fafc"/>
+    <path d="m104 112-31 46 29 17 15-20 21 52 56-20-14-56-33-28z" fill="#fff"/>
+    <path d="m104 112-31 46 29 17 15-20 21 52 56-20-14-56-33-28z" fill="url(#pinstripes)"/>
+    <path d="m100 123-11 26-21-30 16-12 20 15m62-2 18-22-28-20-8 15 17 20" fill="#e6b89d"/>
+    <path d="m62 110 28 11 58-72" fill="none" stroke="#cba46d" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="133" cy="81" r="24" fill="#e6b89d"/>
+    <path d="M109 76q-3-32 27-31 24 2 24 31l-35-8z" fill="#193d89"/>
+    <path d="m110 69-20 11h59l-9-11" fill="#193d89"/>
+    <path d="m113 106 14 10 19-11" fill="none" stroke="#2457d6" stroke-width="7"/>
+    <text x="133" y="156" font-family="Arial, sans-serif" font-size="31" font-weight="900" fill="#2457d6">1</text>
+    <path d="m55 280-19 13h54l3-14m87 0v14h51l-16-15" fill="#193d89"/>
+    <rect x="5" y="300" width="230" height="36" fill="#173568"/>
+    <text x="19" y="323" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="white">SHOMEI ICHIRO</text>
+    <text x="19" y="29" font-family="Arial, sans-serif" font-size="10" letter-spacing="1" fill="#173568">PROOF COLLECTION</text>
+    <text x="19" y="53" font-family="Arial, sans-serif" font-size="16" font-weight="800" fill="#173568">No. 001</text>
+  </g>
+  <rect x="5" y="5" width="230" height="326" rx="12" fill="none" stroke="#e0e7f0"/>
+</svg>

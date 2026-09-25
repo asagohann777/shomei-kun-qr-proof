@@ -1,0 +1,20 @@
+{
+  "name": "shomei-kun-mobile-ui-mock",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "npm run build && python3 -m http.server 4173 --directory dist --bind 0.0.0.0",
+    "verify": "node scripts/verify.mjs",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "daisyui": "5.7.46",
+    "playwright": "1.61.1",
+    "qrcode": "1.5.4",
+    "tailwindcss": "4.3.3",
+    "wrangler": "4.140.0"
+  }
+}

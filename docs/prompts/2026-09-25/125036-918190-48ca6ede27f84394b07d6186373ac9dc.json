@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T12:50:36.918190+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0d89e-1fd2-7121-ba2f-fddcd1e24b23",
+  "prompt": "specを元にまずはUIモックを作成お願いします\nそれを元にチームメンバー（おじいちゃんコンビニ）と相談します\n\n$Poteto Mode",
+  "model": "gpt-6-astra"
+}

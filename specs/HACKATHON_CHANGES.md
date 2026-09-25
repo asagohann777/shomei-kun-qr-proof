@@ -112,3 +112,48 @@ PY
 対応する入力は [公開性とAPIに関する質問](../docs/prompts/2026-09-25/124052-021791-e097150dfc834db6b871cd0dbce92976.json) と [MultiBaas API中心・Amoyの指定](../docs/prompts/2026-09-25/124238-516565-940307cad70d42acbdf9ec9f2ebda8bc.json)。両方ともhookのJSON内の `source` と本文を確認した。
 
 検証: 上記のPythonコマンドを再実行し、7文書・35件のローカルリンク・F01〜F10・A01〜A11・空白検査が成功した。`git diff --check` も成功した。仕様・設計・デモ手順のMultiBaas APIとAmoyの役割を読み合わせ、Curvegrid Testnetを現行の記録先として残していないことを確認した。実サービスへの接続試験は未実施。
+
+## 2026-09-25: 相談用のスマホUIモック
+
+大会期間内の作業として扱えるかは未確認。対象はこのリポジトリ内の新規モックで、既存PoCの実装・データ・公開設定には接続していない。
+
+### 人間の決定とAIの使用範囲
+
+ユーザーがチーム相談用のUIモック、スマホのみの対応、QRスキャン画面、CSSフレームワークによる制作コスト削減を指定した。計画中に所有者情報を優先する構成、模擬QR読取り、公開URLでの共有を選び、実装を承認した。出典は [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) にまとめた。対応する5件のhook JSONの `source` と本文を確認した。その後、スキャンボタンから模擬カメラへ進む指示と、短い文言・注釈削除・UI調整の指示を反映した。追加3件のhook JSONも採用計画から参照できる。
+
+Codexが `prototypes/mobile-ui/` のHTML、JavaScript、翻訳、CSS、SVG、ビルド・ブラウザ検証スクリプト、Cloudflare設定、READMEを作成した。package-lockはnpmが生成した。AIは構成2案を比較し、単一コントローラーとシナリオ状態を採用した。別エージェントによるコメント確認で不要なコメントを1件削除した。
+
+Codexが `SPEC.md`、`ARCHITECTURE.md`、`DEMO.md`、`PLAN.md`、`PRE_EXISTING_WORK.md`、`UI_MOCK_PLAN.md`、この変更記録を更新した。画面画像は実ブラウザのスクリーンショットであり、画像生成AIの完成予想図ではない。カードイラストとアイコンはCodexによる新規SVGで、既存サイトの画像や実在選手の写真は流用していない。
+
+### 実装と公開
+
+- QRスキャン、カード・公開確認、所有者登録、登録処理の4画面を実装した。QR画面は入口のボタンから模擬カメラへ進む。根拠・接続・状態選択はボトムシートにまとめた。
+- 画面の重複注釈、装飾の盾、説明ボックスを削り、ニックネームとウォレットを先に表示した。登録・承認・エラーの文言を短くし、同意欄は標準チェックボックスに揃えた。
+- daisyUI 5.7.46、Tailwind CSS 4.3.3を使用した。Next.js・TypeScriptによる実接続版を実装したとは扱わない。
+- 日英切替、言語保存、同じタブでの模擬入力・処理状態の復元、10種類の相談用シナリオを実装した。
+- 「結果不明」は同じ模擬操作を再確認し、「承認拒否」は未送信に戻る。実際の署名・送信・チェーン照会はない。
+- 公開先は [スマホUIモック](https://shomei-kun-ui-mock.dptr.workers.dev/)。既存Worker名と重複しないことを確認して新規作成した。Cloudflare Worker名は `shomei-kun-ui-mock`、公開バージョンは `0f4b15c3-79d3-4715-a7c4-bd4e6fa82ce0`。
+- 公開URLのHTTP 200、カメラ・マイクを許可しないPermissions-Policy、CSP、noindexを確認した。共有URLとQRに入力した名前や秘密情報を含めない。
+
+### 検証
+
+Node.js 22.23.1、Playwright 1.61.1を使用した。`npm run build` が成功。ローカルでChromium 149.0.7827.55とWebKit 26.5の操作検証が成功した。検証スクリプトと実行方法は [モックのREADME](../prototypes/mobile-ui/README.md) に保存した。
+
+320・390・430px、PCでのスマホ幅表示を撮影し、英語の320・390pxも確認した。横はみ出し、欠落画像、コンソールエラーを自動確認し、画面の画像を目視した。下部操作の上まで最後の内容をスクロールできることも確認するスクリプトにした。
+
+模擬接続・公開同意・登録・再読込・入力の表示・言語保存・初期言語選択・別チェーン・承認拒否・失敗からの復帰・同じ模擬取引の再確認・根拠取得中・未発行・情報取得不能を操作した。操作中の全ブラウザ要求が同一オリジンへのGETであることを確認し、外部APIへの接続や送信処理がないことを検証した。
+
+画像確認でdaisyUIのCSSレイヤーによる下部ボタン幅の競合を見つけて修正した。WebKitのLinux環境では既定の代替フォントで英数字が描画されなかったため、Arialの代替指定を追加した。検証環境の共有ライブラリは `/tmp` に取得し、WebKit用の一時起動スクリプトで参照した。配布スクリプトのライブラリパス上書きと、システムのライブラリ一覧だけを見る事前検査を回避して実ブラウザを起動した。通常環境ではREADMEの `playwright install --with-deps` を使用する。
+
+公開版ではPlaywright 1.61.1のWebKit撮影処理が `body {}` の一時style要素を挿入し、CSP警告を出すことを最小操作と依存ソースで確認した。撮影中のこの特定メッセージだけを `playwrightScreenshotCspWarnings` として別集計し、アプリ操作時のエラーは引き続き失敗にする。配信CSPは緩和していない。
+
+スマホ実機、実カメラ、MetaMask往復、MultiBaas API、Amoy、CLI・コントラクトは未検証。F01〜F10、A01〜A11の実接続試験に合格したとは扱わない。今回の作業ではコミット・pushは行っていない。
+
+最終公開版の検証がChromium・WebKitで成功した。320・390・430pxとPC幅、日英表示、スキャン入口から模擬カメラへの遷移、登録フローを確認した。公開されている7アセットがローカルのビルドとバイト単位で一致し、SHA-256を保存した。
+
+- [実行日時・ブラウザ・配信アセットの検証結果](assets/ui-mock/results.json)
+- [スキャン入口](assets/ui-mock/scan-entry.png)、[模擬カメラ](assets/ui-mock/camera-preview.png)、[公開確認](assets/ui-mock/registered-owner.png)
+- [所有者登録](assets/ui-mock/registration.png)、[承認](assets/ui-mock/approval.png)
+- [WebKit・320pxの模擬カメラ](assets/ui-mock/webkit-camera-320.png)、[WebKit・390pxの登録](assets/ui-mock/webkit-registration-390.png)、[430pxの公開確認](assets/ui-mock/owner-430.png)、[英語・320px](assets/ui-mock/english-320.png)
+
+操作中のアプリのコンソールエラーは0件。WebKitの撮影ツール由来のCSP警告72件は別記録した。公開直後のアセット比較で一度不一致が出たため、配信内容を再取得して確認し、一致した状態で全検証を完了した。文書の参照先・要件ID・空白、JavaScriptの構文も確認した。

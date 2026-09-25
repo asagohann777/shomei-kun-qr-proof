@@ -1,0 +1,31 @@
+{
+  "base": "https://shomei-kun-ui-mock.dptr.workers.dev",
+  "verifiedAt": "2026-09-25T13:44:59.088Z",
+  "results": [
+    {
+      "browser": "chromium",
+      "version": "149.0.7827.55",
+      "status": "passed",
+      "requests": 441,
+      "consoleErrors": [],
+      "playwrightScreenshotCspWarnings": 0
+    },
+    {
+      "browser": "webkit",
+      "version": "26.5",
+      "status": "passed",
+      "requests": 491,
+      "consoleErrors": [],
+      "playwrightScreenshotCspWarnings": 72
+    }
+  ],
+  "assetHashes": {
+    "index.html": "f9165c9f4eaf9fdd0b23bce97aacad7cccd984b1809bd6730bc177ddd79f594a",
+    "app.js": "fcfd8b98460d11300d18024657d2de7c9b9bc0e21a028d7340de25cf68d44415",
+    "messages.js": "c317252c9087b89c4e439e4253c430519816d21f9ca88d0f9e4097863745b306",
+    "style.css": "56e10e9301c827da089bcfab22ca9e006156d2dc67abf9e9029aee7ae9c2666a",
+    "player.svg": "aa03e96d73f0154f740133fdfda2cc41a01b52fde8b9f5481e2e42a30cf45acf",
+    "card-qr.svg": "b119694135df0a67a8ca3cf79d9309a955524fe660a8e02f3faa6d5a02b19d03",
+    "favicon.svg": "32c8afa370fd7e9dab50bbdd3e40d97b1a349bebae05f9b5c96bbd0c11c669ae"
+  }
+}
