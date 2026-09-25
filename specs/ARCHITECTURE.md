@@ -62,7 +62,7 @@ QRは発行単位とカードを特定できる公開ページURLを指す。URL
 
 ## 最小インターフェース
 
-以下は責務と入出力の定義である。具体的なABI・型・コマンド名は、実装用OpenSpec changeで確定する。
+以下は実接続時の責務と入出力の定義である。Web APIの固定モック契約は [BACKEND_DESIGN.md](BACKEND_DESIGN.md) と [openapi.yaml](openapi.yaml) に定義した。ABI・Gatewayの実接続型・CLIコマンド名は後続の設計で確定する。
 
 | 操作 | 入力 | 結果・制約 |
 | --- | --- | --- |

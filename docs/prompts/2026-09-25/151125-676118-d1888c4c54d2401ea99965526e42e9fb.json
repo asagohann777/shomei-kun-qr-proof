@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T15:11:25.676118+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0d91f-0abc-7c11-bc9c-bc570a098155",
+  "prompt": "Implement the plan.",
+  "model": "gpt-6-astra"
+}

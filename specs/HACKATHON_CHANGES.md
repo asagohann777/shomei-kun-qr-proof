@@ -167,3 +167,13 @@ Node.js 22.23.1、Playwright 1.61.1を使用した。`npm run build` が成功�
 - 画像は制作途中として保存した。採用判断、画像編集、アプリへの反映は行っていない。各画像のAI使用範囲・ライセンスは未確認。
 
 その後、ユーザーが会話本文を貼り付けた。Codexが対応するhook JSONから [会話抜粋の原文](../docs/prompts/asagohann777-design-2026-09-25-transcript.txt)を抽出して保存した。ユーザー指示とChatGPT回答が混在する本文を編集せず、hook記録の該当部分と完全一致することを確認した。共有URL自体の取得失敗は解消していない。
+
+## 2026-09-26 JST: 固定モックのWeb API詳細設計
+
+ユーザーが、MultiBaas・ウォレット署名・送信のモック化、固定サンプル応答、Web API優先、サンプル入力への限定を選択し、設計成果物の作成計画を承認した。大会期間との対応は未確認。
+
+Codexが [詳細設計](BACKEND_DESIGN.md)、[OpenAPI定義](openapi.yaml)、[静的検証スクリプト](../scripts/verify_backend_spec.py)、[検証用依存定義](../scripts/requirements-backend-spec.txt)、[会話の選択記録](../docs/prompts/backend-design-decisions.md)を作成した。`SPEC.md`、`ARCHITECTURE.md`、`PLAN.md`、この変更記録も更新した。APIのフィールド、状態、照合条件、エラーと試験計画の具体化にAIを使用した。
+
+Python 3.11でOpenAPI 3.1の構文・参照を検証した。3 APIの応答例30件、シナリオ19件、固定値の対応が検証に合格した。不正な入力・応答10件がJSON Schemaで拒否されることを確認した。最初の検証でサンプルアドレスが42桁の16進数になっていたため40桁へ修正し、再検証した。再実行手順は詳細設計書に記載した。文書のローカル参照先、要件ID、空白も確認した。
+
+B01〜B11はAPI実装後の試験計画で、実行していない。APIサーバー、Gateway、ウォレット、Amoy接続は未実装。既存UI・既存PoCの変更、デプロイ、commit・pushは行っていない。

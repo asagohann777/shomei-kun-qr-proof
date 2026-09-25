@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T14:01:09.789742+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0d8de-b67e-7212-b1b9-0136db69f9ff",
+  "prompt": "$openspec-explore  multibassの接続はモックにしてバックエンドの詳細設計するよ",
+  "model": "gpt-6-astra"
+}

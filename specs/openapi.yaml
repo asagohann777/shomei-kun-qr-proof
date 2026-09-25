@@ -1,0 +1,979 @@
+openapi: 3.1.0
+info:
+  title: 証明くん Web API
+  version: 0.1.0
+  description: 詳細設計。APIは未実装。固定サンプルを返すモックを対象とし、署名・送信・保存は行わない。例のアドレス、ハッシュ、ブロック番号は模擬値であり実証跡ではない。
+servers:
+- url: /
+  description: UIと同一オリジン。既存の静的UIモックにはこのAPIは存在しない。
+security: []
+tags:
+- name: Registration
+  description: 公開読取り、未署名取引の準備、登録取引の照合
+paths:
+  /api/v1/cards/{cardId}:
+    get:
+      operationId: getCard
+      summary: カードの登録情報を取得する
+      tags:
+      - Registration
+      parameters:
+      - $ref: '#/components/parameters/CardId'
+      - $ref: '#/components/parameters/MockScenario'
+      responses:
+        '200':
+          description: 取得または準備に成功。登録確定を意味するのは取引照会のconfirmedのみ。
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+              examples:
+                registered:
+                  $ref: '#/components/examples/registered'
+                unregistered:
+                  $ref: '#/components/examples/unregistered'
+                evidence-pending:
+                  $ref: '#/components/examples/evidence-pending'
+        '400':
+          description: INVALID_INPUT, INVALID_MOCK_SCENARIO
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                INVALID_INPUT:
+                  $ref: '#/components/examples/INVALID_INPUT'
+                INVALID_MOCK_SCENARIO:
+                  $ref: '#/components/examples/INVALID_MOCK_SCENARIO'
+        '404':
+          description: CARD_NOT_FOUND
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                CARD_NOT_FOUND:
+                  $ref: '#/components/examples/CARD_NOT_FOUND'
+        '503':
+          description: UPSTREAM_UNAVAILABLE
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                UPSTREAM_UNAVAILABLE:
+                  $ref: '#/components/examples/UPSTREAM_UNAVAILABLE'
+        '500':
+          description: INTERNAL_ERROR
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                INTERNAL_ERROR:
+                  $ref: '#/components/examples/INTERNAL_ERROR'
+      x-mock-scenarios:
+        default:
+          status: 200
+          example: registered
+        registered:
+          status: 200
+          example: registered
+        unregistered:
+          status: 200
+          example: unregistered
+        not-found:
+          status: 404
+          example: CARD_NOT_FOUND
+        evidence-pending:
+          status: 200
+          example: evidence-pending
+        unavailable:
+          status: 503
+          example: UPSTREAM_UNAVAILABLE
+  /api/v1/cards/{cardId}/registration/prepare:
+    post:
+      operationId: prepareRegistration
+      summary: 未署名取引を準備する
+      tags:
+      - Registration
+      parameters:
+      - $ref: '#/components/parameters/CardId'
+      - $ref: '#/components/parameters/MockScenario'
+      responses:
+        '200':
+          description: 取得または準備に成功。登録確定を意味するのは取引照会のconfirmedのみ。
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrepareResponse'
+              examples:
+                prepared:
+                  $ref: '#/components/examples/prepared'
+        '400':
+          description: INVALID_INPUT, INVALID_MOCK_SCENARIO
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                INVALID_INPUT:
+                  $ref: '#/components/examples/INVALID_INPUT'
+                INVALID_MOCK_SCENARIO:
+                  $ref: '#/components/examples/INVALID_MOCK_SCENARIO'
+        '404':
+          description: CARD_NOT_FOUND
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                CARD_NOT_FOUND:
+                  $ref: '#/components/examples/CARD_NOT_FOUND'
+        '409':
+          description: ALREADY_REGISTERED
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                ALREADY_REGISTERED:
+                  $ref: '#/components/examples/ALREADY_REGISTERED'
+        '422':
+          description: CHAIN_MISMATCH, WALLET_NOT_ALLOWED, MOCK_SAMPLE_UNSUPPORTED
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                CHAIN_MISMATCH:
+                  $ref: '#/components/examples/CHAIN_MISMATCH'
+                WALLET_NOT_ALLOWED:
+                  $ref: '#/components/examples/WALLET_NOT_ALLOWED'
+                MOCK_SAMPLE_UNSUPPORTED:
+                  $ref: '#/components/examples/MOCK_SAMPLE_UNSUPPORTED'
+        '413':
+          description: PAYLOAD_TOO_LARGE
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                PAYLOAD_TOO_LARGE:
+                  $ref: '#/components/examples/PAYLOAD_TOO_LARGE'
+        '415':
+          description: UNSUPPORTED_MEDIA_TYPE
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                UNSUPPORTED_MEDIA_TYPE:
+                  $ref: '#/components/examples/UNSUPPORTED_MEDIA_TYPE'
+        '503':
+          description: UPSTREAM_UNAVAILABLE
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                UPSTREAM_UNAVAILABLE:
+                  $ref: '#/components/examples/UPSTREAM_UNAVAILABLE'
+        '500':
+          description: INTERNAL_ERROR
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                INTERNAL_ERROR:
+                  $ref: '#/components/examples/INTERNAL_ERROR'
+      x-mock-scenarios:
+        default:
+          status: 200
+          example: prepared
+        unregistered:
+          status: 200
+          example: prepared
+        registered:
+          status: 409
+          example: ALREADY_REGISTERED
+        not-found:
+          status: 404
+          example: CARD_NOT_FOUND
+        unavailable:
+          status: 503
+          example: UPSTREAM_UNAVAILABLE
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrepareRequest'
+            example:
+              walletAddress: '0x7a31000000000000000000000000000000008f42'
+              chainId: 80002
+              nickname: おじいちゃんコンビニ
+  /api/v1/cards/{cardId}/transactions/{txHash}:
+    get:
+      operationId: getRegistrationTransaction
+      summary: 対象カードの登録取引を確認する
+      tags:
+      - Registration
+      parameters:
+      - $ref: '#/components/parameters/CardId'
+      - $ref: '#/components/parameters/MockScenario'
+      - $ref: '#/components/parameters/TransactionHash'
+      responses:
+        '200':
+          description: 取得または準備に成功。登録確定を意味するのは取引照会のconfirmedのみ。
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              examples:
+                pending:
+                  $ref: '#/components/examples/pending'
+                confirmed:
+                  $ref: '#/components/examples/confirmed'
+                reverted:
+                  $ref: '#/components/examples/reverted'
+                unknown:
+                  $ref: '#/components/examples/unknown'
+                mismatch:
+                  $ref: '#/components/examples/mismatch'
+        '400':
+          description: INVALID_INPUT, INVALID_MOCK_SCENARIO
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                INVALID_INPUT:
+                  $ref: '#/components/examples/INVALID_INPUT'
+                INVALID_MOCK_SCENARIO:
+                  $ref: '#/components/examples/INVALID_MOCK_SCENARIO'
+        '404':
+          description: CARD_NOT_FOUND
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                CARD_NOT_FOUND:
+                  $ref: '#/components/examples/CARD_NOT_FOUND'
+        '503':
+          description: UPSTREAM_UNAVAILABLE
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                UPSTREAM_UNAVAILABLE:
+                  $ref: '#/components/examples/UPSTREAM_UNAVAILABLE'
+        '500':
+          description: INTERNAL_ERROR
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                INTERNAL_ERROR:
+                  $ref: '#/components/examples/INTERNAL_ERROR'
+      x-mock-scenarios:
+        default:
+          status: 200
+          example: confirmed
+        registered:
+          status: 200
+          example: confirmed
+        pending:
+          status: 200
+          example: pending
+        reverted:
+          status: 200
+          example: reverted
+        unknown:
+          status: 200
+          example: unknown
+        mismatch:
+          status: 200
+          example: mismatch
+        not-found:
+          status: 404
+          example: CARD_NOT_FOUND
+        unavailable:
+          status: 503
+          example: UPSTREAM_UNAVAILABLE
+components:
+  parameters:
+    CardId:
+      name: cardId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/CardId'
+      example: SK-2026-001
+    TransactionHash:
+      name: txHash
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/TransactionHash'
+      example: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    MockScenario:
+      name: X-Mock-Scenario
+      in: header
+      required: false
+      schema:
+        type: string
+        enum:
+        - default
+        - registered
+        - unregistered
+        - not-found
+        - pending
+        - reverted
+        - unknown
+        - evidence-pending
+        - unavailable
+        - mismatch
+        default: default
+      description: モック専用。省略時はdefault。操作別の許可値はx-mock-scenariosに定義。非対応の組合せは400。liveモードでは指定自体を400にする。
+  schemas:
+    Address:
+      type: string
+      pattern: ^0x[0-9a-fA-F]{40}$
+    TransactionHash:
+      type: string
+      pattern: ^0x[0-9a-fA-F]{64}$
+    CardId:
+      type: string
+      minLength: 1
+      maxLength: 64
+      pattern: ^[A-Za-z0-9_-]+$
+    Meta:
+      type: object
+      additionalProperties: false
+      required:
+      - mode
+      properties:
+        mode:
+          type: string
+          enum:
+          - mock
+          - live
+      description: 今回はmockのみ返す。liveは将来の実接続用。mockの場合、実ウォレットへの引渡しと外部取引リンクを禁止する。
+    Owner:
+      type: object
+      additionalProperties: false
+      required:
+      - address
+      - nickname
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        nickname:
+          type: string
+          minLength: 1
+    Registry:
+      type: object
+      additionalProperties: false
+      required:
+      - chainId
+      - contractAddress
+      - issuer
+      properties:
+        chainId:
+          type: integer
+          const: 80002
+        contractAddress:
+          $ref: '#/components/schemas/Address'
+        issuer:
+          $ref: '#/components/schemas/Address'
+    EvidenceAvailable:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - transactionHash
+      - blockNumber
+      properties:
+        status:
+          type: string
+          enum:
+          - available
+        transactionHash:
+          $ref: '#/components/schemas/TransactionHash'
+        blockNumber:
+          type: integer
+          minimum: 0
+    EvidencePending:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - pending
+    EvidenceNone:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - none
+    UnregisteredCard:
+      type: object
+      additionalProperties: false
+      required:
+      - cardId
+      - registry
+      - playerName
+      - status
+      - owner
+      - evidence
+      properties:
+        cardId:
+          $ref: '#/components/schemas/CardId'
+        registry:
+          $ref: '#/components/schemas/Registry'
+        playerName:
+          type: string
+        status:
+          type: string
+          enum:
+          - unregistered
+        owner:
+          type: 'null'
+        evidence:
+          $ref: '#/components/schemas/EvidenceNone'
+    RegisteredCard:
+      type: object
+      additionalProperties: false
+      required:
+      - cardId
+      - registry
+      - playerName
+      - status
+      - owner
+      - evidence
+      properties:
+        cardId:
+          $ref: '#/components/schemas/CardId'
+        registry:
+          $ref: '#/components/schemas/Registry'
+        playerName:
+          type: string
+        status:
+          type: string
+          enum:
+          - registered
+        owner:
+          $ref: '#/components/schemas/Owner'
+        evidence:
+          oneOf:
+          - $ref: '#/components/schemas/EvidenceAvailable'
+          - $ref: '#/components/schemas/EvidencePending'
+    PrepareRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - walletAddress
+      - chainId
+      - nickname
+      properties:
+        walletAddress:
+          $ref: '#/components/schemas/Address'
+        chainId:
+          type: integer
+          minimum: 1
+        nickname:
+          type: string
+          minLength: 1
+    UnsignedTransaction:
+      type: object
+      additionalProperties: false
+      required:
+      - chainId
+      - from
+      - to
+      - data
+      - value
+      properties:
+        chainId:
+          type: integer
+          const: 80002
+        from:
+          $ref: '#/components/schemas/Address'
+        to:
+          $ref: '#/components/schemas/Address'
+        data:
+          type: string
+          pattern: ^0x(?:[0-9a-fA-F]{2})*$
+        value:
+          type: string
+          const: '0'
+      description: 共通転送形式。valueはweiの10進文字列。この操作は送金しない。モックのdata=0xはABI未確定のプレースホルダーで、実送信不可。nonce・gas・手数料は含めない。
+    PreparedRegistration:
+      type: object
+      additionalProperties: false
+      required:
+      - cardId
+      - nickname
+      - transaction
+      properties:
+        cardId:
+          $ref: '#/components/schemas/CardId'
+        nickname:
+          type: string
+          minLength: 1
+        transaction:
+          $ref: '#/components/schemas/UnsignedTransaction'
+    PendingTransaction:
+      type: object
+      additionalProperties: false
+      required:
+      - cardId
+      - transactionHash
+      - status
+      properties:
+        cardId:
+          $ref: '#/components/schemas/CardId'
+        transactionHash:
+          $ref: '#/components/schemas/TransactionHash'
+        status:
+          type: string
+          enum:
+          - pending
+    ConfirmedTransaction:
+      type: object
+      additionalProperties: false
+      required:
+      - cardId
+      - transactionHash
+      - status
+      - owner
+      - blockNumber
+      properties:
+        cardId:
+          $ref: '#/components/schemas/CardId'
+        transactionHash:
+          $ref: '#/components/schemas/TransactionHash'
+        status:
+          type: string
+          enum:
+          - confirmed
+        owner:
+          $ref: '#/components/schemas/Owner'
+        blockNumber:
+          type: integer
+          minimum: 0
+    RevertedTransaction:
+      type: object
+      additionalProperties: false
+      required:
+      - cardId
+      - transactionHash
+      - status
+      properties:
+        cardId:
+          $ref: '#/components/schemas/CardId'
+        transactionHash:
+          $ref: '#/components/schemas/TransactionHash'
+        status:
+          type: string
+          enum:
+          - reverted
+    UnknownTransaction:
+      type: object
+      additionalProperties: false
+      required:
+      - cardId
+      - transactionHash
+      - status
+      - reason
+      properties:
+        cardId:
+          $ref: '#/components/schemas/CardId'
+        transactionHash:
+          $ref: '#/components/schemas/TransactionHash'
+        status:
+          type: string
+          enum:
+          - unknown
+        reason:
+          type: string
+          enum:
+          - TRANSACTION_NOT_SEEN
+          - RECORD_MISMATCH
+    CardResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - meta
+      - data
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/UnregisteredCard'
+          - $ref: '#/components/schemas/RegisteredCard'
+    PrepareResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - meta
+      - data
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        data:
+          $ref: '#/components/schemas/PreparedRegistration'
+    TransactionResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - meta
+      - data
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/PendingTransaction'
+          - $ref: '#/components/schemas/ConfirmedTransaction'
+          - $ref: '#/components/schemas/RevertedTransaction'
+          - $ref: '#/components/schemas/UnknownTransaction'
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - meta
+      - error
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        error:
+          type: object
+          additionalProperties: false
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              enum:
+              - INVALID_INPUT
+              - INVALID_MOCK_SCENARIO
+              - CARD_NOT_FOUND
+              - ALREADY_REGISTERED
+              - WALLET_NOT_ALLOWED
+              - CHAIN_MISMATCH
+              - MOCK_SAMPLE_UNSUPPORTED
+              - UPSTREAM_UNAVAILABLE
+              - INTERNAL_ERROR
+              - PAYLOAD_TOO_LARGE
+              - UNSUPPORTED_MEDIA_TYPE
+            message:
+              type: string
+              minLength: 1
+  examples:
+    registered:
+      value:
+        meta:
+          mode: mock
+        data:
+          cardId: SK-2026-001
+          playerName: 証明一郎
+          registry:
+            chainId: 80002
+            contractAddress: '0x3333333333333333333333333333333333333333'
+            issuer: '0x4444444444444444444444444444444444444444'
+          status: registered
+          owner:
+            address: '0x7a31000000000000000000000000000000008f42'
+            nickname: おじいちゃんコンビニ
+          evidence:
+            status: available
+            transactionHash: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            blockNumber: 100
+    unregistered:
+      value:
+        meta:
+          mode: mock
+        data:
+          cardId: SK-2026-001
+          playerName: 証明一郎
+          registry:
+            chainId: 80002
+            contractAddress: '0x3333333333333333333333333333333333333333'
+            issuer: '0x4444444444444444444444444444444444444444'
+          status: unregistered
+          owner: null
+          evidence:
+            status: none
+    evidence-pending:
+      value:
+        meta:
+          mode: mock
+        data:
+          cardId: SK-2026-001
+          playerName: 証明一郎
+          registry:
+            chainId: 80002
+            contractAddress: '0x3333333333333333333333333333333333333333'
+            issuer: '0x4444444444444444444444444444444444444444'
+          status: registered
+          owner:
+            address: '0x7a31000000000000000000000000000000008f42'
+            nickname: おじいちゃんコンビニ
+          evidence:
+            status: pending
+    prepared:
+      value:
+        meta:
+          mode: mock
+        data:
+          cardId: SK-2026-001
+          nickname: おじいちゃんコンビニ
+          transaction:
+            chainId: 80002
+            from: '0x7a31000000000000000000000000000000008f42'
+            to: '0x3333333333333333333333333333333333333333'
+            value: '0'
+            data: 0x
+    pending:
+      value:
+        meta:
+          mode: mock
+        data:
+          cardId: SK-2026-001
+          transactionHash: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          status: pending
+    confirmed:
+      value:
+        meta:
+          mode: mock
+        data:
+          cardId: SK-2026-001
+          transactionHash: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          status: confirmed
+          owner:
+            address: '0x7a31000000000000000000000000000000008f42'
+            nickname: おじいちゃんコンビニ
+          blockNumber: 100
+    reverted:
+      value:
+        meta:
+          mode: mock
+        data:
+          cardId: SK-2026-001
+          transactionHash: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          status: reverted
+    unknown:
+      value:
+        meta:
+          mode: mock
+        data:
+          cardId: SK-2026-001
+          transactionHash: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          status: unknown
+          reason: TRANSACTION_NOT_SEEN
+    mismatch:
+      value:
+        meta:
+          mode: mock
+        data:
+          cardId: SK-2026-001
+          transactionHash: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          status: unknown
+          reason: RECORD_MISMATCH
+    INVALID_INPUT:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: INVALID_INPUT
+          message: Invalid request.
+    INVALID_MOCK_SCENARIO:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: INVALID_MOCK_SCENARIO
+          message: Scenario is not supported for this operation.
+    CARD_NOT_FOUND:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: CARD_NOT_FOUND
+          message: Card has not been issued.
+    ALREADY_REGISTERED:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: ALREADY_REGISTERED
+          message: Card is already registered.
+    WALLET_NOT_ALLOWED:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: WALLET_NOT_ALLOWED
+          message: Wallet is not authorized for this card.
+    CHAIN_MISMATCH:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: CHAIN_MISMATCH
+          message: Polygon Amoy is required.
+    MOCK_SAMPLE_UNSUPPORTED:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: MOCK_SAMPLE_UNSUPPORTED
+          message: Use the supported sample nickname.
+    UPSTREAM_UNAVAILABLE:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: UPSTREAM_UNAVAILABLE
+          message: Upstream service is unavailable.
+    INTERNAL_ERROR:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: INTERNAL_ERROR
+          message: Internal server error.
+    PAYLOAD_TOO_LARGE:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: PAYLOAD_TOO_LARGE
+          message: Request body is too large.
+    UNSUPPORTED_MEDIA_TYPE:
+      value:
+        meta:
+          mode: mock
+        error:
+          code: UNSUPPORTED_MEDIA_TYPE
+          message: Use application/json.
+x-mock-sample:
+  cardId: SK-2026-001
+  playerName: 証明一郎
+  walletAddress: '0x7a31000000000000000000000000000000008f42'
+  nickname: おじいちゃんコンビニ
+  chainId: 80002
+  contractAddress: '0x3333333333333333333333333333333333333333'
+  issuer: '0x4444444444444444444444444444444444444444'
+  transactionHash: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+  blockNumber: 100
