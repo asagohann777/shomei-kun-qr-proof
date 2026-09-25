@@ -193,3 +193,9 @@ OpenAPIの型定義に合わせた判別可能な型を使用した。Workersで
 AIで作成・変更したファイルは `apps/web/` の実装・構成・試験・README・生成物、`scripts/verify_backend_spec.py`、`specs/openapi.yaml`、`BACKEND_IMPLEMENTATION.md`、`BACKEND_DESIGN.md`、`SPEC.md`、`ARCHITECTURE.md`、`PLAN.md`、この変更記録、[HTTP試験結果](assets/backend/http-next.txt)と [Workers試験結果](assets/backend/http-worker.txt)。生成物はOpenAPIと生成スクリプトから再現できる。
 
 既存UIの接続、実ウォレット・MultiBaas・Amoy、発行者CLIは未実装・未検証。F01〜F10・A01〜A11の実接続試験の合格とは扱わない。既存UI・既存PoCの変更、デプロイ、commit・pushは行っていない。
+
+## 2026-09-26: おじいちゃんコンビニの追加図案を保存
+
+ユーザー指定の `origin/main` をfast-forwardで取り込んだ後、[追加図案12点の一覧](assets/asagohann777/2026-09-26/README.md)を作成した。新規8点を保存し、既存4点は内容が一致する保存済みファイルを参照した。12点すべてを元画像とバイト単位で照合した。制作プロンプトは未受領。大会期間との対応は未確認。
+
+ユーザーが作者を指定し、共同著者付きコミットを指示した。Codexがコピー、照合、一覧とハッシュの記録を担当した。UI変更はこの画像保存コミットの後に行う。
