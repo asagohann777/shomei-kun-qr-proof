@@ -78,3 +78,7 @@
 - [スマホ登録への訂正](../docs/prompts/2026-09-25/122429-037897-c475cb8e8fd244c08302e2043f25f922.json)
 - [計画の実行指示](../docs/prompts/2026-09-25/122651-114438-1fe83e01648547c1a4e98d4f8cc0ec12.json)
 - [選択式の質問と回答の手動記録](../docs/prompts/qr-proof-decisions.md)
+
+## 2026-09-26 JST: 詳細設計に沿った実装
+
+[ユーザーの実装指示](../docs/prompts/2026-09-25/152556-790938-5fdac443e5ab4602b26eb512cec3edb6.json)により、固定モックのWeb APIを `apps/web/` に実装する。[実装計画と検証](BACKEND_IMPLEMENTATION.md)に担当範囲、手順、結果を保存する。既存UIとの接続、実ウォレット、MultiBaas・Amoy実接続、公開は含めない。

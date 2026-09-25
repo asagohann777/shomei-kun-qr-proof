@@ -4,7 +4,7 @@
 
 ## 目的と対象
 
-2026-09-26 JSTに、実接続前の [Web API詳細設計](BACKEND_DESIGN.md) と [OpenAPI定義](openapi.yaml) を追加した。MultiBaas・署名・送信を固定モックにする設計であり、以下の実接続要件を満たした実装とは扱わない。
+2026-09-26 JSTに、実接続前の [Web API詳細設計](BACKEND_DESIGN.md) と [OpenAPI定義](openapi.yaml) を追加した。MultiBaas・署名・送信を固定モックにする設計であり、以下の実接続要件を満たした実装とは扱わない。固定モックAPIの実装と試験は [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md) に記録する。
 
 天地愛プロジェクトの「証明くん」は、個人が自分の記録を登録し、必要な相手へ証明情報を提示する「証明の民主化」を目指す既存プロジェクトである。個人向けPoCがハッカソン以前から存在する。
 

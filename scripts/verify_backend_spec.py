@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from pathlib import Path
+import re
 
 import yaml
 from jsonschema import Draft202012Validator
@@ -36,7 +37,10 @@ for path, methods in document["paths"].items():
     for method, operation in methods.items():
         operations[operation["operationId"]] = (method, path)
         for response in operation["responses"].values():
-            assert response["headers"]["Cache-Control"]["schema"]["const"] == "no-store"
+            cache_pattern = response["headers"]["Cache-Control"]["schema"]["pattern"]
+            assert re.search(cache_pattern, "no-store")
+            assert re.search(cache_pattern, "private, no-cache, no-store, max-age=0, must-revalidate")
+            assert not re.search(cache_pattern, "public, max-age=3600")
             media = response["content"]["application/json"]
             validator = Draft202012Validator(resolve(media["schema"]))
             for example in media["examples"].values():

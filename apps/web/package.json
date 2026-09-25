@@ -1,0 +1,38 @@
+{
+  "name": "@shomei-kun/web-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0 <23"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "npm run generate:check && next build --webpack",
+    "start": "next start",
+    "generate": "node scripts/generate-contract.mjs",
+    "generate:check": "node scripts/generate-contract.mjs --check",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test --experimental-test-isolation=none --test-reporter=spec tests/*.test.ts",
+    "build:worker": "opennextjs-cloudflare build",
+    "preview": "opennextjs-cloudflare preview",
+    "test:http": "node scripts/verify-http.mjs next",
+    "test:worker": "node scripts/verify-http.mjs worker"
+  },
+  "dependencies": {
+    "next": "16.3.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@opennextjs/cloudflare": "1.20.6",
+    "@types/node": "22.20.4",
+    "@types/react": "19.3.0",
+    "ajv": "8.20.0",
+    "openapi-typescript": "7.13.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "wrangler": "4.140.0",
+    "yaml": "2.9.1"
+  }
+}

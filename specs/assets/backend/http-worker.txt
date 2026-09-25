@@ -1,0 +1,36 @@
+
+> @shomei-kun/web-api@0.1.0 test:worker
+> node scripts/verify-http.mjs worker
+
+✔ HTTP getCard / default (70.010754ms)
+✔ HTTP getCard / registered (13.678508ms)
+✔ HTTP getCard / unregistered (14.240313ms)
+✔ HTTP getCard / not-found (15.19082ms)
+✔ HTTP getCard / evidence-pending (15.018019ms)
+✔ HTTP getCard / unavailable (22.810381ms)
+✔ HTTP prepareRegistration / default (29.044229ms)
+✔ HTTP prepareRegistration / unregistered (15.390922ms)
+✔ HTTP prepareRegistration / registered (15.326321ms)
+✔ HTTP prepareRegistration / not-found (14.107512ms)
+✔ HTTP prepareRegistration / unavailable (17.070235ms)
+✔ HTTP getRegistrationTransaction / default (25.482901ms)
+✔ HTTP getRegistrationTransaction / registered (16.361629ms)
+✔ HTTP getRegistrationTransaction / pending (13.146804ms)
+✔ HTTP getRegistrationTransaction / reverted (12.718901ms)
+✔ HTTP getRegistrationTransaction / unknown (12.070196ms)
+✔ HTTP getRegistrationTransaction / mismatch (11.129988ms)
+✔ HTTP getRegistrationTransaction / not-found (13.795709ms)
+✔ HTTP getRegistrationTransaction / unavailable (16.589931ms)
+✔ HTTP defaults are independent happy fixtures (37.068193ms)
+✔ HTTP input errors and registration constraints (222.450459ms)
+✔ HTTP uppercase addresses and hashes normalize (22.68588ms)
+✔ HTTP unknown hashes cannot manufacture confirmation (25.911305ms)
+✔ HTTP parallel scenarios and repeated preparation do not mutate records (144.118939ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1042.831142

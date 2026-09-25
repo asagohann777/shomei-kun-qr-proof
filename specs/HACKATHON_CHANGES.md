@@ -177,3 +177,19 @@ Codexが [詳細設計](BACKEND_DESIGN.md)、[OpenAPI定義](openapi.yaml)、[�
 Python 3.11でOpenAPI 3.1の構文・参照を検証した。3 APIの応答例30件、シナリオ19件、固定値の対応が検証に合格した。不正な入力・応答10件がJSON Schemaで拒否されることを確認した。最初の検証でサンプルアドレスが42桁の16進数になっていたため40桁へ修正し、再検証した。再実行手順は詳細設計書に記載した。文書のローカル参照先、要件ID、空白も確認した。
 
 B01〜B11はAPI実装後の試験計画で、実行していない。APIサーバー、Gateway、ウォレット、Amoy接続は未実装。既存UI・既存PoCの変更、デプロイ、commit・pushは行っていない。
+
+## 2026-09-26 JST: 固定モックのWeb APIを実装
+
+[詳細設計に沿った実装指示](../docs/prompts/2026-09-25/152556-790938-5fdac443e5ab4602b26eb512cec3edb6.json)を受け、カード取得・登録準備・登録確認の3 APIを [apps/web](../apps/web/README.md) に追加した。大会期間との対応は未確認。
+
+CodexがNext.js・TypeScriptの構成、Route Handler、Registration Service、Mock Gateway、Mock Walletの操作ライブラリ、OpenAPIからの型・検証関数・固定サンプル生成、試験と起動手順を作成した。実装担当エージェントが `src/backend` と `src/app` を担当し、親エージェントが構成・生成・試験・文書を担当した。既存PoCのコードやデータは流用していない。
+
+登録準備はカード・許可ウォレット・チェーン・サンプル名を検証する。確認では取引、レシート、イベント、現在の登録内容を照合する。署名・送信・MultiBaas接続はモックで、DBや登録結果の保存はない。Mock Walletの拒否後に確認を開始せず、結果不明から自動再送しない。
+
+OpenAPIの型定義に合わせた判別可能な型を使用した。Workersでは動的コード生成を使わず、Ajvの検証コードを事前生成する。TypeScriptはOpenAPI型生成の互換条件に合わせ5.9.3とした。依存バージョンとlockfileを保存した。
+
+36件のサービス・境界・設定・Wallet試験、Next.jsとローカルWorkersそれぞれ24件のHTTP試験が成功した。OpenAPIの静的検証、生成物一致、型チェック、Next.jsとWorkers向けビルドも成功した。Workersの404には追加のキャッシュ制御指定が付くため、保存禁止を維持したままAPI定義と試験を調整した。初回の失敗と実行環境上の対応は [実装・検証記録](BACKEND_IMPLEMENTATION.md) に記載した。
+
+AIで作成・変更したファイルは `apps/web/` の実装・構成・試験・README・生成物、`scripts/verify_backend_spec.py`、`specs/openapi.yaml`、`BACKEND_IMPLEMENTATION.md`、`BACKEND_DESIGN.md`、`SPEC.md`、`ARCHITECTURE.md`、`PLAN.md`、この変更記録、[HTTP試験結果](assets/backend/http-next.txt)と [Workers試験結果](assets/backend/http-worker.txt)。生成物はOpenAPIと生成スクリプトから再現できる。
+
+既存UIの接続、実ウォレット・MultiBaas・Amoy、発行者CLIは未実装・未検証。F01〜F10・A01〜A11の実接続試験の合格とは扱わない。既存UI・既存PoCの変更、デプロイ、commit・pushは行っていない。

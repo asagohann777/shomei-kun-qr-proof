@@ -2,10 +2,10 @@ openapi: 3.1.0
 info:
   title: 証明くん Web API
   version: 0.1.0
-  description: 詳細設計。APIは未実装。固定サンプルを返すモックを対象とし、署名・送信・保存は行わない。例のアドレス、ハッシュ、ブロック番号は模擬値であり実証跡ではない。
+  description: 固定モックAPIの契約。apps/webに参照実装がある。固定サンプルを返すモックを対象とし、署名・送信・保存は行わない。例のアドレス、ハッシュ、ブロック番号は模擬値であり実証跡ではない。
 servers:
 - url: /
-  description: UIと同一オリジン。既存の静的UIモックにはこのAPIは存在しない。
+  description: API配置先と同一オリジン。既存の静的UIモックはこのAPIに未接続。
 security: []
 tags:
 - name: Registration
@@ -27,7 +27,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -45,7 +45,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -61,7 +61,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -75,7 +75,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -89,7 +89,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -132,7 +132,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -146,7 +146,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -162,7 +162,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -176,7 +176,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -190,7 +190,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -208,7 +208,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -222,7 +222,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -236,7 +236,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -250,7 +250,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -301,7 +301,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -323,7 +323,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -339,7 +339,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -353,7 +353,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:
@@ -367,7 +367,7 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                pattern: '(^|,\s*)no-store(\s*,|$)'
           content:
             application/json:
               schema:

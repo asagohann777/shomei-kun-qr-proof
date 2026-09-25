@@ -2,6 +2,8 @@
 
 状態: 2026-09-25の追加指示により、MultiBaas API中心・Polygon Amoyへ改訂した設計。以下の実接続構成は未実装。接続環境の確認・互換性検証も未実施。相談用UIモックの構成は [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) を参照する。
 
+固定モックAPIは [apps/web](../apps/web/README.md) に実装した。MultiBaas・署名・送信は模擬し、既存UIへの接続と実接続構成の実装は後続とする。検証結果は [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md) を参照する。
+
 ## 構成と責務
 
 既存PoCから独立した追加機能として構成する。既存「証明くん」のコード・データ・保存先に接続しない。
