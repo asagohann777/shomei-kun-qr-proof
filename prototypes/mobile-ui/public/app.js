@@ -1,8 +1,12 @@
 import { messages } from './messages.js';
 import { liveMessages } from './live-messages.js';
 import QRCode from 'qrcode';
+import QrScanner from 'qr-scanner';
+import { createCameraSession, parseCardQr } from '../src/camera-session.js';
+import { cameraMessages } from './camera-messages.js';
 
 const config = __UI_CONFIG__;
+const cameraEnabled = config.cameraMode === 'live';
 const liveEnabled = config.apiMode === 'live';
 let live = null;
 let liveSnapshot = null;
@@ -43,12 +47,72 @@ const read = (storage, key) => { try { return window[storage].getItem(key); } ca
 const write = (storage, key, value) => { try { window[storage].setItem(key, value); } catch { return; } };
 const savedLocale = read('localStorage', localeKey);
 let locale = ['ja', 'en'].includes(savedLocale) ? savedLocale : navigator.languages.map((item) => item.split('-')[0]).find((item) => ['ja', 'en'].includes(item)) || 'en';
-const t = (key) => (liveEnabled ? liveMessages[locale][key] : undefined) ?? messages[locale][key];
+const t = (key) => cameraMessages[locale][key] ?? (liveEnabled ? liveMessages[locale][key] : undefined) ?? messages[locale][key];
 const lines = (key) => escape(t(key)).replace(/\n/g, '<br>');
 let timer;
 let scanning = false;
 let cameraOpen = false;
 let state = liveEnabled ? { ...fixture('unregistered'), nickname: '', view: currentCardId ? 'card' : 'scan' } : restore();
+
+let cameraState = { kind: 'stopped' };
+function createCameraVideo() {
+  const video = document.createElement('video');
+  video.id = 'camera-video'; video.className = 'camera-video'; video.muted = true; video.playsInline = true;
+  return video;
+}
+const photoInput = document.createElement('input');
+photoInput.type = 'file'; photoInput.accept = 'image/*'; photoInput.hidden = true; photoInput.id = 'camera-photo';
+document.body.append(photoInput);
+const camera = createCameraSession({
+  createVideo: createCameraVideo,
+  scannerFactory: (element, decoded, failed) => new QrScanner(element, decoded, { onDecodeError: error => { if (error !== QrScanner.NO_QR_CODE_FOUND) failed(error); }, preferredCamera: 'environment', returnDetailedScanResult: true, highlightScanRegion: false, maxScansPerSecond: 8 }),
+  imageEngine: () => QrScanner.createQrEngine(),
+  scanImage: (file, options) => QrScanner.scanImage(file, options),
+  parse: value => parseCardQr(value, config),
+  changed: next => { cameraState = next; if (cameraOpen && state.view === 'scan') render(true); },
+  detected: result => {
+    cameraOpen = false;
+    if (result.kind === 'sample') { choose('registered'); return; }
+    const url = new URL(location.href); url.search = new URLSearchParams({ cardId: result.id });
+    history.pushState(null, '', url);
+    if (liveEnabled) { void openLiveCard(result.id); return; }
+    state = { ...fixture('unregistered'), scannedCardId: result.id };
+    setCardQr(result.id); persist(); render(); window.scrollTo(0, 0);
+  },
+});
+photoInput.addEventListener('change', () => { const file = photoInput.files[0]; photoInput.value = ''; if (cameraOpen && state.view === 'scan') void camera.photo(file); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && cameraOpen && cameraEnabled) camera.pause(); });
+window.addEventListener('pagehide', () => { if (cameraEnabled) camera.pause(); });
+
+function setCardQr(id) {
+  qrIdentity = id; qrSource = null;
+  const url = new URL(config.publicUrl); url.search = new URLSearchParams({ cardId: id });
+  QRCode.toDataURL(url.href, { margin: 1, color: { dark: '#172b4d', light: '#ffffff' } }).then(source => {
+    if (qrIdentity !== id) return;
+    qrSource = source;
+    for (const image of root.querySelectorAll('.card-qr')) image.src = source;
+  });
+}
+function liveCameraView() {
+  const active = cameraState.kind === 'scanning';
+  const paused = ['paused', 'stopped'].includes(cameraState.kind);
+  const busy = ['starting', 'photo'].includes(cameraState.kind);
+  const label = cameraState.error ?? ({ starting: 'cameraStarting', photo: 'photoReading', paused: 'cameraPaused', stopped: 'cameraPaused' }[cameraState.kind] ?? 'cameraTitle');
+  const status = label === 'cameraError'
+    ? `<div class="scan-status camera-error" role="status"><h1>${escape(t(label))}</h1><p>${escape(t('cameraErrorHelp'))}</p></div>`
+    : `<h1 class="scan-status" role="status">${escape(t(label))}</h1>`;
+  return `<section class="page camera-page live-camera-page">${active && cameraState.torch ? `<button class="flash-button" data-action="flash" aria-pressed="${cameraState.light}">${icon('flash')}<span>${t('flash')}</span></button>` : ''}<div class="scanner live-scanner" aria-label="${t('scanHint')}"><span id="camera-slot"></span>${paused ? `<div class="camera-resume"><button type="button" class="btn btn-primary" data-action="resume-camera">${icon('qr')}${t('cameraResume')}</button></div>` : ''}<div class="scan-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div>${active ? '<div class="scan-light-track" aria-hidden="true"><div class="scan-sweep"></div></div>' : ''}</div>${status}<div class="scan-tools"><button class="round-tool" data-action="photos" ${cameraState.kind === 'photo' ? 'disabled' : ''}>${icon('photo')}<span>${t('fromPhotos')}</span></button><button class="round-tool" data-action="help">${icon('info')}<span>${t('help')}</span></button></div></section>${!active && !paused ? footer('resume-camera', t('cameraRetry'), '', busy) : ''}`;
+}
+async function handleCameraAction(action) {
+  if (action === 'open-camera' || action === 'resume-camera') { cameraOpen = true; render(); window.scrollTo(0, 0); await camera.start(); return true; }
+  if (action === 'close-camera') { cameraOpen = false; camera.stop(); render(); return true; }
+  if (action === 'photos') { photoInput.click(); return true; }
+  if (action === 'flash') { await camera.toggleLight(); return true; }
+  if (action === 'scan') return true;
+  if (action === 'help') { document.querySelector('#help-copy').textContent = t('cameraHelp'); document.querySelector('#help-dialog').showModal(); return true; }
+  return false;
+}
+
 
 function fixture(scenario = 'registered', entry = null) {
   const card = cardStates.includes(scenario) ? scenario : 'unregistered';
@@ -57,24 +121,29 @@ function fixture(scenario = 'registered', entry = null) {
 }
 
 function restore() {
+  const linked = parseCardQr(new URL(location.href).href, { ...config, publicUrl: new URL(location.pathname, location.origin).href });
+  const linkedId = linked?.kind === 'card' ? linked.id : undefined;
   const query = new URL(location.href).searchParams.get('scenario');
   const entry = scenarios.includes(query) ? query : null;
   try {
     const saved = JSON.parse(read('sessionStorage', sessionKey));
-    if (saved?.version === 1 && saved.entry === entry && scenarios.includes(saved.scenario) && views.includes(saved.view) && cardStates.includes(saved.card) && walletStates.includes(saved.wallet) && typeof saved.nickname === 'string' && typeof saved.consent === 'boolean' && (saved.attempt === null || typeof saved.attempt === 'string') && (saved.submittedAt === null || Number.isFinite(saved.submittedAt))) {
+    if (saved?.version === 1 && saved.scannedCardId === linkedId && saved.entry === entry && scenarios.includes(saved.scenario) && views.includes(saved.view) && cardStates.includes(saved.card) && walletStates.includes(saved.wallet) && typeof saved.nickname === 'string' && typeof saved.consent === 'boolean' && (saved.attempt === null || typeof saved.attempt === 'string') && (saved.submittedAt === null || Number.isFinite(saved.submittedAt))) {
       if (['sent', 'confirming'].includes(saved.view) && (!saved.attempt || saved.submittedAt === null)) throw new Error('Incomplete submitted state');
+      if (saved.scannedCardId && !/^[A-Za-z0-9_-]{1,64}$/.test(saved.scannedCardId)) throw new Error('Invalid saved ID');
       return saved;
     }
   } catch {}
+  if (linkedId) return { ...fixture('unregistered'), scannedCardId: linkedId };
   return entry ? fixture(entry, entry) : { ...fixture('unregistered'), view: 'scan' };
 }
 
 function persist() { if (!liveEnabled) write('sessionStorage', sessionKey, JSON.stringify(state)); }
 function update(next, preserveDialog = false) { state = { ...state, ...next }; persist(); render(preserveDialog); }
 function choose(scenario) {
+  currentCardId = null; qrIdentity = null; qrSource = './card-qr.svg';
   const url = new URL(location.href);
-  if (scenario === 'scan') url.search = '';
-  else url.searchParams.set('scenario', scenario);
+  url.search = '';
+  if (scenario !== 'scan') url.searchParams.set('scenario', scenario);
   history.pushState(null, '', url);
   state = scenario === 'scan' ? { ...fixture('unregistered'), view: 'scan' } : fixture(scenario, scenario);
   scanning = false;
@@ -85,23 +154,24 @@ function choose(scenario) {
 }
 function ready() { return liveEnabled ? Boolean(liveSnapshot?.canRegister && state.wallet === 'valid' && state.nickname.isWellFormed() && new TextEncoder().encode(state.nickname).length >= 1 && new TextEncoder().encode(state.nickname).length <= 96) : state.nickname.trim().length > 0 && state.wallet === 'valid'; }
 function walletLabel() { return liveEnabled ? (liveSnapshot?.wallet.address ?? '') : t(state.wallet === 'wrong-wallet' ? 'wrongAddress' : 'simulatedAddress'); }
-function cardLabel() { return liveEnabled ? currentCardId ?? '' : 'TC-001'; }
+function cardLabel() { return liveEnabled ? currentCardId ?? '' : state.scannedCardId ?? 'TC-001'; }
 
 function tradingCard() {
-  return `<div class="trading-card"><div class="card-art"><img src="./assets/trading-card.jpg" alt="${t('cardAlt')}" width="1180" height="1333"><img class="card-qr" src="${liveEnabled ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"></div></div>`;
+  return `<div class="trading-card"><div class="card-art"><img src="./assets/trading-card.jpg" alt="${t('cardAlt')}" width="1180" height="1333"><img class="card-qr" src="${liveEnabled || state.scannedCardId ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"></div></div>`;
 }
 function footer(action, label, extra = '', disabled = false, secondary = false) {
   return `<footer class="bottom-actions"><button type="button" class="btn ${secondary ? 'btn-outline' : 'btn-primary'}" data-action="${action}" ${disabled ? 'disabled' : ''}>${label}</button>${extra}</footer>`;
 }
 function scanView() {
   if (!cameraOpen) return `<section class="page entry-page"><h1 class="page-title">${lines('scanTitle')}</h1><div class="scan-intro"><img class="intro-qr" src="./assets/qr-scan.jpg" alt="${t('qrAlt')}" width="1241" height="1268"></div></section>${footer('open-camera', `${icon('qr')}${t('openCamera')}`)}`;
-  return `<section class="page camera-page"><button class="flash-button" data-action="flash">${icon('flash')}<span>${t('flash')}</span></button><div class="scanner" aria-label="${t('scanHint')}"><div class="scan-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div><img class="scan-center" src="${liveEnabled ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"><div class="scan-light-track" aria-hidden="true"><div class="scan-sweep"></div></div></div><h1 class="scan-status"><span class="scan-status-ring" aria-hidden="true"></span>${t('cameraTitle')}</h1><div class="scan-tools"><button class="round-tool" data-action="photos">${icon('photo')}<span>${t('fromPhotos')}</span></button><button class="round-tool" data-action="help">${icon('info')}<span>${t('help')}</span></button></div></section>${footer('scan', `${scanning ? '<span class="loading loading-spinner loading-xs"></span>' : ''}${t(scanning ? 'scanLoading' : 'scanButton')}`, '', scanning)}`;
+  if (cameraEnabled) return liveCameraView();
+  return `<section class="page camera-page"><button class="flash-button" data-action="flash">${icon('flash')}<span>${t('flash')}</span></button><div class="scanner" aria-label="${t('scanHint')}"><div class="scan-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div><img class="scan-center" src="${liveEnabled || state.scannedCardId ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"><div class="scan-light-track" aria-hidden="true"><div class="scan-sweep"></div></div></div><h1 class="scan-status"><span class="scan-status-ring" aria-hidden="true"></span>${t('cameraTitle')}</h1><div class="scan-tools"><button class="round-tool" data-action="photos">${icon('photo')}<span>${t('fromPhotos')}</span></button><button class="round-tool" data-action="help">${icon('info')}<span>${t('help')}</span></button></div></section>${footer('scan', `${scanning ? '<span class="loading loading-spinner loading-xs"></span>' : ''}${t(scanning ? 'scanLoading' : 'scanButton')}`, '', scanning)}`;
 }
 function detailTable(includeOwner = true, showIcons = false) {
   const rows = liveEnabled
     ? includeOwner ? [['cardName', `${t('player')} / ${t('cardType')}`], ['cardId', cardLabel()], ['ownerLabel', liveSnapshot?.read.card?.owner?.nickname ?? ''], ['wallet', liveSnapshot?.read.card?.owner?.address ?? '']]
       : [['nickname', state.nickname], ['wallet', walletLabel()], ['cardId', cardLabel()]]
-    : includeOwner ? [['cardName', `${t('player')} / ${t('cardType')}`], ['cardId', 'TC-001'], ['ownerLabel', state.nickname], ['wallet', t('simulatedAddress')], ['registeredAt', state.submittedAt ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(state.submittedAt) : t('sampleDate')]] : [['nickname', state.nickname], ['wallet', t('simulatedAddress')], ['cardId', 'TC-001']];
+    : includeOwner ? [['cardName', `${t('player')} / ${t('cardType')}`], ['cardId', cardLabel()], ['ownerLabel', state.nickname], ['wallet', t('simulatedAddress')], ['registeredAt', state.submittedAt ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(state.submittedAt) : t('sampleDate')]] : [['nickname', state.nickname], ['wallet', t('simulatedAddress')], ['cardId', cardLabel()]];
   const fieldIcons = { nickname: 'person', wallet: 'wallet', cardId: 'tag' };
   return `<dl class="record-table${showIcons ? ' review-record-table' : ''}">${rows.map(([key, value]) => `<div><dt>${showIcons ? `<span class="field-icon">${icon(fieldIcons[key])}</span>` : ''}<span>${t(key)}</span></dt><dd>${escape(value)}</dd></div>`).join('')}</dl>`;
 }
@@ -152,13 +222,17 @@ function dialogs() {
 }
 
 function render(preserveDialog = false) {
+  if (cameraEnabled && (!cameraOpen || state.view !== 'scan') && cameraState.kind !== 'stopped') camera.stop();
+  const heldVideo = cameraEnabled && cameraOpen && state.view === 'scan' ? root.querySelector('#camera-video') : null;
+  heldVideo?.remove();
   clearTimeout(timer);
   const openDialog = preserveDialog && root.querySelector('dialog[open]')?.id;
   document.documentElement.lang = locale;
   document.title = t('title');
   const content = state.view === 'scan' ? scanView() : state.view === 'card' ? cardView() : state.view === 'register' ? registerView() : state.view === 'review' ? reviewView() : processView();
   root.innerHTML = `<div class="phone ${state.view === 'scan' && !cameraOpen ? 'home-scene' : 'flow-scene'}"><header class="app-header"><button class="round-button" data-action="${state.view === 'scan' && cameraOpen ? 'close-camera' : 'back-screen'}" aria-label="${t('backScreen')}" ${(['sent', 'confirming', 'unknown'].includes(state.view) || (liveEnabled && state.view === 'approval')) ? 'disabled' : ''}>${icon('back')}</button><a class="brand" href="./" data-action="home"><span class="brand-art"><img src="./assets/logo-ja.jpg" alt="${t('brand')} QR Proof" width="1236" height="1272"></span></a><button class="round-button" data-action="scenarios" aria-label="${t('menu')}"><span aria-hidden="true">•••</span></button></header><p class="demo-label">${t('demo')} · ${t(liveEnabled && config.walletMode === 'mock' ? 'readonly' : 'noTransaction')}</p><main>${content}</main></div>${dialogs()}`;
-  if (openDialog) document.getElementById(openDialog).showModal();
+  if (cameraEnabled && cameraOpen && state.view === 'scan') root.querySelector('#camera-slot').replaceWith(camera.getVideo());
+  if (openDialog) document.getElementById(openDialog)?.showModal();
   if (!liveEnabled && ['sent', 'confirming'].includes(state.view)) {
     const attempt = state.attempt;
     timer = setTimeout(() => {
@@ -185,6 +259,7 @@ root.addEventListener('click', async (event) => {
   if (!button || button.disabled) return;
   event.preventDefault();
   const action = button.dataset.action;
+  if (cameraEnabled && await handleCameraAction(action)) return;
   if (liveEnabled && await handleLiveAction(action)) return;
   if (action === 'clear-nickname') { state.nickname = ''; persist(); render(); document.querySelector('#nickname').focus(); return; }
   if (['help', 'photos', 'flash'].includes(action)) { document.querySelector('#help-copy').textContent = t(action === 'photos' ? 'photoHelp' : action === 'flash' ? 'flashHelp' : 'helpCopy'); document.querySelector('#help-dialog').showModal(); return; }
@@ -203,7 +278,7 @@ root.addEventListener('click', async (event) => {
   if (action === 'details') { document.querySelector('#details-dialog').showModal(); return; }
   if (action === 'share') {
     const url = new URL(location.href);
-    url.search = state.view === 'scan' ? '' : `?scenario=${state.view === 'success' || state.card === 'registered' ? 'registered' : state.scenario}`;
+    url.search = state.view === 'scan' ? '' : state.scannedCardId ? new URLSearchParams({ cardId: state.scannedCardId }).toString() : `?scenario=${state.view === 'success' || state.card === 'registered' ? 'registered' : state.scenario}`;
     try { await navigator.clipboard.writeText(url.href); document.querySelector('#share-status').textContent = t('copied'); }
     catch { history.replaceState(null, '', url); state.entry = url.searchParams.get('scenario'); persist(); document.querySelector('#share-status').textContent = t('copyFailed'); }
     return;
@@ -229,10 +304,11 @@ root.addEventListener('click', async (event) => {
   if (action === 'refresh-evidence') { update({ card: 'registered', scenario: 'registered' }); return; }
   if (action === 'retry-read') { update({ card: 'registered', scenario: 'registered' }); return; }
 });
-window.addEventListener('popstate', () => { if (liveEnabled) { openLiveCard(new URL(location.href).searchParams.get('cardId')); return; } state = restore(); scanning = false; cameraOpen = false; render(); });
+window.addEventListener('popstate', () => { if (liveEnabled) { openLiveCard(new URL(location.href).searchParams.get('cardId')); return; } state = restore(); scanning = false; cameraOpen = false; if (state.scannedCardId) setCardQr(state.scannedCardId); render(); });
 persist();
 render();
-
+if (liveEnabled && currentCardId) void openLiveCard(currentCardId);
+if (!liveEnabled && state.scannedCardId) setCardQr(state.scannedCardId);
 
 function liveDialogs() {
   const card = liveSnapshot?.read.card;
@@ -347,7 +423,7 @@ async function handleLiveAction(action) {
 if (liveEnabled) {
   import('../src/live-registration.js').then(({ createLiveRegistration }) => {
     live = createLiveRegistration(config, receiveLive);
-    return openLiveCard(currentCardId);
+    if (currentCardId) return live.open(currentCardId);
   }).catch(() => { liveSnapshot = { read: { kind: 'unavailable' }, wallet: { kind: 'disconnected' }, registration: { kind: 'idle' } }; state.card = 'unavailable'; render(); });
   const resume = () => { if (!document.hidden && live && currentCardId) live.recheck().catch(() => {}); };
   document.addEventListener('visibilitychange', resume);

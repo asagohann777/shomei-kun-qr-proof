@@ -304,3 +304,15 @@
 
 @keyframes evidence-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .evidence-spinner { animation: none; } }
+
+.live-scanner { overflow: hidden; background: #172b4d; }
+.camera-video { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.live-scanner .scan-corners, .live-scanner .scan-light-track { z-index: 1; pointer-events: none; }
+.live-camera-page .scan-status { line-height: 1.65; font-size: 1rem; }
+
+.live-camera-page .camera-error { display: block; padding: 18px 20px; border-radius: 24px; text-align: left; }
+.camera-error h1 { margin: 0; color: #172b4d; font-size: 1rem; font-weight: 700; line-height: 1.5; }
+.camera-error p { margin: 8px 0 0; color: #334e70; font-size: .875rem; font-weight: 400; line-height: 1.7; }
+
+.camera-resume { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 20px; }
+.camera-resume .btn { width: auto; min-height: 48px; height: auto; padding: 12px 18px; font-size: 1rem; }

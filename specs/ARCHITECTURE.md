@@ -4,6 +4,8 @@
 
 固定モックAPIは [apps/web](../apps/web/README.md) に実装した。mockは固定応答を維持する。追加したlive構成は [Curvegrid詳細設計](CURVEGRID_INTEGRATION_DESIGN.md) と [実装記録](CURVEGRID_INTEGRATION_IMPLEMENTATION.md) を参照。画面・MetaMask接続は最新mainの共通UIへ追加した。環境変数でmock/mock・live/mock・live/metamaskを選ぶ。[接続結果](UI_LIVE_CONNECTION_REPORT.md)を参照。検証結果は [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md) を参照する。
 
+QRの実読取りはブラウザ内の `qr-scanner` とセッション管理で処理する。API・ウォレット設定とは独立した `UI_CAMERA_MODE` をビルドで渡し、画像・動画をサーバーへ送らない。状態管理と配信ヘッダーは [カメラ仕様](CAMERA_SCAN.md) を参照。
+
 ## 構成と責務
 
 既存PoCから独立した追加機能として構成する。既存「証明くん」のコード・データ・保存先に接続しない。
