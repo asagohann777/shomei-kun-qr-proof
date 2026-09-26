@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T09:40:08.130989+00:00",
+  "session_id": "01a0dc17-6562-7900-9202-41fa136ce12f",
+  "turn_id": "01a0dd16-16cc-7d00-aadd-b82b32de6e76",
+  "prompt": "カードは払い出し直すか登録できる状態になってますか？",
+  "model": "gpt-6-astra"
+}

@@ -1,24 +1,21 @@
 # Spec Delta
 
 ## Purpose
-ENS名で受取人のウォレットを指定してカードを発行し、名前の解決先に登録されたカードを検索する。既存のQRと任意アドレス発行を維持する。
+ENS名またはアドレスから登録カードを検索し、接続中ウォレットの検証済みPrimary nameを表示する。ENSは任意で、新規カードは登録先を限定せず、既存のQR登録・閲覧を維持する。
 
 ## ADDED Requirements
 
-### Requirement: Optional ENS recipient
-CLI SHALL accept an optional ENS recipient, mutually exclusive with a wallet address, and preserve unrestricted issuance when neither is provided.
-#### Scenario: Existing invocation
-- **WHEN** issuance omits ENS
-- **THEN** wallet-specific or unrestricted issuance works without ENS configuration
-#### Scenario: ENS issuance
-- **WHEN** an ENS name resolves to a nonzero EOA and the issuer confirms it
-- **THEN** only that address is allowed to register the card
-#### Scenario: Name changed or failed
-- **WHEN** resolution fails or changes before signing
-- **THEN** issuance stops without sending a transaction
-#### Scenario: Resume
-- **WHEN** a saved ENS issuance is resumed after its name changes
-- **THEN** the saved transaction and address are preserved without re-resolution
+### Requirement: Unrestricted issuance independent of ENS
+New card issuance SHALL allow any wallet to perform the first registration and SHALL NOT require ENS configuration or a recipient name. ENS SHALL be used only for optional search and verified name display. Existing issued cards and recorded ownership SHALL remain unchanged.
+#### Scenario: Issue without ENS
+- **WHEN** the issuer creates a new card without ENS configuration
+- **THEN** issuance succeeds without restricting the registration wallet
+#### Scenario: Wallet without an ENS name
+- **WHEN** a wallet without an ENS name registers a newly issued unregistered card
+- **THEN** the normal first-registration flow remains available
+#### Scenario: ENS target changes
+- **WHEN** an ENS name resolves to a different address
+- **THEN** new searches use that address without changing existing registration records or restricting new card issuance
 
 ### Requirement: Wallet registration search
 The system SHALL resolve a name on Sepolia ENSv2 and list verified registrations for the resulting wallet in the configured Curvegrid registry, without a connected wallet.

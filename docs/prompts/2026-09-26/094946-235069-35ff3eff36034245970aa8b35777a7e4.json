@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T09:49:46.235069+00:00",
+  "session_id": "01a0dc17-6562-7900-9202-41fa136ce12f",
+  "turn_id": "01a0dd1e-e433-7f42-84c5-febec1193467",
+  "prompt": "このページの１個前の5舞並んでるやつください",
+  "model": "gpt-6-astra"
+}

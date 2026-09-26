@@ -6,8 +6,8 @@ Palette: white #ffffff, navy #102958, action blue #086bdc, pale button blue #dce
 
 Home: stack equal-sized pill buttons, saturated QR first and pale ENS second. Search: use the smaller flow header, a short title, and one white input area. Results: separate the resolved name/wallet from a vertical list of illustrated trading-card rows. Left-align form labels and results. Each row shows the existing card artwork, card ID, registered nickname and an explicit action to view the registration record.
 
-    ENS名でカードを探す
-    [ENS名                 ]
+    ENS名・アドレスで探す
+    [ENS名またはアドレス    ]
     [        検索          ]
     shomeikun.eth / wallet details
     ウォレットに登録されているカード

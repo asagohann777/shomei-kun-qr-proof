@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T09:39:28.843877+00:00",
+  "session_id": "01a0dc17-6562-7900-9202-41fa136ce12f",
+  "turn_id": "01a0dd15-7a57-7d63-93e2-a57802675fd8",
+  "prompt": "取引がない",
+  "model": "gpt-6-astra"
+}

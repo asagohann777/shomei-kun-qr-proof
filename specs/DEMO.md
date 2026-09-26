@@ -7,6 +7,16 @@
 | 実登録とカメラ読取り | https://shomei-kun-integration.dptr.workers.dev/ui/ |
 | UI検討用モック | https://shomei-kun-ui-mock.dptr.workers.dev/ |
 
+## 撮影用カード
+
+前回のQR付きカード5枚の一覧: https://shomei-video-cards.dptr.workers.dev/g/gvPyRGJ6r3Q80h8WQ070Irl11lg0UXC0/
+
+一覧からカードを開き、QRを読み取って登録情報の確認へ進む。各カードの登録状態はアプリで確認する。登録済みなら閲覧、未登録なら登録へ進む。
+
+今回登録に成功した制限なしカード: https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=demo-open-20260926-02
+
+このカードは登録済みなので閲覧撮影用に使う。前回の5枚とは別のカードで、上の一覧には含まれない。登録操作を撮り直す場合は別の未登録カードを用意する。
+
 ## ENS・アドレス検索を試す
 
 1. 実接続URLで「ENS名・アドレスで探す」を押す。英語表示は「Find by ENS or address」。
@@ -51,7 +61,7 @@ MetaMaskを用意し、登録に使うウォレットへCurvegrid Testnetのテ�
 
 ## 発行と照合
 
-カード発行は [CLI手順](../contracts/README.md)、環境設定は [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md) に従う。CLIは全員許可を既定とし、同じIDを再発行しない。
+カード発行は [CLI手順](../contracts/README.md)、環境設定は [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md) に従う。新規カードは全員許可で発行し、同じIDを再発行しない。現行CLIの `--recipient-ens` と `--wallet` は使わない。ENSの登録・設定は不要。
 
 公開画面のチェーン・コントラクト・カードID・取引ハッシュを使い、RPCでカード状態と登録レシートを照合できる。MultiBaasの管理キーや発行者の鍵は不要。
 

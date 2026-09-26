@@ -82,4 +82,4 @@ ENS名はSepoliaで解決し、Curvegrid Testnetの`CardRegistered`イベント�
 
 登録画面の逆引きは任意の表示補助。正引き一致時だけ表示し、失敗時はnullで返す。アカウント変更時は前の表示を即座に消し、古いリクエストの応答を破棄する。APIキーとENS RPC設定はWorkerの実行時Secretに置き、ブラウザへ渡さない。CCIP/RPCのHTTPリダイレクトはmanualで受けて3xxを拒否する。
 
-CLIはENS指定時にアドレスを確認し、署名前に再解決する。署名済み再開は保存済み取引を使用する。カード別サブネーム、新規Registry/Resolver、永続検索インデックスは追加しない。[詳細](ENS_INTEGRATION.md)。
+新規カードは `allowedWallet` をゼロアドレスとして発行し、登録先を限定しない。ENSは検索・名前表示にのみ使用する。現行CLIの旧 `--recipient-ens` / `--wallet` 指定は削除予定で、今回の仕様更新ではコードを変更していない。既発行カードの制限や署名済み取引を書き換えず、過去の状態ファイルは照合用に保持する。カード別サブネーム、新規Registry/Resolver、永続検索インデックスは追加しない。[詳細](ENS_INTEGRATION.md)。

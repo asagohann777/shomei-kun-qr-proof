@@ -533,3 +533,17 @@ Following explicit user approval, the actual issuer CLI ran with `--recipient-en
 ### Unresolved iPhone recovery report
 
 The user reported an app crash during the iPhone test and "結果を確認できません" after reopening. A subsequent public API read returned the test card as unregistered with no evidence. A pending transaction has not been ruled out. Codex requested the last completed action and MetaMask activity status; no retry or local attempt deletion was performed. The user requested a checkpoint commit before further investigation. iPhone verification remains incomplete.
+
+### Demo issuance without a wallet restriction
+
+The user clarified that ENS is optional and does not require restricting who can register a card. ENS name/address search and verified Primary name display remain desired. Recipient restriction is no longer a requested ENS feature. The earlier restricted test card remains unchanged; removing obsolete CLI options and updating the remaining implementation documentation are follow-up work.
+
+To unblock video recording, Codex issued `demo-open-20260926-02` without a recipient option. The issuer verified the successful transaction `0xfdabf3a162863b3ce55348e1cf488d9b58ed58f29ca2ff96ca9a222b88760d95` and `allowedWallet` equal to the zero address. The public API returned the new card as unregistered. Its separate card ID avoids the previous card's saved unknown attempt. No user registration was submitted, and the iPhone crash recovery issue remains unresolved.
+
+Demo URL: https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=demo-open-20260926-02
+
+### Demo registration and specification correction
+
+The user reported successful registration of `demo-open-20260926-02`. A public API read subsequently confirmed owner `0xc22d961e56b70a73f6dcb1ec0a47b7da1fe38fdd`, nickname `Tkg`, and available evidence at block 19315, transaction `0xaa931283722cd2fc2dc3959ca1268275f58b5cfda3ca281593221a2624a0d5b8`. This verifies the new registration, not recovery of the old unknown attempt. The user reported no transaction in MetaMask activity for the earlier attempt; the crash cause remains unconfirmed.
+
+At the user's request, SPEC, ARCHITECTURE, ENS_INTEGRATION, DEMO, the UI design note and the active OpenSpec artifacts were aligned with optional ENS search/display and unrestricted issuance. The old CLI restriction options remain pending removal. The existing five-card filming gallery was added to DEMO; the newly registered card is separate from that gallery. No code, deployment or screenshot changes were made in this documentation update.
