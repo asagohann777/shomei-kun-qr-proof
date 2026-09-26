@@ -1,8 +1,14 @@
+import { hasMetaMaskProvider, useMetaMaskBrowser, metaMaskBrowserLink, cardPageUrl } from '../src/wallet-navigation.js';
 import { messages } from './messages.js';
+import { walletMessages } from './wallet-messages.js';
 import { liveMessages } from './live-messages.js';
 import QRCode from 'qrcode';
+import QrScanner from 'qr-scanner';
+import { createCameraSession, parseCardQr } from '../src/camera-session.js';
+import { cameraMessages } from './camera-messages.js';
 
 const config = __UI_CONFIG__;
+const cameraEnabled = config.cameraMode === 'live';
 const liveEnabled = config.apiMode === 'live';
 let live = null;
 let liveSnapshot = null;
@@ -10,12 +16,13 @@ let currentCardId = new URL(location.href).searchParams.get('cardId');
 let qrSource = './card-qr.svg';
 let qrIdentity = null;
 let liveError = null;
+let preparingWallet = false;
 
 const root = document.querySelector('#app');
 const sessionKey = 'shomei.mobile-mock.v1';
 const localeKey = 'shomei.mobile-mock.locale';
-const scenarios = ['registered', 'unregistered', 'not-found', 'wrong-wallet', 'wrong-chain', 'rejected', 'failed', 'unknown', 'evidence-pending', 'unavailable', 'registering'];
-const scenarioKeys = ['registered', 'unregistered', 'notFound', 'wrongWallet', 'wrongChain', 'rejected', 'failed', 'unknown', 'evidencePending', 'unavailable', 'registering'];
+const scenarios = ['registered', 'unregistered', 'not-found', 'wrong-wallet', 'wrong-chain', 'rejected', 'failed', 'unknown', 'evidence-pending', 'unavailable', 'registering', 'wallet-connect', 'wallet-add', 'wallet-switch', 'wallet-paused', 'wallet-rejected', 'wallet-ready'];
+const scenarioKeys = ['registered', 'unregistered', 'notFound', 'wrongWallet', 'wrongChain', 'rejected', 'failed', 'unknown', 'evidencePending', 'unavailable', 'registering', 'walletConnectScenario', 'walletAddScenario', 'walletSwitchScenario', 'walletPausedScenario', 'walletRejectedScenario', 'walletReadyScenario'];
 const views = ['scan', 'card', 'register', 'review', 'approval', 'sent', 'confirming', 'success', 'rejected', 'failed', 'unknown', 'processing-preview'];
 const cardStates = ['registered', 'unregistered', 'not-found', 'evidence-pending', 'unavailable'];
 const walletStates = ['disconnected', 'valid', 'wrong-wallet', 'wrong-chain'];
@@ -43,38 +50,107 @@ const read = (storage, key) => { try { return window[storage].getItem(key); } ca
 const write = (storage, key, value) => { try { window[storage].setItem(key, value); } catch { return; } };
 const savedLocale = read('localStorage', localeKey);
 let locale = ['ja', 'en'].includes(savedLocale) ? savedLocale : navigator.languages.map((item) => item.split('-')[0]).find((item) => ['ja', 'en'].includes(item)) || 'en';
-const t = (key) => (liveEnabled ? liveMessages[locale][key] : undefined) ?? messages[locale][key];
+const t = (key) => walletMessages[locale][key] ?? cameraMessages[locale][key] ?? (liveEnabled ? liveMessages[locale][key] : undefined) ?? messages[locale][key];
 const lines = (key) => escape(t(key)).replace(/\n/g, '<br>');
 let timer;
 let scanning = false;
 let cameraOpen = false;
 let state = liveEnabled ? { ...fixture('unregistered'), nickname: '', view: currentCardId ? 'card' : 'scan' } : restore();
 
+let cameraState = { kind: 'stopped' };
+function createCameraVideo() {
+  const video = document.createElement('video');
+  video.id = 'camera-video'; video.className = 'camera-video'; video.muted = true; video.playsInline = true;
+  return video;
+}
+const photoInput = document.createElement('input');
+photoInput.type = 'file'; photoInput.accept = 'image/*'; photoInput.hidden = true; photoInput.id = 'camera-photo';
+document.body.append(photoInput);
+const camera = createCameraSession({
+  createVideo: createCameraVideo,
+  scannerFactory: (element, decoded, failed) => new QrScanner(element, decoded, { onDecodeError: error => { if (error !== QrScanner.NO_QR_CODE_FOUND) failed(error); }, preferredCamera: 'environment', returnDetailedScanResult: true, highlightScanRegion: false, maxScansPerSecond: 8 }),
+  imageEngine: () => QrScanner.createQrEngine(),
+  scanImage: (file, options) => QrScanner.scanImage(file, options),
+  parse: value => parseCardQr(value, config),
+  changed: next => { cameraState = next; if (cameraOpen && state.view === 'scan') render(true); },
+  detected: result => {
+    cameraOpen = false;
+    if (result.kind === 'sample') { choose('registered'); return; }
+    const url = new URL(location.href); url.search = new URLSearchParams({ cardId: result.id });
+    history.pushState(null, '', url);
+    if (liveEnabled) { void openLiveCard(result.id); return; }
+    state = { ...fixture('unregistered'), scannedCardId: result.id };
+    setCardQr(result.id); persist(); render(); window.scrollTo(0, 0);
+  },
+});
+photoInput.addEventListener('change', () => { const file = photoInput.files[0]; photoInput.value = ''; if (cameraOpen && state.view === 'scan') void camera.photo(file); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && cameraOpen && cameraEnabled) camera.pause(); });
+window.addEventListener('pagehide', () => { if (cameraEnabled) camera.pause(); });
+
+function setCardQr(id) {
+  qrIdentity = id; qrSource = null;
+  const url = new URL(config.publicUrl); url.search = new URLSearchParams({ cardId: id });
+  QRCode.toDataURL(url.href, { margin: 1, color: { dark: '#172b4d', light: '#ffffff' } }).then(source => {
+    if (qrIdentity !== id) return;
+    qrSource = source;
+    for (const image of root.querySelectorAll('.card-qr')) image.src = source;
+  });
+}
+function liveCameraView() {
+  const active = cameraState.kind === 'scanning';
+  const paused = ['paused', 'stopped'].includes(cameraState.kind);
+  const busy = ['starting', 'photo'].includes(cameraState.kind);
+  const label = cameraState.error ?? ({ starting: 'cameraStarting', photo: 'photoReading', paused: 'cameraPaused', stopped: 'cameraPaused' }[cameraState.kind] ?? 'cameraTitle');
+  const status = label === 'cameraError'
+    ? `<div class="scan-status camera-error" role="status"><h1>${escape(t(label))}</h1><p>${escape(t('cameraErrorHelp'))}</p></div>`
+    : `<h1 class="scan-status" role="status">${escape(t(label))}</h1>`;
+  return `<section class="page camera-page live-camera-page">${active && cameraState.torch ? `<button class="flash-button" data-action="flash" aria-pressed="${cameraState.light}">${icon('flash')}<span>${t('flash')}</span></button>` : ''}<div class="scanner live-scanner" aria-label="${t('scanHint')}"><span id="camera-slot"></span>${paused ? `<div class="camera-resume"><button type="button" class="btn btn-primary" data-action="resume-camera">${icon('qr')}${t('cameraResume')}</button></div>` : ''}<div class="scan-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div>${active ? '<div class="scan-light-track" aria-hidden="true"><div class="scan-sweep"></div></div>' : ''}</div>${status}<div class="scan-tools"><button class="round-tool" data-action="photos" ${cameraState.kind === 'photo' ? 'disabled' : ''}>${icon('photo')}<span>${t('fromPhotos')}</span></button><button class="round-tool" data-action="help">${icon('info')}<span>${t('help')}</span></button></div></section>${!active && !paused ? footer('resume-camera', t('cameraRetry'), '', busy) : ''}`;
+}
+async function handleCameraAction(action) {
+  if (action === 'open-camera' || action === 'resume-camera') { cameraOpen = true; render(); window.scrollTo(0, 0); await camera.start(); return true; }
+  if (action === 'close-camera') { cameraOpen = false; camera.stop(); render(); return true; }
+  if (action === 'photos') { photoInput.click(); return true; }
+  if (action === 'flash') { await camera.toggleLight(); return true; }
+  if (action === 'scan') return true;
+  if (action === 'help') { document.querySelector('#help-copy').textContent = t('cameraHelp'); document.querySelector('#help-dialog').showModal(); return true; }
+  return false;
+}
+
+
 function fixture(scenario = 'registered', entry = null) {
   const card = cardStates.includes(scenario) ? scenario : 'unregistered';
-  const view = scenario === 'registering' ? 'processing-preview' : ['wrong-wallet', 'wrong-chain'].includes(scenario) ? 'register' : ['rejected', 'failed', 'unknown'].includes(scenario) ? scenario : 'card';
-  return { version: 1, entry, scenario, view, card, wallet: ['wrong-wallet', 'wrong-chain'].includes(scenario) ? scenario : 'disconnected', nickname: 'おじいちゃんコンビニ', consent: false, attempt: ['failed', 'unknown'].includes(scenario) ? 'sample-attempt' : null, submittedAt: null };
+  const view = scenario.startsWith('wallet-') ? 'register' : scenario === 'registering' ? 'processing-preview' : ['wrong-wallet', 'wrong-chain'].includes(scenario) ? 'register' : ['rejected', 'failed', 'unknown'].includes(scenario) ? scenario : 'card';
+  return { version: 1, entry, scenario, view, card, wallet: scenario === 'wallet-ready' ? 'valid' : ['wallet-add', 'wallet-switch', 'wallet-paused'].includes(scenario) ? 'wrong-chain' : ['wrong-wallet', 'wrong-chain'].includes(scenario) ? scenario : 'disconnected', nickname: 'おじいちゃんコンビニ', consent: false, attempt: ['failed', 'unknown'].includes(scenario) ? 'sample-attempt' : null, submittedAt: null };
 }
 
 function restore() {
+  const linked = parseCardQr(new URL(location.href).href, { ...config, publicUrl: new URL(location.pathname, location.origin).href });
+  const linkedId = linked?.kind === 'card' ? linked.id : undefined;
   const query = new URL(location.href).searchParams.get('scenario');
   const entry = scenarios.includes(query) ? query : null;
   try {
     const saved = JSON.parse(read('sessionStorage', sessionKey));
-    if (saved?.version === 1 && saved.entry === entry && scenarios.includes(saved.scenario) && views.includes(saved.view) && cardStates.includes(saved.card) && walletStates.includes(saved.wallet) && typeof saved.nickname === 'string' && typeof saved.consent === 'boolean' && (saved.attempt === null || typeof saved.attempt === 'string') && (saved.submittedAt === null || Number.isFinite(saved.submittedAt))) {
+    if (saved?.version === 1 && saved.scannedCardId === linkedId && saved.entry === entry && scenarios.includes(saved.scenario) && views.includes(saved.view) && cardStates.includes(saved.card) && walletStates.includes(saved.wallet) && typeof saved.nickname === 'string' && typeof saved.consent === 'boolean' && (saved.attempt === null || typeof saved.attempt === 'string') && (saved.submittedAt === null || Number.isFinite(saved.submittedAt))) {
       if (['sent', 'confirming'].includes(saved.view) && (!saved.attempt || saved.submittedAt === null)) throw new Error('Incomplete submitted state');
+      if (saved.scannedCardId && !/^[A-Za-z0-9_-]{1,64}$/.test(saved.scannedCardId)) throw new Error('Invalid saved ID');
       return saved;
     }
   } catch {}
+  if (linkedId) return { ...fixture('unregistered'), scannedCardId: linkedId };
   return entry ? fixture(entry, entry) : { ...fixture('unregistered'), view: 'scan' };
 }
 
-function persist() { if (!liveEnabled) write('sessionStorage', sessionKey, JSON.stringify(state)); }
+function liveDraftKey() { return `shomei.wallet-draft:${config.apiBaseUrl}:${currentCardId}`; }
+function persist() {
+  if (!liveEnabled) write('sessionStorage', sessionKey, JSON.stringify(state));
+  else if (currentCardId) write('sessionStorage', liveDraftKey(), JSON.stringify({ nickname: state.nickname, preparingWallet, view: state.view }));
+}
 function update(next, preserveDialog = false) { state = { ...state, ...next }; persist(); render(preserveDialog); }
 function choose(scenario) {
+  currentCardId = null; qrIdentity = null; qrSource = './card-qr.svg';
   const url = new URL(location.href);
-  if (scenario === 'scan') url.search = '';
-  else url.searchParams.set('scenario', scenario);
+  url.search = '';
+  if (scenario !== 'scan') url.searchParams.set('scenario', scenario);
   history.pushState(null, '', url);
   state = scenario === 'scan' ? { ...fixture('unregistered'), view: 'scan' } : fixture(scenario, scenario);
   scanning = false;
@@ -85,23 +161,24 @@ function choose(scenario) {
 }
 function ready() { return liveEnabled ? Boolean(liveSnapshot?.canRegister && state.wallet === 'valid' && state.nickname.isWellFormed() && new TextEncoder().encode(state.nickname).length >= 1 && new TextEncoder().encode(state.nickname).length <= 96) : state.nickname.trim().length > 0 && state.wallet === 'valid'; }
 function walletLabel() { return liveEnabled ? (liveSnapshot?.wallet.address ?? '') : t(state.wallet === 'wrong-wallet' ? 'wrongAddress' : 'simulatedAddress'); }
-function cardLabel() { return liveEnabled ? currentCardId ?? '' : 'TC-001'; }
+function cardLabel() { return liveEnabled ? currentCardId ?? '' : state.scannedCardId ?? 'TC-001'; }
 
 function tradingCard() {
-  return `<div class="trading-card"><div class="card-art"><img src="./assets/trading-card.jpg" alt="${t('cardAlt')}" width="1180" height="1333"><img class="card-qr" src="${liveEnabled ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"></div></div>`;
+  return `<div class="trading-card"><div class="card-art"><img src="./assets/trading-card.jpg" alt="${t('cardAlt')}" width="1180" height="1333"><img class="card-qr" src="${liveEnabled || state.scannedCardId ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"></div></div>`;
 }
 function footer(action, label, extra = '', disabled = false, secondary = false) {
   return `<footer class="bottom-actions"><button type="button" class="btn ${secondary ? 'btn-outline' : 'btn-primary'}" data-action="${action}" ${disabled ? 'disabled' : ''}>${label}</button>${extra}</footer>`;
 }
 function scanView() {
   if (!cameraOpen) return `<section class="page entry-page"><h1 class="page-title">${lines('scanTitle')}</h1><div class="scan-intro"><img class="intro-qr" src="./assets/qr-scan.jpg" alt="${t('qrAlt')}" width="1241" height="1268"></div></section>${footer('open-camera', `${icon('qr')}${t('openCamera')}`)}`;
-  return `<section class="page camera-page"><button class="flash-button" data-action="flash">${icon('flash')}<span>${t('flash')}</span></button><div class="scanner" aria-label="${t('scanHint')}"><div class="scan-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div><img class="scan-center" src="${liveEnabled ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"><div class="scan-light-track" aria-hidden="true"><div class="scan-sweep"></div></div></div><h1 class="scan-status"><span class="scan-status-ring" aria-hidden="true"></span>${t('cameraTitle')}</h1><div class="scan-tools"><button class="round-tool" data-action="photos">${icon('photo')}<span>${t('fromPhotos')}</span></button><button class="round-tool" data-action="help">${icon('info')}<span>${t('help')}</span></button></div></section>${footer('scan', `${scanning ? '<span class="loading loading-spinner loading-xs"></span>' : ''}${t(scanning ? 'scanLoading' : 'scanButton')}`, '', scanning)}`;
+  if (cameraEnabled) return liveCameraView();
+  return `<section class="page camera-page"><button class="flash-button" data-action="flash">${icon('flash')}<span>${t('flash')}</span></button><div class="scanner" aria-label="${t('scanHint')}"><div class="scan-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div><img class="scan-center" src="${liveEnabled || state.scannedCardId ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"><div class="scan-light-track" aria-hidden="true"><div class="scan-sweep"></div></div></div><h1 class="scan-status"><span class="scan-status-ring" aria-hidden="true"></span>${t('cameraTitle')}</h1><div class="scan-tools"><button class="round-tool" data-action="photos">${icon('photo')}<span>${t('fromPhotos')}</span></button><button class="round-tool" data-action="help">${icon('info')}<span>${t('help')}</span></button></div></section>${footer('scan', `${scanning ? '<span class="loading loading-spinner loading-xs"></span>' : ''}${t(scanning ? 'scanLoading' : 'scanButton')}`, '', scanning)}`;
 }
 function detailTable(includeOwner = true, showIcons = false) {
   const rows = liveEnabled
     ? includeOwner ? [['cardName', `${t('player')} / ${t('cardType')}`], ['cardId', cardLabel()], ['ownerLabel', liveSnapshot?.read.card?.owner?.nickname ?? ''], ['wallet', liveSnapshot?.read.card?.owner?.address ?? '']]
       : [['nickname', state.nickname], ['wallet', walletLabel()], ['cardId', cardLabel()]]
-    : includeOwner ? [['cardName', `${t('player')} / ${t('cardType')}`], ['cardId', 'TC-001'], ['ownerLabel', state.nickname], ['wallet', t('simulatedAddress')], ['registeredAt', state.submittedAt ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(state.submittedAt) : t('sampleDate')]] : [['nickname', state.nickname], ['wallet', t('simulatedAddress')], ['cardId', 'TC-001']];
+    : includeOwner ? [['cardName', `${t('player')} / ${t('cardType')}`], ['cardId', cardLabel()], ['ownerLabel', state.nickname], ['wallet', t('simulatedAddress')], ['registeredAt', state.submittedAt ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(state.submittedAt) : t('sampleDate')]] : [['nickname', state.nickname], ['wallet', t('simulatedAddress')], ['cardId', cardLabel()]];
   const fieldIcons = { nickname: 'person', wallet: 'wallet', cardId: 'tag' };
   return `<dl class="record-table${showIcons ? ' review-record-table' : ''}">${rows.map(([key, value]) => `<div><dt>${showIcons ? `<span class="field-icon">${icon(fieldIcons[key])}</span>` : ''}<span>${t(key)}</span></dt><dd>${escape(value)}</dd></div>`).join('')}</dl>`;
 }
@@ -115,6 +192,9 @@ function evidenceStatus() {
 function registeredView(completed = false) {
   return `<section class="page result-page"><div class="status-symbol success">${icon('check')}</div><h1 class="page-title">${t(completed ? 'successTitle' : 'registered')}</h1>${tradingCard()}<div class="info-panel">${detailTable()}<div id="evidence-status" role="status" aria-live="polite" aria-busy="${liveSnapshot?.refresh.kind === 'checking'}">${evidenceStatus()}</div><div class="result-actions"><button class="btn btn-outline" data-action="details">${t('detailsButton')}</button></div></div></section>`;
 }
+function metaMaskHandoff() {
+  return `<p class="process-copy">${t('inAppContinue')}</p><a class="btn btn-primary wallet-prepare-button" data-metamask-browser href="${escape(metaMaskBrowserLink(config.publicUrl, currentCardId))}">${t('openInMetaMask')}</a><details class="network-settings"><summary>${t('browserNotOpened')}</summary><p>${t('pasteInMetaMask')}</p><input class="input input-bordered w-full" aria-label="${t('cardPageAddress')}" readonly value="${escape(cardPageUrl(config.publicUrl, currentCardId))}"><button class="btn btn-outline wallet-prepare-button" data-action="copy-card-url">${t('copyCardUrl')}</button><p id="card-url-copy-status" role="status"></p></details>`;
+}
 function cardView() {
   if (liveEnabled && (!liveSnapshot || liveSnapshot.read.kind === 'loading')) return `<section class="page"><h1 class="page-title" role="status">${t('loading')}</h1></section>`;
   if (['not-found', 'unavailable'].includes(state.card)) {
@@ -122,12 +202,33 @@ function cardView() {
     return `<section class="page"><div class="status-symbol warning">${icon('info')}</div><h1 class="page-title">${t(absent ? 'notFoundTitle' : 'unavailableTitle')}</h1><p class="process-copy">${lines(absent ? 'notFoundCopy' : 'unavailableCopy')}</p></section>${footer(absent ? 'scan-again' : 'retry-read', t(absent ? 'scanAnother' : 'retry'))}`;
   }
   if (['registered', 'evidence-pending'].includes(state.card)) return registeredView();
-  return `<section class="page read-page"><div class="status-symbol">${icon('check')}</div><h1 class="page-title">${t('readTitle')}</h1>${tradingCard()}<div class="info-panel card-summary"><h2>${t('player')}</h2><p>${t('cardType')}</p><p>ID: ${escape(cardLabel())}</p><span class="registration-badge">${t('unregistered')}</span></div></section>${(liveEnabled && config.walletMode === 'mock' ? '' : footer('start-register', `${t('next')}${icon('arrow')}`))}`;
+  return `<section class="page read-page"><div class="status-symbol">${icon('check')}</div><h1 class="page-title">${t('readTitle')}</h1>${tradingCard()}<div class="info-panel card-summary"><h2>${t('player')}</h2><p>${t('cardType')}</p><p>ID: ${escape(cardLabel())}</p><span class="registration-badge">${t('unregistered')}</span></div></section>${(liveEnabled && config.walletMode === 'mock' ? '' : useMetaMaskBrowser(config) ? `<footer class="bottom-actions">${metaMaskHandoff()}</footer>` : footer('start-register', `${t('next')}${icon('arrow')}`))}`;
+}
+function walletSetup() {
+  if (liveEnabled) return liveSnapshot?.preparation ?? { kind: 'idle' };
+  if (state.wallet === 'valid') return { kind: 'ready' };
+  const step = state.scenario.slice('wallet-'.length);
+  if (['connect', 'add', 'switch'].includes(step)) return { kind: 'pending', step };
+  if (['paused', 'rejected'].includes(step)) return { kind: step, step: 'switch' };
+  return { kind: state.wallet === 'wrong-chain' ? 'paused' : 'idle', step: 'switch' };
+}
+function walletPreparationView() {
+  const setup = walletSetup();
+  const network = liveSnapshot?.read.connection?.network;
+  const name = network?.name ?? 'Curvegrid Testnet';
+  const pending = setup.kind === 'pending';
+  const status = setup.kind === 'ready' ? 'walletReady' : setup.kind === 'idle' ? 'preparationCopy' : pending ? setup.slow ? 'setupSlow' : { check: 'setupCheck', connect: 'setupConnect', add: 'setupAdd', switch: 'setupSwitch' }[setup.step] : { paused: 'setupPaused', rejected: 'setupRejected', failed: 'setupFailed', blocked: 'setupBlocked' }[setup.kind];
+  const action = pending || setup.kind === 'blocked' ? 'check-wallet' : 'prepare-wallet';
+  return `<div class="wallet-preparation" id="wallet-preparation"><p class="form-label">${t('walletPreparationTitle')}</p><p class="wallet-network">${escape(name)}</p><div class="wallet-status ${setup.kind === 'ready' ? 'wallet-ready' : ''}" role="status" aria-live="polite">${pending && !setup.slow ? '<span class="loading loading-spinner loading-xs" aria-hidden="true"></span>' : setup.kind === 'ready' ? icon('check') : ''}<span>${t(status)}</span></div>${state.wallet !== 'disconnected' ? `<p class="wallet-address">${escape(walletLabel())}</p>` : ''}${setup.kind !== 'ready' ? `<p class="wallet-return">${t(hasMetaMaskProvider() ? 'approveInApp' : 'returnToBrowser')}</p><button class="btn btn-primary wallet-prepare-button" data-action="${action}">${t(pending || setup.kind === 'blocked' ? 'checkWallet' : setup.kind === 'idle' ? 'prepareWallet' : 'continueWallet')}</button>` : ''}<button class="btn btn-ghost wallet-help-button" data-action="wallet-help">${t('walletHelp')}</button>${['failed', 'blocked'].includes(setup.kind) || setup.slow ? diagnosticControls() : ''}</div>`;
 }
 function registerView() {
-  const wrong = ['wrong-wallet', 'wrong-chain'].includes(state.wallet);
-  const walletKey = state.wallet === 'wrong-wallet' ? 'wrongWallet' : 'wrongChain';
-  return `<section class="page register-page">${tradingCard()}<div class="info-panel"><h1 class="page-title">${t('registerTitle')}</h1><div class="form-field"><label class="form-label" for="nickname">${t('nickname')}</label><div class="nickname-input"><input class="input input-bordered" id="nickname" name="nickname" autocomplete="off" value="${escape(state.nickname)}"><button type="button" data-action="clear-nickname" aria-label="${t('clearNickname')}">${icon('close')}</button></div></div><div class="form-field"><p class="form-label">${t('wallet')}</p>${state.wallet === 'disconnected' ? `<button class="btn btn-outline connect-button" data-action="connect" ${liveEnabled && liveSnapshot?.wallet.kind === 'connecting' ? 'disabled' : ''}>${icon('wallet')}${t(liveEnabled && liveSnapshot?.wallet.kind === 'connecting' ? 'connectingWallet' : 'connect')}</button>` : `<div class="wallet-value">${escape(walletLabel())}${icon('wallet')}</div>`}</div>${liveEnabled && liveError ? `<div class="alert alert-error" role="alert">${escape(t(liveError))}</div>` : ''}${wrong ? `<div class="alert alert-error"><div><p>${t(walletKey + 'Title')}</p><button class="btn btn-ghost" data-action="fix-wallet">${t(state.wallet === 'wrong-wallet' ? 'switchWallet' : 'switchChain')}</button></div></div>` : ''}</div></section>${footer('confirm', `${t('next')}${icon('arrow')}`, '', !ready())}`;
+  if (useMetaMaskBrowser(config)) return `<section class="page register-page">${tradingCard()}<div class="info-panel"><h1 class="page-title">${t('registerTitle')}</h1>${metaMaskHandoff()}</div></section>`;
+  return `<section class="page register-page">${tradingCard()}<div class="info-panel"><h1 class="page-title">${t('registerTitle')}</h1><div class="form-field"><label class="form-label" for="nickname">${t('nickname')}</label><div class="nickname-input"><input class="input input-bordered" id="nickname" name="nickname" autocomplete="off" value="${escape(state.nickname)}"><button type="button" data-action="clear-nickname" aria-label="${t('clearNickname')}">${icon('close')}</button></div></div>${walletPreparationView()}${state.wallet === 'wrong-wallet' ? `<p role="alert">${t('wrongWalletTitle')}</p><button class="btn btn-outline" data-action="fix-wallet">${t('switchWallet')}</button>` : ''}</div></section>${footer('confirm', `${t('next')}${icon('arrow')}`, '', !ready())}`;
+}
+function walletHelpDialog() {
+  const network = liveSnapshot?.read.connection?.network;
+  const link = metaMaskBrowserLink(config.publicUrl, currentCardId);
+  return `<dialog id="wallet-help-dialog" class="modal modal-bottom" aria-labelledby="wallet-help-title"><div class="modal-box"><h2 id="wallet-help-title">${t('walletHelp')}</h2><p class="wallet-return">${t('walletHelpCopy')}</p>${liveEnabled ? `<a class="btn btn-primary wallet-prepare-button" href="${escape(link)}">${t('openInMetaMask')}</a>` : ''}${network ? `<details class="network-settings"><summary>${t('manualNetwork')}</summary><p>${t('manualNetworkCopy')}</p><dl class="data-list">${[['networkName', network.name], ['chainIdLabel', network.chainId], ['currencyLabel', network.nativeCurrency.symbol], ['rpcLabel', network.rpcUrls[0]]].map(([label, value]) => `<div><dt>${t(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl><button class="btn btn-outline wallet-prepare-button" data-action="copy-network">${t('networkSettings')}</button><p id="network-copy-status" role="status"></p></details>` : ''}<form method="dialog"><button class="btn btn-outline wallet-prepare-button">${t('close')}</button></form></div></dialog>`;
 }
 function reviewView() {
   return `<section class="page review-page"><h1 class="page-title">${t('confirmTitle')}</h1>${tradingCard()}<div class="info-panel"><h2 class="panel-title">${t('confirmHeading')}</h2>${detailTable(false, true)}<label class="consent-label"><input type="checkbox" class="consent-checkbox" id="consent" ${state.consent ? 'checked' : ''}><span><strong>${t('consent')}</strong><small>${t('consentNote')}</small></span></label><button class="btn btn-primary panel-primary" data-action="register-reviewed" ${state.consent && ready() ? '' : 'disabled'}>${t('registerNow')}${icon('arrow')}</button><button class="btn btn-outline edit-button" data-action="edit-review">${icon('back')}${t('edit')}</button></div></section>`;
@@ -152,13 +253,17 @@ function dialogs() {
 }
 
 function render(preserveDialog = false) {
+  if (cameraEnabled && (!cameraOpen || state.view !== 'scan') && cameraState.kind !== 'stopped') camera.stop();
+  const heldVideo = cameraEnabled && cameraOpen && state.view === 'scan' ? root.querySelector('#camera-video') : null;
+  heldVideo?.remove();
   clearTimeout(timer);
   const openDialog = preserveDialog && root.querySelector('dialog[open]')?.id;
   document.documentElement.lang = locale;
   document.title = t('title');
   const content = state.view === 'scan' ? scanView() : state.view === 'card' ? cardView() : state.view === 'register' ? registerView() : state.view === 'review' ? reviewView() : processView();
-  root.innerHTML = `<div class="phone ${state.view === 'scan' && !cameraOpen ? 'home-scene' : 'flow-scene'}"><header class="app-header"><button class="round-button" data-action="${state.view === 'scan' && cameraOpen ? 'close-camera' : 'back-screen'}" aria-label="${t('backScreen')}" ${(['sent', 'confirming', 'unknown'].includes(state.view) || (liveEnabled && state.view === 'approval')) ? 'disabled' : ''}>${icon('back')}</button><a class="brand" href="./" data-action="home"><span class="brand-art"><img src="./assets/logo-ja.jpg" alt="${t('brand')} QR Proof" width="1236" height="1272"></span></a><button class="round-button" data-action="scenarios" aria-label="${t('menu')}"><span aria-hidden="true">•••</span></button></header><p class="demo-label">${t('demo')} · ${t(liveEnabled && config.walletMode === 'mock' ? 'readonly' : 'noTransaction')}</p><main>${content}</main></div>${dialogs()}`;
-  if (openDialog) document.getElementById(openDialog).showModal();
+  root.innerHTML = walletHelpDialog() + `<div class="phone ${state.view === 'scan' && !cameraOpen ? 'home-scene' : 'flow-scene'}"><header class="app-header"><button class="round-button" data-action="${state.view === 'scan' && cameraOpen ? 'close-camera' : 'back-screen'}" aria-label="${t('backScreen')}" ${(['sent', 'confirming', 'unknown'].includes(state.view) || (liveEnabled && state.view === 'approval')) ? 'disabled' : ''}>${icon('back')}</button><a class="brand" href="./" data-action="home"><span class="brand-art"><img src="./assets/logo-ja.jpg" alt="${t('brand')} QR Proof" width="1236" height="1272"></span></a><button class="round-button" data-action="scenarios" aria-label="${t('menu')}"><span aria-hidden="true">•••</span></button></header><p class="demo-label">${liveEnabled ? t(config.walletMode === 'mock' ? 'readonly' : 'demo') : `${t('demo')} · ${t('noTransaction')}`}</p><main>${content}</main></div>${dialogs()}`;
+  if (cameraEnabled && cameraOpen && state.view === 'scan') root.querySelector('#camera-slot').replaceWith(camera.getVideo());
+  if (openDialog) document.getElementById(openDialog)?.showModal();
   if (!liveEnabled && ['sent', 'confirming'].includes(state.view)) {
     const attempt = state.attempt;
     timer = setTimeout(() => {
@@ -185,6 +290,15 @@ root.addEventListener('click', async (event) => {
   if (!button || button.disabled) return;
   event.preventDefault();
   const action = button.dataset.action;
+  if (cameraEnabled && await handleCameraAction(action)) return;
+  if (action === 'copy-card-url') {
+    try { await navigator.clipboard.writeText(cardPageUrl(config.publicUrl, currentCardId)); root.querySelector('#card-url-copy-status').textContent = t('copied'); }
+    catch { root.querySelector('#card-url-copy-status').textContent = t('copyCardManually'); }
+    return;
+  }
+  if (action === 'wallet-help') { root.querySelector('#wallet-help-dialog').showModal(); return; }
+  if (!liveEnabled && action === 'prepare-wallet') { if (walletSetup().kind === 'idle') root.querySelector('#wallet-dialog').showModal(); else update({ wallet: 'valid' }); return; }
+  if (!liveEnabled && action === 'check-wallet') { update({ scenario: 'wallet-paused', wallet: 'wrong-chain' }); return; }
   if (liveEnabled && await handleLiveAction(action)) return;
   if (action === 'clear-nickname') { state.nickname = ''; persist(); render(); document.querySelector('#nickname').focus(); return; }
   if (['help', 'photos', 'flash'].includes(action)) { document.querySelector('#help-copy').textContent = t(action === 'photos' ? 'photoHelp' : action === 'flash' ? 'flashHelp' : 'helpCopy'); document.querySelector('#help-dialog').showModal(); return; }
@@ -203,7 +317,7 @@ root.addEventListener('click', async (event) => {
   if (action === 'details') { document.querySelector('#details-dialog').showModal(); return; }
   if (action === 'share') {
     const url = new URL(location.href);
-    url.search = state.view === 'scan' ? '' : `?scenario=${state.view === 'success' || state.card === 'registered' ? 'registered' : state.scenario}`;
+    url.search = state.view === 'scan' ? '' : state.scannedCardId ? new URLSearchParams({ cardId: state.scannedCardId }).toString() : `?scenario=${state.view === 'success' || state.card === 'registered' ? 'registered' : state.scenario}`;
     try { await navigator.clipboard.writeText(url.href); document.querySelector('#share-status').textContent = t('copied'); }
     catch { history.replaceState(null, '', url); state.entry = url.searchParams.get('scenario'); persist(); document.querySelector('#share-status').textContent = t('copyFailed'); }
     return;
@@ -229,10 +343,11 @@ root.addEventListener('click', async (event) => {
   if (action === 'refresh-evidence') { update({ card: 'registered', scenario: 'registered' }); return; }
   if (action === 'retry-read') { update({ card: 'registered', scenario: 'registered' }); return; }
 });
-window.addEventListener('popstate', () => { if (liveEnabled) { openLiveCard(new URL(location.href).searchParams.get('cardId')); return; } state = restore(); scanning = false; cameraOpen = false; render(); });
-persist();
+window.addEventListener('popstate', () => { if (liveEnabled) { openLiveCard(new URL(location.href).searchParams.get('cardId')); return; } state = restore(); scanning = false; cameraOpen = false; if (state.scannedCardId) setCardQr(state.scannedCardId); render(); });
+if (!liveEnabled) persist();
 render();
-
+if (liveEnabled && currentCardId) void openLiveCard(currentCardId);
+if (!liveEnabled && state.scannedCardId) setCardQr(state.scannedCardId);
 
 function liveDialogs() {
   const card = liveSnapshot?.read.card;
@@ -261,13 +376,17 @@ function liveNotice(code) {
 }
 function receiveLive(snapshot) {
   const statusOnly = liveSnapshot && (snapshot.refresh.kind === 'checking' || liveSnapshot.refresh.kind === 'checking') && root.querySelector('#evidence-status');
+  const walletOnly = state.view === 'register' && liveSnapshot && snapshot.registration.kind === 'idle' && liveSnapshot.registration.kind === 'idle' && JSON.stringify(snapshot.read) === JSON.stringify(liveSnapshot.read) && root.querySelector('#wallet-preparation');
   const changedWallet = liveSnapshot && snapshot.walletRevision !== liveSnapshot.walletRevision;
   liveSnapshot = snapshot;
   if (changedWallet) { state.consent = false; if (state.view === 'review') state.view = 'register'; }
   const readState = snapshot.read;
   if (readState.kind === 'ready') {
     state.card = readState.card.status === 'registered' ? (readState.card.evidence.status === 'pending' ? 'evidence-pending' : 'registered') : 'unregistered';
-    if (readState.card.owner) state.nickname = readState.card.owner.nickname;
+    if (readState.card.owner) {
+      state.nickname = readState.card.owner.nickname;
+      if (snapshot.registration.kind === 'idle' && ['register', 'review'].includes(state.view)) state.view = 'card';
+    }
   } else if (readState.kind === 'not-found') state.card = 'not-found';
   else if (readState.kind === 'unavailable') state.card = 'unavailable';
   state.wallet = snapshot.wallet.kind !== 'connected' ? 'disconnected' : snapshot.wallet.chainId !== readState.connection?.network.chainId ? 'wrong-chain' : 'valid';
@@ -278,12 +397,24 @@ function receiveLive(snapshot) {
   if (statusOnly) {
     statusOnly.setAttribute('aria-busy', String(snapshot.refresh.kind === 'checking'));
     statusOnly.innerHTML = evidenceStatus();
+  } else if (walletOnly) {
+    walletOnly.outerHTML = walletPreparationView();
+    const next = root.querySelector('[data-action="confirm"]');
+    if (next) next.disabled = !ready();
   } else render(true);
 }
 async function openLiveCard(cardId) {
   currentCardId = cardId;
   liveError = null;
   state = { ...fixture('unregistered'), nickname: '', view: cardId ? 'card' : 'scan' };
+  preparingWallet = false;
+  let restoreForm = false;
+  try {
+    const draft = JSON.parse(read('sessionStorage', liveDraftKey()));
+    if (typeof draft?.nickname === 'string') state.nickname = draft.nickname;
+    preparingWallet = config.walletMode === 'metamask' && !useMetaMaskBrowser(config) && draft?.preparingWallet === true;
+    restoreForm = preparingWallet && ['register', 'review'].includes(draft.view);
+  } catch {}
   cameraOpen = false;
   scanning = false;
   if (cardId) {
@@ -291,13 +422,19 @@ async function openLiveCard(cardId) {
     qrIdentity = cardId; qrSource = null;
     QRCode.toDataURL(url.href, { margin: 1, color: { dark: '#172b4d', light: '#ffffff' } }).then(source => { if (qrIdentity === cardId) { qrSource = source; const img = root.querySelector('.card-qr'); if (img) img.src = source; } });
     render();
-    if (live) await live.open(cardId);
+    if (live) {
+      await live.open(cardId);
+      if (preparingWallet && state.card === 'unregistered' && liveSnapshot?.registration.kind === 'idle') {
+        if (restoreForm) { state.view = 'register'; render(); }
+        await live.resumeSetup();
+      }
+    }
   } else { qrIdentity = null; qrSource = './card-qr.svg'; render(); }
 }
 async function handleLiveAction(action) {
   if (action === 'copy-diagnostics') {
     const { diagnostics } = await import('../src/live-api.js');
-    const report = JSON.stringify({ cardId: currentCardId, walletAddress: liveSnapshot?.wallet.address ?? null, chainId: liveSnapshot?.wallet.chainId ?? null, code: liveSnapshot?.registration.errorCode ?? null, errors: diagnostics() }, null, 2);
+    const report = JSON.stringify({ cardId: currentCardId, walletAddress: liveSnapshot?.wallet.address ?? null, chainId: liveSnapshot?.wallet.chainId ?? null, preparation: liveSnapshot?.preparation, code: liveSnapshot?.preparation.errorCode ?? liveSnapshot?.registration.errorCode ?? null, errors: diagnostics() }, null, 2);
     const output = root.querySelector('#diagnostic-output');
     try { await navigator.clipboard.writeText(report); output.textContent = t('diagnosticsCopied'); }
     catch { output.textContent = report; }
@@ -321,13 +458,23 @@ async function handleLiveAction(action) {
     catch { document.querySelector('#share-status').textContent = url.href; }
     return true;
   }
-  if (action === 'connect' || action === 'fix-wallet') {
+  if (action === 'copy-network') {
+    const network = liveSnapshot.read.connection.network;
+    const text = `${network.name}\nChain ID: ${network.chainId}\n${network.nativeCurrency.symbol}\n${network.rpcUrls[0]}`;
+    const output = root.querySelector('#network-copy-status');
+    try { await navigator.clipboard.writeText(text); output.textContent = t('copied'); }
+    catch { output.textContent = text; }
+    return true;
+  }
+  if (action === 'check-wallet') { await live?.resumeSetup(); return true; }
+  if (action === 'prepare-wallet' || action === 'connect' || action === 'fix-wallet') {
     if (!live || config.walletMode !== 'metamask') return true;
-    try { if (action === 'fix-wallet' && state.wallet === 'wrong-chain') await live.switchChain(); else await live.connect(); }
+    preparingWallet = true; persist();
+    try { await live.connect(); }
     catch { liveError = 'connectFailed'; render(); }
     return true;
   }
-  if (action === 'disconnect') { await live?.disconnect(); state.consent = false; render(); return true; }
+  if (action === 'disconnect') { preparingWallet = false; persist(); await live?.disconnect(); state.consent = false; render(); return true; }
   if (action === 'start-register' && config.walletMode !== 'metamask') return true;
   if (action === 'confirm') { if (ready()) update({ view: 'review', consent: false }); return true; }
   if (action === 'register-reviewed') {
@@ -347,9 +494,15 @@ async function handleLiveAction(action) {
 if (liveEnabled) {
   import('../src/live-registration.js').then(({ createLiveRegistration }) => {
     live = createLiveRegistration(config, receiveLive);
-    return openLiveCard(currentCardId);
+    if (currentCardId) return openLiveCard(currentCardId);
   }).catch(() => { liveSnapshot = { read: { kind: 'unavailable' }, wallet: { kind: 'disconnected' }, registration: { kind: 'idle' } }; state.card = 'unavailable'; render(); });
-  const resume = () => { if (!document.hidden && live && currentCardId) live.recheck().catch(() => {}); };
+  const resume = () => {
+    live?.setVisible(!document.hidden);
+    if (!document.hidden && live && currentCardId) {
+      if (preparingWallet) live.resumeSetup().catch(() => {});
+      live.recheck().catch(() => {});
+    }
+  };
   document.addEventListener('visibilitychange', resume);
   window.addEventListener('pageshow', resume);
 }

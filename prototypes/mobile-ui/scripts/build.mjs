@@ -22,14 +22,17 @@ await build({ entryPoints: ['public/app.js'], bundle: true, splitting: true, for
     eciesjs: resolve('src/metamask-ecies.js'),
   },
 });
+let headers = await readFile('public/_headers', 'utf8');
+if (config.cameraMode === 'live') {
+  headers = headers.replace('camera=()', 'camera=(self)').replace("img-src 'self' data:", "img-src 'self' data: blob:").replace("connect-src 'self'", "media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self'");
+}
 if (config.apiMode === 'live') {
-  let headers = await readFile('public/_headers', 'utf8');
   const connect = ["'self'", config.apiBaseUrl];
   if (config.walletMode === 'metamask') connect.push(config.rpcOrigin, 'wss://mm-sdk-relay.api.cx.metamask.io');
   headers = headers.replace("connect-src 'self'", `connect-src ${connect.join(' ')}`);
-  await writeFile(`${output}/_headers`, headers);
   const html = (await readFile('public/index.html', 'utf8')).replace('証明くん | UIモック', '証明くん | Testnet').replace('証明くんのカード登録・公開確認を相談するためのUIモック。実際の登録は行いません。', 'カードの登録所有者を確認し、本人ウォレットで登録します。');
   await writeFile(`${output}/index.html`, html);
 }
+await writeFile(`${output}/_headers`, headers);
 execFileSync('node_modules/.bin/tailwindcss', ['-i', 'styles/input.css', '-o', `${output}/style.css`, '--minify'], { stdio: 'inherit' });
 console.log(`Built ${config.apiMode}/${config.walletMode} UI in ${output}. Card QR: ${cardUrl.href}`);

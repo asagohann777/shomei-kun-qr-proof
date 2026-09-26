@@ -2,6 +2,8 @@
 
 状態: 2026-09-25の合意を反映した仕様。Curvegrid向けAPI・コントラクト・CLIは実装済み。実環境の受け入れ試験とスマホ結合は未実施。相談用のUIモックは別途 [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) に記録する。
 
+カメラは `UI_CAMERA_MODE=mock|live` で切り替える。実スキャンと端末内写真読取りの受付条件・停止条件・検証範囲は [カメラ仕様](CAMERA_SCAN.md) を参照。既定のモック動作を維持する。
+
 ## 目的と対象
 
 2026-09-26 JSTに、実接続前の [Web API詳細設計](BACKEND_DESIGN.md) と [OpenAPI定義](openapi.yaml) を追加した。MultiBaas・署名・送信を固定モックにする設計であり、以下の実接続要件を満たした実装とは扱わない。固定モックAPIの実装と試験は [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md) に記録する。追加したCurvegrid連携の範囲と未達条件は [CURVEGRID_INTEGRATION_IMPLEMENTATION.md](CURVEGRID_INTEGRATION_IMPLEMENTATION.md) を参照。
@@ -110,3 +112,13 @@ F08ではAmoy Polygonscanの取引・コントラクトページへの導線と�
 - 参加トラック、応募先、大会期間と各作業日時の対応。
 
 設計は [アーキテクチャ](ARCHITECTURE.md)、採用計画は [計画記録](PLAN.md)、実施内容は [変更記録](HACKATHON_CHANGES.md) を参照する。
+
+## MetaMask接続準備の追加条件（2026-09-26）
+
+接続前に使用ネットワークと準備の導線を表示する。未追加とは断定せず、ウォレットの未対応チェーン応答で追加を案内する。接続・追加・切替と登録取引を別の状態として扱う。MetaMaskへの移動中は次の承認要求を開始せず、ブラウザ復帰時に接続を再確認し、必要な操作を案内する。準備時には登録APIや署名を呼ばない。
+
+前面で60秒応答を確認できない場合は再確認と手動案内を表示し、要求を自動再送しない。対象チェーンとアドレスが確認できたときだけ登録確認へ進める。モックの準備シナリオと閲覧専用モードを維持する。詳細と実機検証の区別は [接続準備計画](METAMASK_PREPARATION_PLAN.md) を参照。
+
+## 2026-09-26: iPhone・iPadのMetaMask導線
+
+実接続モードのiPhone/iPad外部ブラウザでは、未登録カードからMetaMask内ブラウザへ同じカードIDで移動して登録する。ニックネーム入力は移動後とし、登録済みカードの閲覧とモックは従来どおり。

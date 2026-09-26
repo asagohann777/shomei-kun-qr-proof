@@ -2,6 +2,10 @@ import { CardResponse, ConnectionResponse, PrepareResponse, TransactionResponse,
 
 const failures = [];
 export function diagnostics() { return structuredClone(failures); }
+export function recordWalletEvent(fields) {
+  failures.push({ time: new Date().toISOString(), ...fields });
+  if (failures.length > 60) failures.shift();
+}
 export function recordFailure(fields) {
   const entry = { time: new Date().toISOString(), ...fields };
   failures.push(entry);

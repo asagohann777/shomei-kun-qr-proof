@@ -99,7 +99,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     await layout('390-unregistered');
     await action('start-register').click();
     await page.locator('#nickname').fill(nickname);
-    await action('connect').click();
+    await action('prepare-wallet').click();
     await action('confirm').waitFor({ state: 'visible' });
     await page.waitForFunction(() => !document.querySelector('[data-action="confirm"]').disabled);
     await action('confirm').click();
@@ -186,7 +186,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     assert.match(await page.locator('#details-dialog').innerText(), new RegExp(hash));
     await page.locator('#details-dialog form button').click();
     assertions.push('initial confirmation waits for evidence; refresh updates only status, preserves DOM and owner on failure, recovers and updates details');
-    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); });
     failRead = true;
     await page.reload();
     await action('retry-read').waitFor();
@@ -198,11 +198,11 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     await page.locator('.result-page').waitFor();
     assertions.push('503 remains unavailable; explicit retry recovers');
     phase = 'unregistered'; failPrepare = true;
-    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); });
     await page.goto(`${base}/?cardId=${cardId}`);
     await action('start-register').click();
     await page.locator('#nickname').fill(nickname);
-    await action('connect').click(); await action('confirm').click();
+    await action('prepare-wallet').click(); await action('confirm').click();
     await page.locator('#consent').check(); await action('register-reviewed').click();
     await action('copy-diagnostics').waitFor();
     assert.match(await page.locator('[role="alert"]').innerText(), /登録許可先/);
@@ -215,9 +215,10 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     assert.equal(walletCalls.filter(method => method === 'eth_sendTransaction').length, 1);
     for (const width of [390, 320, 1365]) { await page.setViewportSize({ width, height: 844 }); await layout(`${width}-wallet-not-allowed`); }
     prepareError = 'INSUFFICIENT_FUNDS';
+    await page.evaluate(() => sessionStorage.clear());
     await page.reload(); await action('start-register').click();
     await page.locator('#nickname').fill(nickname);
-    await action('connect').click(); await action('confirm').click();
+    await action('prepare-wallet').click(); await action('confirm').click();
     await page.locator('#consent').check(); await action('register-reviewed').click();
     await action('copy-diagnostics').waitFor();
     assert.match(await page.locator('[role="alert"]').innerText(), /ガス代が足りません/);
@@ -230,10 +231,12 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     if (readonlyBase) {
       phase = 'unregistered';
       const before = walletCalls.length;
+      await page.addInitScript(({ api, cardId }) => sessionStorage.setItem(`shomei.wallet-draft:${api}:${cardId}`, JSON.stringify({ nickname: 'Saved draft', preparingWallet: true, view: 'register' })), { api, cardId });
       await page.goto(`${readonlyBase}/?cardId=${cardId}`);
       await page.waitForFunction(() => document.body.innerText.includes('browser-fixture-001'));
       assert.equal(await action('start-register').count(), 0);
-      assert.equal(await action('connect').count(), 0);
+      assert.equal(await action('prepare-wallet').count(), 0);
+      assert.equal(await page.locator('#nickname').count(), 0, 'read-only mode must ignore a saved registration form');
       assert.equal(walletCalls.length, before);
       readonly = 'live/mock reads API fixture and offers no registration or wallet';
       await layout('1365-readonly');

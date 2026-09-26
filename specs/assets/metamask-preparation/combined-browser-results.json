@@ -1,0 +1,91 @@
+[
+  {
+    "browser": "chromium",
+    "passed": true,
+    "actualMetaMask": false,
+    "realDevice": false,
+    "errors": [],
+    "screenshotWarnings": [],
+    "approvalRequests": [
+      "eth_requestAccounts",
+      "wallet_switchEthereumChain",
+      "wallet_addEthereumChain",
+      "wallet_switchEthereumChain"
+    ]
+  },
+  {
+    "browser": "webkit",
+    "passed": true,
+    "actualMetaMask": false,
+    "realDevice": false,
+    "errors": [],
+    "screenshotWarnings": [
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      },
+      {
+        "type": "playwright-screenshot-csp",
+        "source": "http://127.0.0.1:4284/?cardId=wallet-browser-fixture",
+        "screenshotActive": true
+      }
+    ],
+    "approvalRequests": [
+      "eth_requestAccounts",
+      "wallet_switchEthereumChain",
+      "wallet_addEthereumChain",
+      "wallet_switchEthereumChain"
+    ]
+  }
+]

@@ -69,10 +69,11 @@ test('SDK is lazy, custom RPC is supplied, analytics are disabled, mobile sessio
   const provider = fakeProvider();
   let options;
   let connection;
+  let connections = 0;
   let disconnected = false;
   const wallet = await createMetaMaskWallet({ network, dappUrl: 'https://ui.example.test/?cardId=one', injectedProvider: () => null, createClient: async (value) => {
     options = value;
-    return { getProvider: () => provider, connect: async (value) => { connection = value; }, disconnect: async () => { disconnected = true; } };
+    return { getProvider: () => provider, connect: async (value) => { connections++; connection = value; }, disconnect: async () => { disconnected = true; } };
   } });
   assert.equal(options, undefined);
   assert.deepEqual(await wallet.connect(), expected);
@@ -80,7 +81,8 @@ test('SDK is lazy, custom RPC is supplied, analytics are disabled, mobile sessio
   assert.deepEqual(options.analytics, { enabled: false });
   assert.deepEqual(options.ui, { headless: true });
   assert.deepEqual(options.mobile, { useDeeplink: false });
-  assert.deepEqual(connection, { chainIds: [chain] });
+  assert.equal(connections, 1);
+  assert.equal(connection, undefined);
   assert.equal(options.dapp.url, 'https://ui.example.test/?cardId=one');
   await wallet.disconnect();
   assert.equal(disconnected, true);
@@ -162,18 +164,25 @@ test('4001 is preserved with no retry and repeated send while pending is rejecte
   wallet.dispose();
 });
 
-test('add chain happens only on 4902 and then checks actual switched network', async () => {
+test('switch and add are separate approval requests, errors are preserved for preparation', async () => {
   const { wallet, provider } = await setup();
   await wallet.connect();
-  let switches = 0;
-  provider.respond = async ({ method }) => {
-    if (method === 'wallet_switchEthereumChain' && switches++ === 0) throw Object.assign(new Error('Unknown chain'), { code: 4902 });
-  };
+  provider.respond = async ({ method }) => { if (method === 'wallet_switchEthereumChain') throw Object.assign(new Error('Unknown chain'), { code: 4902 }); };
+  await assert.rejects(wallet.switchChain(), { code: 4902 });
+  assert.equal(provider.requests.some(({ method }) => method === 'wallet_addEthereumChain'), false);
+  await wallet.addChain();
+  provider.respond = undefined;
   assert.deepEqual(await wallet.switchChain(), expected);
   assert.equal(provider.requests.filter(({ method }) => method === 'wallet_addEthereumChain').length, 1);
-  provider.respond = async ({ method }) => { if (method === 'wallet_switchEthereumChain') throw Object.assign(new Error('Rejected'), { code: 4001 }); };
-  await assert.rejects(wallet.switchChain(), { code: 4001 });
-  assert.equal(provider.requests.filter(({ method }) => method === 'wallet_addEthereumChain').length, 1);
+  wallet.dispose();
+});
+
+test('restoring a session reads existing permission without requesting a new connection', async () => {
+  const { wallet, provider } = await setup();
+  assert.deepEqual(await wallet.restore(), expected);
+  assert.deepEqual(provider.requests.map(r => r.method), ['eth_accounts', 'eth_chainId']);
+  provider.accounts = [];
+  assert.equal(await wallet.restore(), null);
   wallet.dispose();
 });
 
@@ -198,5 +207,19 @@ test('connection rejection retains wallet error code and can be retried explicit
   provider.respond = undefined;
   assert.deepEqual(await wallet.connect(), expected);
   assert.equal(provider.listenerCount('accountsChanged'), 1);
+  wallet.dispose();
+});
+
+
+test('stale restoration cannot disconnect a newer successful connection', async () => {
+  const { wallet, provider } = await setup();
+  let release, reads = 0;
+  provider.respond = ({ method }) => method === 'eth_chainId' && ++reads === 1 ? new Promise(resolve => { release = resolve; }) : undefined;
+  const restoring = wallet.restore();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(await wallet.connect(), expected);
+  release('0x1');
+  await assert.rejects(restoring, { code: 'WALLET_CHANGED' });
+  assert.deepEqual(await wallet.snapshot(), expected);
   wallet.dispose();
 });
