@@ -2,7 +2,7 @@ English | [日本語](design.ja.md)
 
 # Design
 
-Correction on 2026-09-26: demo registration is open to everyone. When omitted in the CLI, allowedWallet=0 permits first registration by any wallet owner. References below to a specified allowed wallet apply only to restricted cards with a nonzero value. See the [open-registration plan](../../../../specs/OPEN_REGISTRATION_DEMO.md) for current deployment and verification.
+Correction on 2026-09-26: demo registration is open to everyone. When omitted in the CLI, allowedWallet=0 permits first registration by any wallet owner. References below to a specified allowed wallet apply only to restricted cards with a nonzero value. See the [open-registration plan](../../../specs/OPEN_REGISTRATION_DEMO.md) for current deployment and verification.
 
 ## Context
 
