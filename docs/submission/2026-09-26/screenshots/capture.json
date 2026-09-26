@@ -1,0 +1,69 @@
+{
+  "capturedAt": "2026-09-26T05:12:57.697Z",
+  "commit": "5d3e676e3271e04ab9b83219dafe78821fd4af18",
+  "base": "http://127.0.0.1:4189",
+  "browser": "Chromium 149.0.7827.55",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "deviceScaleFactor": 2,
+  "fullPage": true,
+  "locale": "en-US",
+  "errors": [],
+  "captures": [
+    {
+      "file": "01-home-en.png",
+      "description": "Home and QR scan entry",
+      "heading": "Check ownership with QR",
+      "mode": "mock API, mock wallet, mock camera"
+    },
+    {
+      "file": "02-qr-scan-en.png",
+      "description": "Simulated QR scanning interface",
+      "heading": "Scanning QR code",
+      "mode": "mock API, mock wallet, mock camera"
+    },
+    {
+      "file": "03-unregistered-card-en.png",
+      "description": "Unregistered sample card",
+      "heading": "QR code read successfully",
+      "mode": "mock API, mock wallet, mock camera"
+    },
+    {
+      "file": "04-owner-information-en.png",
+      "description": "Owner information with a simulated wallet",
+      "heading": "Enter owner information",
+      "mode": "mock API, mock wallet, mock camera"
+    },
+    {
+      "file": "05-review-en.png",
+      "description": "Review and consent before registration",
+      "heading": "Register with this information?",
+      "mode": "mock API, mock wallet, mock camera"
+    },
+    {
+      "file": "06-wallet-approval-en.png",
+      "description": "Simulated approval, not MetaMask UI",
+      "heading": "Approve in your wallet",
+      "mode": "mock API, mock wallet, mock camera"
+    },
+    {
+      "file": "07-registration-progress-en.png",
+      "description": "Stable processing preview, not a pending transaction",
+      "heading": "Registering…",
+      "mode": "mock API, mock wallet, mock camera"
+    },
+    {
+      "file": "08-registration-complete-en.png",
+      "description": "Simulated registration completion, not an on-chain receipt",
+      "heading": "Registration complete",
+      "mode": "mock API, mock wallet, mock camera"
+    },
+    {
+      "file": "09-record-details-en.png",
+      "description": "Simulated record details",
+      "mode": "mock"
+    }
+  ]
+}

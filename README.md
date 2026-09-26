@@ -1,0 +1,1 @@
+- [English UI demo screenshots (9 PNGs)](docs/submission/2026-09-26/screenshots/)

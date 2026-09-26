@@ -1,0 +1,25 @@
+{
+  "receivedOn": "2026-09-26",
+  "source": "User-provided Downloads files; role assignment follows the order in the user request.",
+  "processing": "Copied and renamed only. No resizing, cropping, recompression or image generation.",
+  "assets": [
+    {
+      "originalName": "ChatGPT 画像 2026年9月25日 17_29_33.png",
+      "file": "shomei-kun-icon.png",
+      "role": "icon",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2247497,
+      "sha256": "afdd16b5edcbc1cdcc45f6222d6ac38e2e86d678a840b097727974dc13348221"
+    },
+    {
+      "originalName": "ChatGPT 画像 2026年9月25日 17_29_12.png",
+      "file": "shomei-kun-cover.png",
+      "role": "cover",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2659811,
+      "sha256": "2e8ed14cd6b651ed884675716db7b723709889436e89219e6f66d3dbf2c7b563"
+    }
+  ]
+}
