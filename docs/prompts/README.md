@@ -1,52 +1,56 @@
-# プロンプトの保存
+English | [日本語](README.ja.md)
 
-Codexの `UserPromptSubmit` hookが受け取った入力本文を、このディレクトリにJSONで保存する。大会への提出時は記録もGitに含める。
+# Prompt records
 
-## 有効にする
+The Codex `UserPromptSubmit` hook saves the text it receives as JSON in this directory. Include these records in Git for the hackathon submission.
 
-1. Python 3.10以上とGitがある環境で、このリポジトリをCodexで開く。
-2. プロジェクトの設定を信頼し、設定追加前から開いていたセッションは開き直す。
-3. Codex CLIの `/hooks` で `.codex/hooks.json` の `UserPromptSubmit` を確認して信頼する。
-4. 次の入力後に `docs/prompts/YYYY-MM-DD/` にJSONが作成されたことを確認する。
+## Enable capture
 
-`.codex/config.toml` でhooksを有効にしている。グローバル設定は変更しない。このリポジトリではworktreeを作成せず作業してよい。
+1. Open this repository in Codex on a system with Python 3.10 or later and Git.
+2. Trust the project settings. Reopen sessions that were already running before the settings were added.
+3. In Codex CLI, use `/hooks` to review and trust the `UserPromptSubmit` hook in `.codex/hooks.json`.
+4. After the next input, check that a JSON file appears under `docs/prompts/YYYY-MM-DD/`.
 
-Codexは未承認のhookをスキップするため、ファイルを配置しただけでは自動保存は始まらない。管理側でプロジェクトhooksを禁止している環境では利用できない。
+Hooks are enabled in `.codex/config.toml`. Global settings are unchanged. This repository permits work without creating a worktree.
 
-## 保存される内容
+Codex skips untrusted hooks. Adding the configuration files alone does not start capture. Capture is unavailable where administrators disable project hooks.
 
-- `prompt`: hookが受け取った本文。改行、日本語、引用符を保持する。
-- `captured_at`: hookが保存したUTC日時。元の入力日時とは区別する。
-- `session_id`、`turn_id`、提供された場合の `model`。
-- `source`、`schema_version`。
+## Captured fields
 
-ファイル名はUTC時刻とランダムIDから作る。同じターンへの追加入力や同時入力でも既存ファイルを上書きしない。同じイベントが再配信された場合も別の記録として残す。
+- `prompt`: the text received by the hook, preserving line breaks, Japanese text, and quotation marks.
+- `captured_at`: the UTC capture time, distinct from the time of the original input.
+- `session_id`, `turn_id`, and `model` when supplied.
+- `source` and `schema_version`.
 
-記録は一時ファイルへの書き込み後に確定する。スクリプトが入力不正・保存失敗を検出した場合は終了コード2を返し、Codexへの入力をブロックする。hook自体が無効、未承認、起動不能の場合まで記録を保証するものではない。
+Filenames combine UTC time with a random ID. Additional or concurrent inputs in the same turn never overwrite an existing file. A repeated event is also kept as a separate record.
 
-## 手動で補うもの
+The script writes a temporary file before finalizing the record. Invalid input or a storage failure causes exit code 2 and blocks the input to Codex. This does not guarantee capture if the hook itself is disabled, untrusted, or unable to start.
 
-このhookはユーザーのテキスト入力だけを扱う。導入前の入力、添付画像・ファイル、他ツールのプロンプト、採用した計画、プロジェクト固有の指示やテンプレートは別途保存する。回答全体や内部推論、端末の絶対パス、セッションの全履歴は収集しない。
+## Material to record manually
 
-`bootstrap-request.md` はhook導入を依頼したユーザーメッセージの手動転記であり、hookによる自動記録ではない。プロジェクトの継続的な指示はルートの `AGENTS.md`、計画と仕様は `specs/` に保存する。
+The hook captures user text only. Record earlier inputs, attachments, prompts from other tools, adopted plans, project instructions, and templates separately. It does not collect complete AI answers, internal reasoning, terminal absolute paths, or full session histories.
 
-秘密鍵・認証情報・実顧客データを入力しない。公開前に記録を確認する。秘匿化した場合は、その箇所と理由を記録する。
+`bootstrap-request.md` is a manual transcription of the request to install the hook, not an automatically captured record. Ongoing project instructions belong in the root `AGENTS.md`; plans and specifications belong in `specs/`.
 
-## 検証する
+Do not enter private keys, credentials, or actual customer data. Review records before publication. If a record is redacted, identify the location and reason.
 
-リポジトリのルートで実行する。テストは一時リポジトリを使い、提出用の記録にテスト入力を混ぜない。
+English documentation is the default. Japanese originals are available through the language links. Translated quotations in the English guides are translations, not verbatim user inputs. Captured JSON and supplied `.txt` transcripts remain unchanged in their source language to preserve provenance.
+
+## Verify capture
+
+Run this command at the repository root. The tests use temporary repositories and do not mix test input into submission records.
 
 ```sh
 python3 -m unittest discover -s tests -v
 ```
 
-## 根拠
+## References
 
-- [ETHGlobal Tokyo 2026のルール](https://ethglobal.com/events/tokyo2026/info/details): 仕様駆動開発の仕様・プロンプト・計画資料を提出リポジトリに含め、AI利用箇所と既存成果を開示する。
-- [Codex hooks公式仕様](https://learn.chatgpt.com/docs/hooks): プロジェクトhooks、`UserPromptSubmit` の入力とブロック、`/hooks` の信頼設定。
+- [ETHGlobal Tokyo 2026 rules](https://ethglobal.com/events/tokyo2026/info/details): include specifications, prompts, and plans used for spec-driven development; disclose AI use and pre-existing work.
+- [Official Codex hooks documentation](https://learn.chatgpt.com/docs/hooks): project hooks, `UserPromptSubmit` input and blocking, and `/hooks` trust settings.
 
-確認日: 2026-09-25。ローカルCLI: `codex-cli 0.156.1`。
+Checked on 2026-09-25. Local CLI: `codex-cli 0.156.1`.
 
-## 画像生成の提供記録
+## Supplied image-generation records
 
-- [おじいちゃんコンビニ「プロンプト報告1」（1〜28項）](asagohann777-prompt-report-1-2026-09-26.md)。2026-09-26受領。UI案の検討と実装素材への分離をまとめた提供報告。
+- [Ojiichan Konbini's Prompt report 1, sections 1–28](asagohann777-prompt-report-1-2026-09-26.md). Received on 2026-09-26. The report describes UI design iterations and the separation of implementation assets.

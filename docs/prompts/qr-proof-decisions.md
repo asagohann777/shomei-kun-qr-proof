@@ -1,60 +1,62 @@
-# QR登録機能の探索で確認した選択回答
+English | [日本語](qr-proof-decisions.ja.md)
 
-出典: 2026-09-25の本リポジトリでのCodex会話。Codexが会話上の `request_user_input` の質問・回答から手動転記した。hookによる自動保存ではない。回答ごとの正確な時刻は記録していない。
+# Decisions from QR registration exploration
 
-文書作成時点でhookのJSONには最初の依頼、スマホへの訂正、計画の実行指示が保存されていた。以下の選択回答はそれらのJSONに含まれないため補った。AIの内部推論や会話全文の記録ではない。
+Source: the Codex conversation in this repository on 2026-09-25. Codex manually transcribed questions and answers from `request_user_input`. This is not automatic hook capture. Exact times for each answer were not recorded.
 
-## ニックネームの保存先
+At the time of writing, hook JSON contained the initial request, the correction to mobile support, and the instruction to execute the plan. The selected answers below were added manually because they were absent from those JSON files. This is not a record of internal AI reasoning or the entire conversation. Questions, options, and quoted answers below are English translations; the Japanese version preserves their recorded wording.
 
-質問: 「ニックネームは、今回どの方法で登録情報と結び付けますか？」
+## Nickname storage
 
-選択肢:
+Question: "How should the nickname be linked to the registration information?"
 
-- 「文字列もオンチェーン (Recommended)」: 公開ニックネームを所有者と一緒に記録し、登録後は変更・削除しない。デモの構成が小さくなる。
-- 「文字列は別の保存先」: ブロックチェーンには照合用ハッシュを記録する。文字列の保管と照合、取得できない場合の表示も設計する。
+Options:
 
-ユーザーの回答: 「文字列もオンチェーン (Recommended)」
+- "Store the string on-chain too (Recommended)": record the public nickname with the owner, with no changes or deletion after registration. This keeps the demo smaller.
+- "Store the string elsewhere": record a verification hash on the blockchain. Also design string storage, verification, and unavailable-data display.
 
-## 既存PoCとの関係
+User's answer: "Store the string on-chain too (Recommended)."
 
-質問: 「今回の完成条件に、既存『証明くん』PoCとの実際のデータ連携を含めますか？」
+## Relationship to the existing PoC
 
-選択肢:
+Question: "Should completion include actual data integration with the existing Shomei-kun PoC?"
 
-- 「独立した追加機能のデモ (Recommended)」: このリポジトリのCLI・コントラクト・デモだけで実演する。既存PoCとの接続は将来の拡張点として記録する。
-- 「既存PoCとの連携まで含める」: 既存の記録や画面からカード登録に接続する。既存ソース・API・利用許諾の確認を仕様化の前提にする。
+Options:
 
-ユーザーの回答: 「独立した追加機能のデモ (Recommended)」
+- "Independent additional-feature demo (Recommended)": demonstrate using only this repository's CLI, contract, and demo. Record PoC integration as a future extension.
+- "Include integration with the existing PoC": connect existing records or screens to card registration. Confirm source code, APIs, and permissions before specifying the integration.
 
-## 登録の操作環境と訂正
+User's answer: "Independent additional-feature demo (Recommended)."
 
-質問: 「デモの所有者登録は、どの操作環境まで対応させますか？」
+## Registration environment and correction
 
-選択肢:
+Question: "Which environments should support owner registration in the demo?"
 
-- 「スマホとPCのMetaMask (Recommended)」: スマホの通常ブラウザからMetaMaskアプリへ接続し、PCでは拡張機能を使う。QRから登録までの流れを実演する。
-- 「PCのMetaMask拡張機能」: 登録は準備済みのPCで行い、スマホではQRからの閲覧を実演する。接続部分の実装と検証を絞る。
-- 「複数種類のウォレット」: MetaMask以外にも対応する。対応対象の選定と各ウォレットでの接続検証を追加する。
+Options:
 
-最初の回答: 「PCのMetaMask拡張機能」
+- "MetaMask on mobile and PC (Recommended)": connect a normal mobile browser to the MetaMask app and use the extension on PC. Demonstrate the flow from QR to registration.
+- "PC MetaMask extension": register on a prepared PC and demonstrate QR viewing on mobile. Reduce connection implementation and verification scope.
+- "Multiple wallet types": support wallets beyond MetaMask. Add wallet selection and connection tests for each supported wallet.
 
-その後のユーザーによる訂正: 「ごめんやっぱりスマホでお願いいsます」
+Initial answer: "PC MetaMask extension."
 
-最終的な扱いは、スマホの通常ブラウザからMetaMaskアプリへ接続する登録である。PCだけで登録する案は採用しない。訂正本文は [hook記録](2026-09-25/122429-037897-c475cb8e8fd244c08302e2043f25f922.json) にも保存されている。
+Later user correction: "Sorry, please use mobile after all." The original contains a typo retained in the Japanese version.
 
-## 外部での確認
+The adopted scope is registration through a normal mobile browser connected to the MetaMask app, not PC-only registration. The correction is also preserved in the [hook record](2026-09-25/122429-037897-c475cb8e8fd244c08302e2043f25f922.json).
 
-質問: 「F08の外部確認は、どこまでを必須にしますか？」
+## External verification
 
-選択肢:
+Question: "How much external verification is required by F08?"
 
-- 「取引情報と照合手順 (Recommended)」: 画面に根拠の取引情報を表示し、公開用RPCを使って第三者が独立して照合できる手順を提供する。
-- 「公開エクスプローラーも必須」: 第三者がログイン不要で外部サイトの取引ページを開けることまで求める。Curvegridでの提供可否を追加確認する。
+Options:
 
-ユーザーの回答: 「取引情報と照合手順 (Recommended)」
+- "Transaction information and verification procedure (Recommended)": display supporting transaction information and provide a procedure for independent third-party verification through a public RPC.
+- "Require a public explorer too": require a transaction page that third parties can open without logging in. Check whether Curvegrid provides one.
 
-## 計画の採用
+User's answer: "Transaction information and verification procedure (Recommended)."
 
-上記を反映した計画を提示した後、ユーザーは「Implement the plan.」と指示した。[hook記録](2026-09-25/122651-114438-1fe83e01648547c1a4e98d4f8cc0ec12.json) を参照する。
+## Plan adoption
 
-採用計画は [specs/PLAN.md](../../specs/PLAN.md) に保存した。今回の実行対象は仕様・設計・デモ手順などの文書作成であり、アプリ実装ではない。
+After receiving a plan reflecting those choices, the user said, "Implement the plan." See the [hook record](2026-09-25/122651-114438-1fe83e01648547c1a4e98d4f8cc0ec12.json).
+
+The adopted plan is stored in [specs/PLAN.md](../../specs/PLAN.md). That task covered specifications, design, and demo documentation, not application implementation.

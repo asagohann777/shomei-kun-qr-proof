@@ -1,23 +1,25 @@
-# おじいちゃんコンビニ「プロンプト報告1」の保存記録
+English | [日本語](asagohann777-prompt-report-1-2026-09-26.ja.md)
 
-受領日: 2026-09-26 JST。対象: ETHGlobal Tokyo 2026 / Shomei-kun QR Proof。
+# Preservation record for Ojiichan Konbini's Prompt report 1
 
-[報告本文（1〜28項）](asagohann777-prompt-report-1-2026-09-26.txt)は、ユーザーがおじいちゃんコンビニの画像生成時の記録として提供した文章。UI8画面の検討、人間による修正指示、背景・ロゴ・QR表示・カードの素材分離を扱う。
+Received on 2026-09-26 JST. Project: ETHGlobal Tokyo 2026 / Shomei-kun QR Proof.
 
-## 出典と保存方法
+The [report, sections 1–28](asagohann777-prompt-report-1-2026-09-26.txt), was supplied by the user as a record of Ojiichan Konbini's image-generation work. It covers eight UI screens, human revision instructions, and the separation of backgrounds, logos, QR illustrations, and card artwork into implementation assets.
 
-- [前編のユーザー入力](2026-09-26/050249-887379-82be7f4a5ff541d3a8cfc5b9aebd3d32.json)
-- [続編のユーザー入力](2026-09-26/050323-903904-4e5f6104d1974765ab9cba84c0163c49.json)
+## Sources and preservation method
 
-上記JSONは今回の入力をUserPromptSubmit hookが保存したもの。報告本文はCodexがそこから抽出して結合した。前編の保存依頼文と続編末尾の「続編もありました」を除き、提供された本文の文言・改行を保持した。画像生成時の外部会話を自動取得したものではなく、会話全文や個別の生成プロンプト原文を保証するものでもない。報告文自体の執筆でAIを使用したかは未確認。
+- [First user input](2026-09-26/050249-887379-82be7f4a5ff541d3a8cfc5b9aebd3d32.json)
+- [Continuation input](2026-09-26/050323-903904-4e5f6104d1974765ab9cba84c0163c49.json)
 
-[先に受領した制作会話の記録](asagohann777-design-2026-09-25.md)と[受領画像・素材一覧](../../specs/assets/asagohann777/README.md)も参照。
+The UserPromptSubmit hook saved those inputs as JSON. Codex extracted and joined the report text, preserving its wording and line breaks except for the first input's save request and the continuation's final remark meaning "There was a continuation too." The report was not automatically retrieved from the external image-generation conversation. It is not guaranteed to contain the complete conversation or verbatim individual generation prompts. Whether AI helped write the report itself is unknown.
 
-## 報告内容と検証済み事項の区別
+See also the [earlier design conversation record](asagohann777-design-2026-09-25.md) and [supplied image and asset inventory](../../specs/assets/asagohann777/README.md).
 
-- 本文は提供者の制作経緯の報告として保存した。画像ごとの生成日時・使用モデル・個別プロンプトとの対応、大会期間との対応は未確認。
-- 本文の透過素材に関する記述は制作時の報告。リポジトリで受領したロゴ・QRイラストは白背景のJPEGで、カード周囲の市松模様もJPEGの画素である。受領ファイルに透過があるという検証結果ではない。
-- 本文の「本人・所有者を確定」「登録された情報は改ざんできません」などは、当時の目的・画面文言として記録した。現在の実装や本人確認、所有権、改ざん耐性を保証する仕様・検証結果には置き換えない。
-- 続編の終了フラグまでを「プロンプト報告1」とする。「プロンプト報告2」は今回の受領範囲に含まれない。
+## Reported work versus verified facts
 
-Codexは本文の抽出・結合、出典の記載、関連資料へのリンク追加と一致確認を担当した。今回、画像の生成・加工やUIの変更は行っていない。
+- The text is preserved as the contributor's account of the design process. Individual image dates, models, prompt mappings, and alignment with the hackathon period have not been verified.
+- Statements about transparent assets describe the reported production process. The supplied logo and QR illustrations in the repository are white-background JPEGs. The checkerboard surrounding the card is also JPEG pixel data. The report is not evidence that the received files have transparency.
+- Phrases meaning "identify the person/owner" and "registered information cannot be altered" are historical goals and screen wording. They are not substituted for the current implementation specification or proof of identity, ownership, or tamper resistance.
+- Prompt report 1 ends at the continuation's completion marker. Prompt report 2 was not included in the material received here.
+
+Codex extracted and joined the text, documented its sources, added related links, and verified the match. No images were generated or edited, and no UI changes were made in this preservation task.

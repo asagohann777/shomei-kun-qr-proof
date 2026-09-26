@@ -1,7 +1,9 @@
-# 手動保存したユーザー指示
+English | [日本語](camera-integration-request.ja.md)
 
-2026-09-26。このファイルは会話から手動転記した。
+# Manually saved user instructions
 
-> 旧コミットのSHAから取得できるのは承知してるが無視する
+Manually transcribed from the conversation on 2026-09-26. The quotation below is an English translation; the Japanese version preserves the recorded wording.
+
+> I know it can be retrieved through an old commit SHA, but disregard that.
 >
-> mainの最新でカメラが起動できるようになってるのでそれ取り込んでテストできるようにしてください
+> The latest main can now start the camera. Bring that in so we can test it.

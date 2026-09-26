@@ -1,17 +1,19 @@
-# Curvegrid連携の選択記録
+English | [日本語](curvegrid-integration-decisions.ja.md)
 
-2026-09-26 JSTにCodexが会話の選択結果を手動で要約した。質問文の逐語録やhookによる自動保存ではない。
+# Curvegrid integration decisions
 
-| 論点 | ユーザーの選択 |
+Codex manually summarized the selected answers on 2026-09-26 JST. This is neither a verbatim question transcript nor an automatic hook capture.
+
+| Topic | User's selection |
 | --- | --- |
-| 接続先 | まずCurvegrid Testnet。MultiBaas環境は作成済みで後から設定 |
-| 試験範囲 | 登録・書込みまで |
-| コントラクト | 所有者登録を新規実装 |
-| スマホ操作 | 通常ブラウザからMetaMaskへ接続 |
-| ニックネーム | 固定値をやめ、自由入力 |
-| 並行開発 | こちらはAPI・コントラクト・CLI。画面とブラウザのMetaMask接続はUI担当 |
-| 進め方 | ブランチとPRを作成。先に計画をMarkdownへ保存し、詳細設計をユーザーが確認してから実装 |
+| Target | Start with Curvegrid Testnet; the MultiBaas environment already exists and will be configured later |
+| Test scope | Include registration and writes |
+| Contract | Implement a new owner-registration contract |
+| Mobile operation | Connect to MetaMask from a normal browser |
+| Nickname | Replace the fixed sample with free-form input |
+| Parallel development | This work covers API, contract, and CLI; the UI developer handles screens and browser MetaMask integration |
+| Process | Create a branch and PR; save the plan in Markdown first, and implement after the user reviews the detailed design |
 
-選択結果を反映した [計画](../../specs/CURVEGRID_INTEGRATION_PLAN.md) を保存した。名前の96バイト上限、モジュール構成などはCodexの設計提案であり、個別にユーザーが指定した条件とは扱わない。
+The [plan](../../specs/CURVEGRID_INTEGRATION_PLAN.md) records these selections. The 96-byte nickname limit and module structure were Codex design proposals, not conditions individually specified by the user.
 
-対応するhook JSONは2026-09-25 UTCの `201954`、`202746`、`203111`。元のチェックアウトから同一内容で専用worktreeへコピーした。元ファイルを削除・書換えしていない。質問への選択回答とAIの計画はhook記録に含まれると主張しない。
+The corresponding hook JSON files use 2026-09-25 UTC prefixes `201954`, `202746`, and `203111`. They were copied unchanged from the original checkout into the dedicated worktree. The originals were not deleted or rewritten. This document does not claim that selected answers or AI plans are present in the hook records.

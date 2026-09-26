@@ -1,21 +1,23 @@
-# 手動保存したユーザー指示
+English | [日本語](apple-metamask-browser-request.ja.md)
 
-2026-09-26。会話から手動転記した。
+# Manually saved user instructions
 
-> カメラは問題ない metamaskを開いた後metamaskのデフォルト画面が出る
+Manually transcribed from the conversation on 2026-09-26. The quotations below are English translations; the Japanese version preserves the recorded wording.
 
-ユーザーは最新版のMetaMaskと、接続段階のREQUEST_EXPIREDログを提示した。公開履歴から除去済みのテストカードIDを再掲載しないため、ログの全文は保存せず症状を計画に記録した。
+> The camera works. After opening MetaMask, its default screen appears.
 
-> そもそも論だけiphoneの時はmetamaskのブラウザに飛ぶとかできないんですか？
+The user reported using the latest MetaMask and provided a connection-stage REQUEST_EXPIRED log. The full log was not saved because it would republish a test card ID already removed from public history. The symptoms were recorded in the plan instead.
 
-> ipadでのデモもあるので同様に対応しておいてほしいです
+> At a more basic level, could the iPhone open MetaMask's browser directly?
 
-追加の実機報告:
+> There is also an iPad demo, so please support it in the same way.
 
-> metamaskのアプリは開くけどブラウザは開かんね
+Additional device report:
 
-直接リンク版の実機確認とマージ指示を手動転記:
+> The MetaMask app opens, but the browser does not.
 
-> 開いたわ
+Manually transcribed device confirmation and merge instruction for the direct-link version:
 
-> PRマージしよう
+> It opened.
+
+> Let's merge the PR.

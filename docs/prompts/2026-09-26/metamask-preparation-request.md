@@ -1,25 +1,27 @@
-# MetaMaskの接続準備に関する依頼
+English | [日本語](metamask-preparation-request.ja.md)
 
-出典: このCodex会話。2026-09-26にCodexが手動転記。hookによる自動保存ではない。採用した計画は `specs/METAMASK_PREPARATION_PLAN.md` に保存。
+# Request to improve MetaMask connection preparation
 
-## 不親切なネットワーク案内の改善
+Source: this Codex conversation, manually transcribed by Codex on 2026-09-26. This is not an automatic hook capture. The adopted plan is in `specs/METAMASK_PREPARATION_PLAN.md`. Quotations below are English translations; the Japanese version preserves the recorded wording.
 
-> metamaskないのブラウザだと、ネットワークが異なりますと出たあと、ネットワークを切り替えとでます
+## Improve unclear network guidance
+
+> In MetaMask's browser, it says the network is different, then asks me to switch networks.
 >
-> 課題が2点あります
-> safari chromeの時でもネットワークが追加されてない場合に接続前に追加を簡単にできるように案内したいです
+> There are two issues.
+> In Safari and Chrome too, if the network has not been added, I want clear guidance that makes it easy to add before connecting.
 >
-> ネットワークが未追加の時の表示が非常に不親切です $frontend-design
+> The display when the network has not been added is very unhelpful. $frontend-design
 
-## アプリ移動後の制御確認
+## Check control after switching apps
 
-> これってmetamaskアプリに遷移した後でもちゃんと制御できるようになってますか？
+> Does this still work properly after moving to the MetaMask app?
 
-## 実装指示
+## Implementation instruction
 
 > Implement the plan.
 
-## 作業中の追加依頼
+## Additional request during the work
 
-> 別件で50件のテストカード publicリポジトリにコミットしちゃってるけど履歴から消しといて
-> カードの再発行までなしなくていい
+> Separately, I committed 50 test cards to a public repository. Remove them from the history.
+> There is no need to reissue the cards.

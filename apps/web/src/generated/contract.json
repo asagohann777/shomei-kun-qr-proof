@@ -1,21 +1,21 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "証明くん Web API",
+    "title": "Shomei-kun Web API",
     "version": "0.2.0",
-    "description": "固定mockとCurvegrid Testnet向けlive APIの契約。liveはMultiBaas経由で読取り・未署名取引の準備・記録の照合を行う。登録者本人がウォレットで署名・送信する。応答例は合成データであり実証跡ではない。"
+    "description": "API contract for fixed mock responses and live Curvegrid Testnet integration. Live mode reads data, prepares unsigned transactions, and verifies records through MultiBaas. Registrants sign and submit transactions in their own wallets. Response examples are synthetic data, not evidence of actual transactions."
   },
   "servers": [
     {
       "url": "/",
-      "description": "API配置先と同一オリジン。既存の静的UIモックはこのAPIに未接続。"
+      "description": "Same origin as the API deployment. The existing static UI mock is not connected to this API."
     }
   ],
   "security": [],
   "tags": [
     {
       "name": "Registration",
-      "description": "公開読取り、未署名取引の準備、登録取引の照合"
+      "description": "Public reads, unsigned transaction preparation, and registration transaction verification"
     }
   ],
   "paths": {
@@ -84,7 +84,7 @@
     "/api/v1/ens/cards": {
       "get": {
         "operationId": "getEnsCards",
-        "summary": "ENS名の解決先ウォレットに登録されているカードを検索",
+        "summary": "Find cards registered to a wallet by ENS name or address",
         "parameters": [
           {
             "name": "name",
@@ -234,7 +234,7 @@
     "/api/v1/cards/{cardId}": {
       "get": {
         "operationId": "getCard",
-        "summary": "カードの登録情報を取得する",
+        "summary": "Get card registration information",
         "tags": [
           "Registration"
         ],
@@ -248,7 +248,7 @@
         ],
         "responses": {
           "200": {
-            "description": "取得または準備に成功。登録確定を意味するのは取引照会のconfirmedのみ。",
+            "description": "Retrieval or preparation succeeded. Only a confirmed transaction-query result establishes registration confirmation.",
             "headers": {
               "Cache-Control": {
                 "schema": {
@@ -439,7 +439,7 @@
     "/api/v1/cards/{cardId}/registration/prepare": {
       "post": {
         "operationId": "prepareRegistration",
-        "summary": "未署名取引を準備する",
+        "summary": "Prepare an unsigned transaction",
         "tags": [
           "Registration"
         ],
@@ -453,7 +453,7 @@
         ],
         "responses": {
           "200": {
-            "description": "取得または準備に成功。登録確定を意味するのは取引照会のconfirmedのみ。",
+            "description": "Retrieval or preparation succeeded. Only a confirmed transaction-query result establishes registration confirmation.",
             "headers": {
               "Cache-Control": {
                 "schema": {
@@ -750,7 +750,7 @@
     "/api/v1/cards/{cardId}/transactions/{txHash}": {
       "get": {
         "operationId": "getRegistrationTransaction",
-        "summary": "対象カードの登録取引を確認する",
+        "summary": "Check a card registration transaction",
         "tags": [
           "Registration"
         ],
@@ -767,7 +767,7 @@
         ],
         "responses": {
           "200": {
-            "description": "取得または準備に成功。登録確定を意味するのは取引照会のconfirmedのみ。",
+            "description": "Retrieval or preparation succeeded. Only a confirmed transaction-query result establishes registration confirmation.",
             "headers": {
               "Cache-Control": {
                 "schema": {
@@ -972,7 +972,7 @@
     "/api/v1/connection": {
       "get": {
         "operationId": "getConnection",
-        "summary": "設定したMultiBaasとRPCの接続確認",
+        "summary": "Check the configured MultiBaas and RPC connections",
         "responses": {
           "200": {
             "description": "API response",
@@ -1153,7 +1153,7 @@
           ],
           "default": "default"
         },
-        "description": "モック専用。省略時はdefault。操作別の許可値はx-mock-scenariosに定義。非対応の組合せは400。liveモードでは指定自体を400にする。"
+        "description": "Mock only. Defaults to default when omitted. Allowed values per operation are defined in x-mock-scenarios. Unsupported combinations return 400. Live mode rejects this header with 400."
       }
     },
     "schemas": {
@@ -1386,7 +1386,7 @@
             ]
           }
         },
-        "description": "mockは模擬操作、liveは設定したチェーンの実記録。mockの取引は実送信不可。"
+        "description": "Mock mode simulates operations; live mode reads actual records on the configured chain. Mock transactions must not be submitted."
       },
       "Owner": {
         "type": "object",
@@ -1578,7 +1578,7 @@
           "nickname": {
             "type": "string",
             "minLength": 1,
-            "description": "liveでは1〜96 UTF-8バイト、不正Unicodeを拒否する。trim・正規化なし。mockは固定サンプルだけ受理。"
+            "description": "Live mode accepts 1 to 96 UTF-8 bytes and rejects invalid Unicode without trimming or normalization. Mock mode accepts only the fixed sample."
           }
         }
       },
@@ -1613,7 +1613,7 @@
             "const": "0"
           }
         },
-        "description": "共通転送形式。valueはweiの10進文字列。この操作は送金しない。モックのdata=0xはABI未確定のプレースホルダーで、実送信不可。nonce・gas・手数料は含めない。"
+        "description": "Shared transport format. Value is a decimal string in wei; this operation transfers no funds. Mock data=0x is a placeholder for an undefined ABI and must not be submitted. Nonce, gas, and fee fields are omitted."
       },
       "PreparedRegistration": {
         "type": "object",

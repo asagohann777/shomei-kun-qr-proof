@@ -1,13 +1,15 @@
-# おじいちゃんコンビニのデザイン制作プロンプトの出典
+English | [日本語](asagohann777-design-2026-09-25.ja.md)
 
-- 制作者はおじいちゃんコンビニ。GitHub IDは `asagohann777`。ユーザーの申告を記録した。
-- 出典はユーザーが指定した [ChatGPT共有会話](https://chatgpt.com/share/6ab67b6a-d580-83e9-bf2e-39001594f5)。
-- 保存日は2026-09-25。
-- 保存方法はCodexによる手動記録。共有会話のプロンプトをhookで自動保存したものではない。
-- 取得状況は未取得。Web取得は失敗し、Chromeでも `Can't load shared conversation 6ab67b6a-d580-83e9-bf2e-39001594f5` と表示された。本文やAIの回答を推測で補っていない。
-- その後、ユーザーが本セッションに会話本文を貼り付けたため、[提供された会話抜粋](asagohann777-design-2026-09-25-transcript.txt)を保存した。ユーザー指示とChatGPT回答が混在する原文を保持した。共有会話の全体かどうかと画像ごとの対応は未確認。
-- 貼り付けの [hook記録](2026-09-25/135325-280272-25292ac93b564a7ab8481a21496266af.json)から、案内文「プロンプトはコピペで送ります」とその直後の空行を除いた本文を抽出した。文言・誤字・Markdown記号は修正していない。本文保存はCodexによる抽出であり、外部共有会話からの自動取得ではない。
+# Sources for Ojiichan Konbini's design prompts
 
-[対応する画像9点と作者・保存情報](../../specs/assets/asagohann777/2026-09-25/README.md)。各画像と個別プロンプトの対応は未確認。
+- The creator is Ojiichan Konbini, GitHub ID `asagohann777`, as reported by the user.
+- The source is the [shared ChatGPT conversation](https://chatgpt.com/share/6ab67b6a-d580-83e9-bf2e-39001594f5) specified by the user.
+- Saved on 2026-09-25.
+- Codex recorded this provenance manually. The external conversation's prompts were not automatically captured by the hook.
+- Retrieval failed. Web access failed, and Chrome displayed `Can't load shared conversation 6ab67b6a-d580-83e9-bf2e-39001594f5`. No conversation text or AI answers were invented to fill the gap.
+- The user later pasted the conversation into this session. The [supplied excerpt](asagohann777-design-2026-09-25-transcript.txt) preserves the original mixture of user instructions and ChatGPT answers. Whether it is the full shared conversation, and how it maps to individual images, remain unverified.
+- Codex extracted the body from the [hook record](2026-09-25/135325-280272-25292ac93b564a7ab8481a21496266af.json), excluding the introductory sentence meaning "I will copy and paste the prompts" and the following blank line. Wording, typos, and Markdown syntax were not corrected. This was extraction from supplied text, not automatic retrieval of the external conversation.
 
-今回の保存依頼そのものは [UserPromptSubmitの記録](2026-09-25/135140-912522-65f47d410a69424db0324ea600c8105f.json)に存在する。これは外部ChatGPT会話の本文とは別の記録。
+See the [nine corresponding images and their creator/storage records](../../specs/assets/asagohann777/2026-09-25/README.md). The mapping from each image to an individual prompt has not been verified.
+
+The request to save these records appears in a separate [UserPromptSubmit record](2026-09-25/135140-912522-65f47d410a69424db0324ea600c8105f.json). That record is distinct from the external ChatGPT conversation.

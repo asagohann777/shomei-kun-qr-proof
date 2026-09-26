@@ -1,27 +1,30 @@
-# 導入時の依頼
+English | [日本語](bootstrap-request.ja.md)
 
-保存方法: Codexがこの会話のユーザーメッセージを手動転記した。hook導入前のため、自動取得の日時・セッションID・ターンIDは付与していない。
+# Initial setup request
 
-以下が依頼本文。
+Preservation method: Codex manually transcribed the user message from this conversation. It preceded hook installation, so no automatic capture timestamp, session ID, or turn ID was assigned.
+
+The following is an English translation of the request. The Japanese version linked above preserves the original wording.
 
 ```text
-まず AGENT.mdの整備をする
+First, prepare AGENT.md.
 
-ハッカソンのルールでプロンプトも含めてリポジトリに含めたい
-https://ethglobal.com/events/tokyo2026/info/details　を確認して
-codexのhooks で docs/prompts配下に保存されるようにしたい
-このルールをhookとして実装せよ
+I want prompts included in the repository under the hackathon rules.
+Check https://ethglobal.com/events/tokyo2026/info/details.
+Use Codex hooks to save them under docs/prompts.
+Implement this rule as a hook.
 
-グローバルの設定ではworktreeを強制しているが、本フォルダでは利用しなくて良い
+Global settings require worktrees, but they do not need to be used in this folder.
 
-仕様は specs/ 配下に以下の内容が保存されるようにする
+Store the following specification documents under specs/:
 
 SPEC.md
 ARCHITECTURE.md
 PRE_EXISTING_WORK.md
 HACKATHON_CHANGES.md
 
-中身に関してはこれから詰めるが、本リポジトリの目的としては
+We will work out the contents later, but the purpose of this repository is:
 
-本プロジェクトは天地愛プロジェクトの証明くんの既存プロジェクトから新たにOSSとして機能の参照実装とデモアプリを作ることである
+Build a new open-source reference implementation and demo app for functionality
+based on the Tennchiai Project's existing Shomei-kun project.
 ```

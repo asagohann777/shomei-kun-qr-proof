@@ -25,7 +25,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ENS名の解決先ウォレットに登録されているカードを検索 */
+        /** Find cards registered to a wallet by ENS name or address */
         get: operations["getEnsCards"];
         put?: never;
         post?: never;
@@ -42,7 +42,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** カードの登録情報を取得する */
+        /** Get card registration information */
         get: operations["getCard"];
         put?: never;
         post?: never;
@@ -61,7 +61,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 未署名取引を準備する */
+        /** Prepare an unsigned transaction */
         post: operations["prepareRegistration"];
         delete?: never;
         options?: never;
@@ -76,7 +76,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 対象カードの登録取引を確認する */
+        /** Check a card registration transaction */
         get: operations["getRegistrationTransaction"];
         put?: never;
         post?: never;
@@ -93,7 +93,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 設定したMultiBaasとRPCの接続確認 */
+        /** Check the configured MultiBaas and RPC connections */
         get: operations["getConnection"];
         put?: never;
         post?: never;
@@ -154,7 +154,7 @@ export interface components {
         Address: string;
         TransactionHash: string;
         CardId: string;
-        /** @description mockは模擬操作、liveは設定したチェーンの実記録。mockの取引は実送信不可。 */
+        /** @description Mock mode simulates operations; live mode reads actual records on the configured chain. Mock transactions must not be submitted. */
         Meta: {
             /** @enum {string} */
             mode: "mock" | "live";
@@ -203,10 +203,10 @@ export interface components {
         PrepareRequest: {
             walletAddress: components["schemas"]["Address"];
             chainId: number;
-            /** @description liveでは1〜96 UTF-8バイト、不正Unicodeを拒否する。trim・正規化なし。mockは固定サンプルだけ受理。 */
+            /** @description Live mode accepts 1 to 96 UTF-8 bytes and rejects invalid Unicode without trimming or normalization. Mock mode accepts only the fixed sample. */
             nickname: string;
         };
-        /** @description 共通転送形式。valueはweiの10進文字列。この操作は送金しない。モックのdata=0xはABI未確定のプレースホルダーで、実送信不可。nonce・gas・手数料は含めない。 */
+        /** @description Shared transport format. Value is a decimal string in wei; this operation transfers no funds. Mock data=0x is a placeholder for an undefined ABI and must not be submitted. Nonce, gas, and fee fields are omitted. */
         UnsignedTransaction: {
             chainId: number;
             from: components["schemas"]["Address"];
@@ -314,7 +314,7 @@ export interface components {
         CardId: components["schemas"]["CardId"];
         /** @example 0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */
         TransactionHash: components["schemas"]["TransactionHash"];
-        /** @description モック専用。省略時はdefault。操作別の許可値はx-mock-scenariosに定義。非対応の組合せは400。liveモードでは指定自体を400にする。 */
+        /** @description Mock only. Defaults to default when omitted. Allowed values per operation are defined in x-mock-scenarios. Unsupported combinations return 400. Live mode rejects this header with 400. */
         MockScenario: "default" | "registered" | "unregistered" | "not-found" | "pending" | "reverted" | "unknown" | "evidence-pending" | "unavailable" | "mismatch";
     };
     requestBodies: never;
@@ -460,7 +460,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description モック専用。省略時はdefault。操作別の許可値はx-mock-scenariosに定義。非対応の組合せは400。liveモードでは指定自体を400にする。 */
+                /** @description Mock only. Defaults to default when omitted. Allowed values per operation are defined in x-mock-scenarios. Unsupported combinations return 400. Live mode rejects this header with 400. */
                 "X-Mock-Scenario"?: components["parameters"]["MockScenario"];
             };
             path: {
@@ -471,7 +471,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description 取得または準備に成功。登録確定を意味するのは取引照会のconfirmedのみ。 */
+            /** @description Retrieval or preparation succeeded. Only a confirmed transaction-query result establishes registration confirmation. */
             200: {
                 headers: {
                     "Cache-Control"?: string;
@@ -538,7 +538,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description モック専用。省略時はdefault。操作別の許可値はx-mock-scenariosに定義。非対応の組合せは400。liveモードでは指定自体を400にする。 */
+                /** @description Mock only. Defaults to default when omitted. Allowed values per operation are defined in x-mock-scenarios. Unsupported combinations return 400. Live mode rejects this header with 400. */
                 "X-Mock-Scenario"?: components["parameters"]["MockScenario"];
             };
             path: {
@@ -560,7 +560,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description 取得または準備に成功。登録確定を意味するのは取引照会のconfirmedのみ。 */
+            /** @description Retrieval or preparation succeeded. Only a confirmed transaction-query result establishes registration confirmation. */
             200: {
                 headers: {
                     "Cache-Control"?: string;
@@ -667,7 +667,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description モック専用。省略時はdefault。操作別の許可値はx-mock-scenariosに定義。非対応の組合せは400。liveモードでは指定自体を400にする。 */
+                /** @description Mock only. Defaults to default when omitted. Allowed values per operation are defined in x-mock-scenarios. Unsupported combinations return 400. Live mode rejects this header with 400. */
                 "X-Mock-Scenario"?: components["parameters"]["MockScenario"];
             };
             path: {
@@ -680,7 +680,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description 取得または準備に成功。登録確定を意味するのは取引照会のconfirmedのみ。 */
+            /** @description Retrieval or preparation succeeded. Only a confirmed transaction-query result establishes registration confirmation. */
             200: {
                 headers: {
                     "Cache-Control"?: string;

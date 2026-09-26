@@ -1,84 +1,86 @@
-# 採用計画: QR起点・現在登録所有者確認の仕様文書作成
+English | [日本語](PLAN.ja.md)
 
-状態: 2026-09-25の採用計画と、その後の改訂を手動保存した記録。hookによる回答の自動収集ではない。初版のCurvegrid Testnet・RPC中心の設計は、同日の追加指示でMultiBaas API中心・Polygon Amoyに変更した。
+# Adopted plan: specifications for QR-based registered-owner lookup
 
-この初版計画の承認は文書作成を対象とする。アプリ実装、コミット、push、提出、デプロイはこの作業に含めない。現行の仕様は [SPEC.md](SPEC.md)、設計は [ARCHITECTURE.md](ARCHITECTURE.md)、実施結果は [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md) に記録する。
+Status: manually preserved record of the plan adopted on 2026-09-25 and its later revisions. This is not automatic capture of AI answers by the hook. The initial Curvegrid Testnet/RPC design changed to a MultiBaas API/Polygon Amoy design after additional instructions that day.
 
-## 追加の採用計画: スマホUIモック
+Approval of the initial plan covered documentation. Application implementation, commits, push, submission, and deployment were outside that task. Current requirements are in [SPEC.md](SPEC.md), architecture in [ARCHITECTURE.md](ARCHITECTURE.md), and results in [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md).
 
-その後のUI作成依頼と実行指示により、スマホ縦画面だけの操作可能なモックを作る。QRスキャンを含む4画面、daisyUIとTailwind CSS、公開プレビューを採用した。範囲・判断・検証手順は [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) に保存する。以下の「文書だけ」という記録は当時の作業範囲を示す。
+## Additional adopted plan: mobile UI mock
 
-## 現行の変更点: MultiBaas API中心・Polygon Amoy
+A later UI request and execution instruction added an interactive portrait-phone mock. The choices were four screens including QR scanning, daisyUI and Tailwind CSS, and a public preview. Scope, decisions, and checks are recorded in [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md). References to documentation-only work below describe the scope at that time.
 
-[ユーザーの追加指示](../docs/prompts/2026-09-25/124238-516565-940307cad70d42acbdf9ec9f2ebda8bc.json) により、次を現行方針とする。以下の初版は経緯を残すための履歴であり、競合する箇所にはこの改訂を適用する。
+## Revision at that time: MultiBaas API and Polygon Amoy
 
-- 記録先をPolygon Amoy、チェーンID 80002、ガス代通貨をテストPOLとする。
-- アプリのサーバーと発行者CLIは、MultiBaas APIで状態読取り・未署名取引作成・レシートとイベントの取得を行う。
-- 登録者はMetaMaskで、発行者はCLI側で署名し、Amoyへ送信する。MultiBaasが利用者に代わって署名する構成にしない。
-- アプリ用の最小権限APIキーはCloudflareのサーバー側Secretに保存する。通常のブラウザ読取りはアプリ経由で行う。
-- 第三者はMultiBaas以外のAmoy RPCとAmoy Polygonscanで照合する。公開画面に取引・コントラクトページへの導線を設ける。
-- API障害やイベント同期遅延は未登録に置き換えない。Amoy向けMultiBaas環境の利用可否・権限・同期は実装前に確認する。
+The [additional user instruction](../docs/prompts/2026-09-25/124238-516565-940307cad70d42acbdf9ec9f2ebda8bc.json) established the following direction. The initial plan below remains as history; this revision supersedes conflicting parts at that stage.
 
-今回も文書だけを更新する。既存PoCとの分離、スマホ登録、ニックネームのオンチェーン保存、一度限りの登録、日英表示は継続する。
+- Use Polygon Amoy, chain ID 80002, with test POL for gas.
+- The application server and issuer CLI use MultiBaas APIs for state reads, unsigned transaction preparation, receipts, and events.
+- Registrants sign in MetaMask; the issuer signs through the CLI. Both submit to Amoy. MultiBaas does not sign on users' behalf.
+- Store a least-privilege application API key in a server-side Cloudflare Secret. Normal browser reads go through the application.
+- Third parties verify through an Amoy RPC independent of MultiBaas and Amoy Polygonscan. Public screens link to transaction and contract pages.
+- Do not translate API failures or event-indexing delays into an unregistered state. Verify Amoy MultiBaas availability, permissions, and synchronization before implementation.
 
-## 初版の目的と成果物
+This revision also covered documentation only. Separation from the existing PoC, mobile registration, on-chain nicknames, one-time registration, and Japanese/English display remain in scope.
 
-既存「証明くん」を出発点に、このリポジトリだけで動く追加機能のデモを定義する。
+## Initial purpose and deliverables
 
-- 仕様文書に、背景、既存機能との区別、役割、F01〜F10、画面、受け入れ条件を整理する。
-- 設計文書に、構成、登録・閲覧の流れ、公開データ、権限制御、技術選定を記載する。
-- 既存成果・変更記録を更新し、参照元、人間が決めた内容、AIの調査・文書作成範囲を記録する。
-- デモ手順を追加し、事前準備、スマホでの実演、第三者による照合手順をまとめる。
-- 採用計画を `specs/` に保存し、自動保存されていない選択回答を出典付きで補う。
+Define an additional-feature demo based on Shomei-kun that runs entirely from this repository.
 
-## 初版の仕様の確定内容
+- Document background, separation from existing features, roles, F01–F10, screens, and acceptance criteria.
+- Document architecture, registration and viewing flows, public data, permissions, and technology choices.
+- Update pre-existing-work and change records with sources, human decisions, and the scope of AI research and writing.
+- Add demo instructions for preparation, mobile operation, and third-party verification.
+- Save the adopted plan under `specs/` and manually preserve selected answers that were not automatically captured, with provenance.
 
-- 発行者はCLIでカードIDと登録許可ウォレットを発行する。発行と所有者登録の完了を区別する。
-- 許可されたウォレット本人の取引だけを受理し、所有者とニックネームを同じ取引でオンチェーン記録する。二重登録と上書きはコントラクトで拒否する。
-- ニックネームは公開され、登録後の変更・削除を提供しない。登録確認時に公開項目を説明する。
-- QRは公開確認ページのURLを格納する。カードはチェーン、コントラクト、カードIDの組で識別する。
-- 「現在の登録所有者」は登録記録上の所有者を意味する。QRのコピー判定、物理カードの真贋・所持は証明範囲に含めない。
-- 所有権移転、登録取消し、既存PoCとのデータ連携は今回の対象外とする。
-- カード確認と公開確認を同じページの状態違いとしてまとめ、登録入力・登録処理と合わせて3種類の画面にする。「証明一郎」と「おじいちゃんコンビニ」を実演に使用する。
-- 言語は保存済みの選択を優先する。未選択ならブラウザの優先順で最初に一致する日本語・英語を使い、一致しなければ英語にする。ニックネームは翻訳しない。
+## Initial agreed requirements
 
-## 初版の構成とインターフェース
+- The issuer uses a CLI to issue card IDs with allowed registration wallets. Distinguish issuance from completed owner registration.
+- Accept only transactions signed by the allowed wallet. Record the owner and nickname on-chain in the same transaction. The contract rejects duplicate registration and overwrites.
+- Nicknames are public and cannot be edited or deleted after registration. Explain the public fields during confirmation.
+- The QR contains the public record URL. Identify a card by chain, contract, and card ID.
+- "Current registered owner" means the owner in the registration record. Detecting QR copies or proving physical authenticity or possession is outside scope.
+- Ownership transfers, registration cancellation, and data integration with the existing PoC are outside scope.
+- Combine card confirmation and public viewing as states of one page. Together with registration input and registration processing, there are three screen types. Use the fictional player Shomei Ichiro and the demo nickname Ojiichan Konbini.
+- Prefer the saved language choice. Otherwise choose the first Japanese or English match in browser preference order, defaulting to English. Do not translate nicknames.
 
-- Next.js・TypeScriptをCloudflare Workersで動かす。Next.js本体のビルドを利用するOpenNextを採用案として記録する。
-- 登録はスマホを主対象とし、MetaMask Connectで通常ブラウザからMetaMaskアプリへ接続する。
-- Curvegrid Testnetに登録用コントラクトを配置する。発行、本人による登録、公開読取り、発行・登録イベントを最小インターフェースとする。
-- 発行時に許可ウォレットを固定する。登録内容の管理者による書換え、コントラクトのアップグレード機能は設けない。
-- 閲覧はウォレット接続不要とする。所有者の正本はチェーン上の状態とし、登録取引はイベントから取得する。
-- 公開用Web3接続情報と管理用認証情報を区別する。発行者の署名鍵はCLI側で管理し、利用者の秘密鍵はアプリで扱わない。
-- 外部証跡にチェーンID、コントラクト、カードID、発行者、登録取引ハッシュを表示する。第三者が公開用RPCへ直接照会する手順を提供する。公開エクスプローラーは必須にしない。
+## Initial architecture and interfaces
 
-## 初版の受け入れ条件と留保
+- Run Next.js and TypeScript on Cloudflare Workers. Record OpenNext, which uses Next.js's own build, as the proposed adapter.
+- Focus registration on phones, using MetaMask Connect to connect a normal browser to the MetaMask app.
+- Deploy a registration contract on Curvegrid Testnet. Its minimum interface includes issuance, self-registration, public reads, and issuance/registration events.
+- Fix the allowed wallet at issuance. Do not add administrator rewrites of registered data or contract upgrades.
+- Allow viewing without a wallet connection. Chain state is authoritative for the owner; obtain the registration transaction from events.
+- Separate public Web3 connection settings from management credentials. Keep the issuer signing key on the CLI side. The app does not handle users' private keys.
+- Display chain ID, contract, card ID, issuer, and registration transaction hash as evidence. Provide direct public-RPC verification steps. A public explorer is not required in this initial version.
 
-正規発行、ID重複、未発行ID、権限のない発行、許可外ウォレット、別チェーン、二重登録、上書きの試験を要件IDに対応付ける。スマホでQRを読み、MetaMaskで登録し、未接続の別端末で同じ記録を確認する流れを検証する。
+## Initial acceptance criteria and unresolved items
 
-承認待ち、送信済み、記録確認中、成功、拒否・失敗、確認不能を区別する。成功レシートと記録の照合前に成功表示しない。再読込・アプリ復帰後はチェーンを再照会し、自動再送しない。
+Map tests for valid issuance, duplicate IDs, unissued IDs, unauthorized issuance, disallowed wallets, wrong chains, duplicate registration, and overwrites to requirement IDs. Verify scanning a QR on a phone, registering in MetaMask, and checking the same record from another device without a connected wallet.
 
-日英切替、保存、デスクトップ・390px・320pxの表示、スマホ実機でのウォレット往復を確認する。第三者が独立した照合手順を実行できることを確認する。
+Distinguish approval pending, submitted, record verification, success, rejection/failure, and unknown outcomes. Do not display success before matching a successful receipt to the record. Re-query the chain after reload or app return; do not automatically resend.
 
-実際のMultiBaas環境、チェーンID、RPC、コントラクト、公開URLは環境確認後に記入する。OSSライセンス、素材の利用許諾、応募トラック、大会期間との対応は未確認として残す。試験結果は実行後に記録し、計画段階で成功扱いにしない。
+Check Japanese/English switching and persistence, desktop/390px/320px layouts, and wallet round trips on a physical phone. Verify that a third party can carry out the independent verification procedure.
 
-## 会話への参照
+Fill in the actual MultiBaas environment, chain ID, RPC, contract, and public URL after checking the environment. Leave the OSS license, asset permissions, entry track, and alignment with the hackathon period unconfirmed until established. Record test results after execution, not as successes at the planning stage.
 
-### 2026-09-26 JST: Web APIの詳細設計
+## Conversation references
 
-採用範囲はMultiBaas・署名・送信の固定モック。状態を保存せず、登録入力はサンプルに限定する。発行者CLIは後続とする。
+### 2026-09-26 JST: detailed Web API design
 
-成果物は [BACKEND_DESIGN.md](BACKEND_DESIGN.md) と [openapi.yaml](openapi.yaml)。カード取得、登録準備、登録確認の3 APIについて、入出力、エラー、シナリオ、照合条件と実接続への移行条件を定義する。静的検証スクリプトでOpenAPIと応答例を照合する。APIサーバーや既存UIへの接続は今回の対象に含めない。
+The adopted scope uses fixed mocks for MultiBaas, signing, and submission. It stores no state and accepts sample registration input only. The issuer CLI is deferred.
 
-実装後の試験B01〜B11は詳細設計書に保存する。今回の静的検証を実接続試験の合格として扱わない。[選択結果と出典](../docs/prompts/backend-design-decisions.md)も保存する。
+Deliverables are [BACKEND_DESIGN.md](BACKEND_DESIGN.md) and [openapi.yaml](openapi.yaml). Define inputs, outputs, errors, scenarios, verification conditions, and live-migration conditions for card retrieval, registration preparation, and registration confirmation. A static checker compares OpenAPI with response examples. API server implementation and connection to the existing UI are outside this task.
 
-### 初版の参照
+The detailed design records implementation tests B01–B11. Static checks do not count as successful live tests. Preserve [selected answers and provenance](../docs/prompts/backend-design-decisions.md).
 
-- [最初の依頼](../docs/prompts/2026-09-25/121716-439190-2cd0d9f92aa8468588e7978b39382568.json)
-- [スマホ登録への訂正](../docs/prompts/2026-09-25/122429-037897-c475cb8e8fd244c08302e2043f25f922.json)
-- [計画の実行指示](../docs/prompts/2026-09-25/122651-114438-1fe83e01648547c1a4e98d4f8cc0ec12.json)
-- [選択式の質問と回答の手動記録](../docs/prompts/qr-proof-decisions.md)
+### Initial references
 
-## 2026-09-26 JST: 詳細設計に沿った実装
+- [Initial request](../docs/prompts/2026-09-25/121716-439190-2cd0d9f92aa8468588e7978b39382568.json)
+- [Correction to mobile registration](../docs/prompts/2026-09-25/122429-037897-c475cb8e8fd244c08302e2043f25f922.json)
+- [Instruction to execute the plan](../docs/prompts/2026-09-25/122651-114438-1fe83e01648547c1a4e98d4f8cc0ec12.json)
+- [Manually recorded multiple-choice questions and answers](../docs/prompts/qr-proof-decisions.md)
 
-[ユーザーの実装指示](../docs/prompts/2026-09-25/152556-790938-5fdac443e5ab4602b26eb512cec3edb6.json)により、固定モックのWeb APIを `apps/web/` に実装する。[実装計画と検証](BACKEND_IMPLEMENTATION.md)に担当範囲、手順、結果を保存する。既存UIとの接続、実ウォレット、MultiBaas・Amoy実接続、公開は含めない。
+## 2026-09-26 JST: implementation based on the detailed design
+
+The [user's implementation instruction](../docs/prompts/2026-09-25/152556-790938-5fdac443e5ab4602b26eb512cec3edb6.json) adds the fixed mock Web API in `apps/web/`. Save responsibilities, steps, and results in the [implementation and verification record](BACKEND_IMPLEMENTATION.md). Integration with the existing UI, real wallets, live MultiBaas/Amoy, and publication are excluded at this stage.

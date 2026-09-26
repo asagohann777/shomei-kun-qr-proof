@@ -1,19 +1,21 @@
-# バックエンド設計の選択記録
+English | [日本語](backend-design-decisions.ja.md)
 
-2026-09-26 JSTにCodexが会話の選択結果を手動で整理した。質問文の逐語録ではなく、採用範囲の要約である。hookがAIの質問・回答や計画全文を保存したものではない。
+# Backend design decisions
 
-| 論点 | ユーザーが選択した範囲 |
+Codex manually summarized the selected answers on 2026-09-26 JST. This is a scope summary, not a verbatim question transcript. The hook did not capture the AI's questions, answers, or complete plans.
+
+| Topic | Scope selected by the user |
 | --- | --- |
-| モックの対象 | MultiBaasに加え、ウォレット署名・Amoyへの送信もモック |
-| 状態の保存 | 固定サンプルだけを返す。登録結果を保存・端末間共有しない |
-| 設計する機能 | Web APIを先に設計し、発行者CLIは後続 |
-| 登録入力 | サンプル入力に固定し、自由なニックネーム入力は後続 |
+| Mock coverage | Mock wallet signing and submission to Amoy as well as MultiBaas |
+| State storage | Return fixed samples only; do not persist registration results or share them across devices |
+| Functions to design | Design the Web API first; defer the issuer CLI |
+| Registration input | Use fixed sample input; defer free-form nickname input |
 
-採用計画は、カード取得・登録準備・登録確認の3 API、共通応答、固定シナリオ、照合条件、実接続への移行条件を詳細設計書とOpenAPIにまとめること。APIサーバーの実装は含まない。
+The adopted plan was to document three APIs for card retrieval, registration preparation, and confirmation, along with a shared response format, fixed scenarios, verification conditions, and conditions for live integration. API server implementation was outside that task.
 
-- [探索の依頼](2026-09-25/140109-789742-3fa35cc7e2b54786aaaa64a589110919.json)
-- [計画の実行指示](2026-09-25/151125-676118-d1888c4c54d2401ea99965526e42e9fb.json)
-- [採用計画](../../specs/PLAN.md)
-- [詳細設計](../../specs/BACKEND_DESIGN.md)
+- [Exploration request](2026-09-25/140109-789742-3fa35cc7e2b54786aaaa64a589110919.json)
+- [Instruction to execute the plan](2026-09-25/151125-676118-d1888c4c54d2401ea99965526e42e9fb.json)
+- [Adopted plan](../../specs/PLAN.md)
+- [Detailed design](../../specs/BACKEND_DESIGN.md)
 
-hookのファイル名はUTC。実行指示の保存日時は2026-09-25 UTC、2026-09-26 JSTである。カードIDの文字制約、本文の上限、フィールド名などはCodexが計画を具体化した設計値であり、個別にユーザーが指定した値ではない。
+Hook filenames use UTC. The execution instruction was saved on 2026-09-25 UTC, which was 2026-09-26 JST. Card-ID character restrictions, body size limits, and field names were design choices made by Codex while detailing the plan, not individually specified user requirements.
