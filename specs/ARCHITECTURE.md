@@ -149,3 +149,7 @@ MultiBaas APIの停止・制限・キー失効、Amoy RPCの障害時は該当�
 ウォレット境界はrestoreで既存権限を読み、switchChainとaddChainを別々の承認として扱う。4902、4001、-32002はSDKのrpcCodeや入れ子エラーも正規化する。MetaMaskへの移動で停止するブラウザ処理に依存した連続承認は前提にしない。
 
 sessionStorageにはカード/API単位のニックネーム、画面、準備開始マーカーだけを保存する。接続済みの判定には使わず、SDK/providerで再照合する。登録取引の既存の保存・再照会は維持する。公開APIとコントラクトの変更はない。
+
+## 2026-09-26: iPhone・iPadのMetaMask導線
+
+iPhone/iPadの登録入口は公式dappリンクを使用する。MetaMask providerがある場合は注入providerを使い、再移動しない。SafariのSDK接続下書きは復元しない。判定・URL生成は `wallet-navigation.js`。詳細は `APPLE_METAMASK_BROWSER_PLAN.md`。

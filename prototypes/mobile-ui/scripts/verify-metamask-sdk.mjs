@@ -11,7 +11,7 @@ await mkdir(output, { recursive: true });
 for (const [name, engine] of Object.entries({ chromium, webkit })) {
   const browser = await engine.launch({ headless: true });
   try {
-    const context = await browser.newContext({ ...devices['iPhone 13'], locale: 'ja-JP' });
+    const context = await browser.newContext({ ...devices['Pixel 5'], locale: 'ja-JP' });
     const page = await context.newPage();
     page.setDefaultTimeout(15000);
     const errors = [];

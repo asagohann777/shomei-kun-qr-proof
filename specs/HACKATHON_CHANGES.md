@@ -454,3 +454,7 @@ Chromium/WebKitの日英320px・390pxで表示と操作を確認し、カメラ�
 ## 2026-09-26: integrationの実カメラを有効化
 
 ユーザーの試験依頼により、Codexが最新mainの取り込みを確認し、専用integrationを `UI_CAMERA_MODE=live` で再ビルド・公開した。カメラ本体は変更せず、既定モックを維持。公開動画・写真QRの検証スクリプトと起動手順を追加した。Worker versionは `7a4a7673-a63b-465e-8cc8-a648561931fe`。公開資産24件の一致、Chromiumの動画QR読取り、WebKitの拒否後の写真読取りが成功。実機未確認。大会期間との対応は未確認。詳細は `INTEGRATION_CAMERA_PLAN.md`。
+
+## 2026-09-26: iPhone・iPadはMetaMask内ブラウザへ案内
+
+ユーザーがSafariでの接続期限切れを報告し、アプリ内ブラウザへ移動する案とiPad対応を指定した。Codexが端末判定、同じカードへの公式dappリンク、入力前の移動導線、アプリ内の案内文を実装。既存UI・モック・実カメラを維持した。単体76件とChromium/WebKitの分岐・表示試験に成功。専用integrationへversion `77d732e4-0ad2-424c-88ad-bd6466962351` を配置し、公開資産24件の一致を確認。実機でのアプリ起動・承認は未確認。詳細は `APPLE_METAMASK_BROWSER_PLAN.md`。大会期間との対応は未確認。

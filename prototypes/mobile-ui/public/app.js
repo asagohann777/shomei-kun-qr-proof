@@ -1,3 +1,4 @@
+import { hasMetaMaskProvider, useMetaMaskBrowser, metaMaskBrowserLink } from '../src/wallet-navigation.js';
 import { messages } from './messages.js';
 import { walletMessages } from './wallet-messages.js';
 import { liveMessages } from './live-messages.js';
@@ -191,6 +192,9 @@ function evidenceStatus() {
 function registeredView(completed = false) {
   return `<section class="page result-page"><div class="status-symbol success">${icon('check')}</div><h1 class="page-title">${t(completed ? 'successTitle' : 'registered')}</h1>${tradingCard()}<div class="info-panel">${detailTable()}<div id="evidence-status" role="status" aria-live="polite" aria-busy="${liveSnapshot?.refresh.kind === 'checking'}">${evidenceStatus()}</div><div class="result-actions"><button class="btn btn-outline" data-action="details">${t('detailsButton')}</button></div></div></section>`;
 }
+function metaMaskHandoff() {
+  return `<p class="process-copy">${t('inAppContinue')}</p><a class="btn btn-primary wallet-prepare-button" data-metamask-browser href="${escape(metaMaskBrowserLink(config.publicUrl, currentCardId))}">${t('openInMetaMask')}</a>`;
+}
 function cardView() {
   if (liveEnabled && (!liveSnapshot || liveSnapshot.read.kind === 'loading')) return `<section class="page"><h1 class="page-title" role="status">${t('loading')}</h1></section>`;
   if (['not-found', 'unavailable'].includes(state.card)) {
@@ -198,7 +202,7 @@ function cardView() {
     return `<section class="page"><div class="status-symbol warning">${icon('info')}</div><h1 class="page-title">${t(absent ? 'notFoundTitle' : 'unavailableTitle')}</h1><p class="process-copy">${lines(absent ? 'notFoundCopy' : 'unavailableCopy')}</p></section>${footer(absent ? 'scan-again' : 'retry-read', t(absent ? 'scanAnother' : 'retry'))}`;
   }
   if (['registered', 'evidence-pending'].includes(state.card)) return registeredView();
-  return `<section class="page read-page"><div class="status-symbol">${icon('check')}</div><h1 class="page-title">${t('readTitle')}</h1>${tradingCard()}<div class="info-panel card-summary"><h2>${t('player')}</h2><p>${t('cardType')}</p><p>ID: ${escape(cardLabel())}</p><span class="registration-badge">${t('unregistered')}</span></div></section>${(liveEnabled && config.walletMode === 'mock' ? '' : footer('start-register', `${t('next')}${icon('arrow')}`))}`;
+  return `<section class="page read-page"><div class="status-symbol">${icon('check')}</div><h1 class="page-title">${t('readTitle')}</h1>${tradingCard()}<div class="info-panel card-summary"><h2>${t('player')}</h2><p>${t('cardType')}</p><p>ID: ${escape(cardLabel())}</p><span class="registration-badge">${t('unregistered')}</span></div></section>${(liveEnabled && config.walletMode === 'mock' ? '' : useMetaMaskBrowser(config) ? `<footer class="bottom-actions">${metaMaskHandoff()}</footer>` : footer('start-register', `${t('next')}${icon('arrow')}`))}`;
 }
 function walletSetup() {
   if (liveEnabled) return liveSnapshot?.preparation ?? { kind: 'idle' };
@@ -215,16 +219,15 @@ function walletPreparationView() {
   const pending = setup.kind === 'pending';
   const status = setup.kind === 'ready' ? 'walletReady' : setup.kind === 'idle' ? 'preparationCopy' : pending ? setup.slow ? 'setupSlow' : { check: 'setupCheck', connect: 'setupConnect', add: 'setupAdd', switch: 'setupSwitch' }[setup.step] : { paused: 'setupPaused', rejected: 'setupRejected', failed: 'setupFailed', blocked: 'setupBlocked' }[setup.kind];
   const action = pending || setup.kind === 'blocked' ? 'check-wallet' : 'prepare-wallet';
-  return `<div class="wallet-preparation" id="wallet-preparation"><p class="form-label">${t('walletPreparationTitle')}</p><p class="wallet-network">${escape(name)}</p><div class="wallet-status ${setup.kind === 'ready' ? 'wallet-ready' : ''}" role="status" aria-live="polite">${pending && !setup.slow ? '<span class="loading loading-spinner loading-xs" aria-hidden="true"></span>' : setup.kind === 'ready' ? icon('check') : ''}<span>${t(status)}</span></div>${state.wallet !== 'disconnected' ? `<p class="wallet-address">${escape(walletLabel())}</p>` : ''}${setup.kind !== 'ready' ? `<p class="wallet-return">${t('returnToBrowser')}</p><button class="btn btn-primary wallet-prepare-button" data-action="${action}">${t(pending || setup.kind === 'blocked' ? 'checkWallet' : setup.kind === 'idle' ? 'prepareWallet' : 'continueWallet')}</button>` : ''}<button class="btn btn-ghost wallet-help-button" data-action="wallet-help">${t('walletHelp')}</button>${['failed', 'blocked'].includes(setup.kind) || setup.slow ? diagnosticControls() : ''}</div>`;
+  return `<div class="wallet-preparation" id="wallet-preparation"><p class="form-label">${t('walletPreparationTitle')}</p><p class="wallet-network">${escape(name)}</p><div class="wallet-status ${setup.kind === 'ready' ? 'wallet-ready' : ''}" role="status" aria-live="polite">${pending && !setup.slow ? '<span class="loading loading-spinner loading-xs" aria-hidden="true"></span>' : setup.kind === 'ready' ? icon('check') : ''}<span>${t(status)}</span></div>${state.wallet !== 'disconnected' ? `<p class="wallet-address">${escape(walletLabel())}</p>` : ''}${setup.kind !== 'ready' ? `<p class="wallet-return">${t(hasMetaMaskProvider() ? 'approveInApp' : 'returnToBrowser')}</p><button class="btn btn-primary wallet-prepare-button" data-action="${action}">${t(pending || setup.kind === 'blocked' ? 'checkWallet' : setup.kind === 'idle' ? 'prepareWallet' : 'continueWallet')}</button>` : ''}<button class="btn btn-ghost wallet-help-button" data-action="wallet-help">${t('walletHelp')}</button>${['failed', 'blocked'].includes(setup.kind) || setup.slow ? diagnosticControls() : ''}</div>`;
 }
 function registerView() {
+  if (useMetaMaskBrowser(config)) return `<section class="page register-page">${tradingCard()}<div class="info-panel"><h1 class="page-title">${t('registerTitle')}</h1>${metaMaskHandoff()}</div></section>`;
   return `<section class="page register-page">${tradingCard()}<div class="info-panel"><h1 class="page-title">${t('registerTitle')}</h1><div class="form-field"><label class="form-label" for="nickname">${t('nickname')}</label><div class="nickname-input"><input class="input input-bordered" id="nickname" name="nickname" autocomplete="off" value="${escape(state.nickname)}"><button type="button" data-action="clear-nickname" aria-label="${t('clearNickname')}">${icon('close')}</button></div></div>${walletPreparationView()}${state.wallet === 'wrong-wallet' ? `<p role="alert">${t('wrongWalletTitle')}</p><button class="btn btn-outline" data-action="fix-wallet">${t('switchWallet')}</button>` : ''}</div></section>${footer('confirm', `${t('next')}${icon('arrow')}`, '', !ready())}`;
 }
 function walletHelpDialog() {
   const network = liveSnapshot?.read.connection?.network;
-  const url = new URL(config.publicUrl);
-  if (currentCardId) url.search = new URLSearchParams({ cardId: currentCardId });
-  const link = `https://link.metamask.io/dapp/${url.href.replace(/^https?:\/\//, '')}`;
+  const link = metaMaskBrowserLink(config.publicUrl, currentCardId);
   return `<dialog id="wallet-help-dialog" class="modal modal-bottom" aria-labelledby="wallet-help-title"><div class="modal-box"><h2 id="wallet-help-title">${t('walletHelp')}</h2><p class="wallet-return">${t('walletHelpCopy')}</p>${liveEnabled ? `<a class="btn btn-primary wallet-prepare-button" href="${escape(link)}">${t('openInMetaMask')}</a>` : ''}${network ? `<details class="network-settings"><summary>${t('manualNetwork')}</summary><p>${t('manualNetworkCopy')}</p><dl class="data-list">${[['networkName', network.name], ['chainIdLabel', network.chainId], ['currencyLabel', network.nativeCurrency.symbol], ['rpcLabel', network.rpcUrls[0]]].map(([label, value]) => `<div><dt>${t(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl><button class="btn btn-outline wallet-prepare-button" data-action="copy-network">${t('networkSettings')}</button><p id="network-copy-status" role="status"></p></details>` : ''}<form method="dialog"><button class="btn btn-outline wallet-prepare-button">${t('close')}</button></form></div></dialog>`;
 }
 function reviewView() {
@@ -404,7 +407,7 @@ async function openLiveCard(cardId) {
   try {
     const draft = JSON.parse(read('sessionStorage', liveDraftKey()));
     if (typeof draft?.nickname === 'string') state.nickname = draft.nickname;
-    preparingWallet = config.walletMode === 'metamask' && draft?.preparingWallet === true;
+    preparingWallet = config.walletMode === 'metamask' && !useMetaMaskBrowser(config) && draft?.preparingWallet === true;
     restoreForm = preparingWallet && ['register', 'review'].includes(draft.view);
   } catch {}
   cameraOpen = false;

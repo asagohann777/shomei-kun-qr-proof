@@ -1,0 +1,18 @@
+[
+  {
+    "browser": "chromium",
+    "passed": true,
+    "externalIPhoneAndIPad": "same-card link; no SDK connection; no nickname transfer",
+    "injectedMetaMask": "connection approved without app handoff",
+    "realDevice": false,
+    "errors": []
+  },
+  {
+    "browser": "webkit",
+    "passed": true,
+    "externalIPhoneAndIPad": "same-card link; no SDK connection; no nickname transfer",
+    "injectedMetaMask": "connection approved without app handoff",
+    "realDevice": false,
+    "errors": []
+  }
+]
