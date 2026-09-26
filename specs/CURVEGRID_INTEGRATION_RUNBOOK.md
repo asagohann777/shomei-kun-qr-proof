@@ -43,10 +43,10 @@ APIの形式は [OpenAPI](openapi.yaml) が正である。UIのAPI base URLに�
 POST /api/v1/cards/{cardId}/registration/prepare
 Content-Type: application/json
 
-{"walletAddress":"<MetaMaskのアドレス>","chainId":2017,"nickname":"おじいちゃんコンビニ"}
+{"walletAddress":"<MetaMaskのアドレス>","chainId":2017072401,"nickname":"おじいちゃんコンビニ"}
 ```
 
-`2017` は形式説明用であり、配置先の実値ではない。接続応答・ウォレットの実値を使う。ニックネームは1〜96 UTF-8バイト。空白除去やUnicode正規化を行わない。
+`2017072401` は現在のintegrationのチェーンID。別の配置では接続応答・ウォレットの実値を使う。ニックネームは1〜96 UTF-8バイト。空白除去やUnicode正規化を行わない。
 
 4. 応答のmode、chainId、from、to、valueとregisterの引数をABIで照合する。署名前に接続アドレスとchain IDを再取得し、変更されていたら準備をやり直す。
 5. `data.transaction` をMetaMaskへ渡す。`chainId` は数値、`value` は10進wei文字列なので、EIP-1193要求へ渡す際に16進数量へ変換する。nonce・gas・手数料はウォレットに委ねる。
@@ -65,7 +65,7 @@ UI_CAMERA_MODE=live BACKEND_MODE=live npm run build:integration
 npm run test:worker:live
 ```
 
-`test:worker:live` は接続情報を持たない専用設定で、設定不足・CORS・mock指定拒否をローカルWorkers上で検証する。公開先URLは実際に配置した後に記録する。
+`test:worker:live` は接続情報を持たない専用設定で、設定不足・CORS・mock指定拒否をローカルWorkers上で検証する。公開UIは `https://shomei-kun-integration.dptr.workers.dev/ui/`。
 
 ## 検証を再実行する
 

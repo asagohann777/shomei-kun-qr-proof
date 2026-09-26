@@ -1,6 +1,4 @@
-# カメラ読み取り
-
-2026-09-26。専用worktree、ブランチ `feat/camera-scan` で実装。大会期間との対応は未確認。人間が実カメラとモックの切替、既存デザインの維持を指定し、AIがコード・テスト・この記録を作成した。
+# カメラ読取り
 
 ## 設定と受付形式
 
@@ -24,12 +22,8 @@ IDは既存APIの `[A-Za-z0-9_-]{1,64}`。ID単体、外部URL、重複パラメ
 
 `qr-scanner` 1.4.2を固定し、workerは同一配信元にバンドルする。実モードのみ `camera=(self)`、画像・動画・workerのblobを許可する。外部CDNや `unsafe-inline` は追加しない。
 
-## 検証と限界
+## 検証手順
 
-`npm test` はURL受付、起動失敗、二重検出、停止・再起動、遅延応答、写真キャンセル・解析中の離脱、デコーダーエラー、ライト操作を検証する。`npm run verify:camera` はChromium/WebKitで、カメラ拒否後の写真読み取り、ネイティブBarcodeDetectorなしの実workerデコード、表示IDと生成QRの一致、モック時の権限要求ゼロを確認する。Chromiumでは生成したY4M映像を仮想カメラへ渡して実際の動画デコードも確認する。テストにはFFmpegが必要。
+`prototypes/mobile-ui` で `npm test` と `npm run verify:camera` を実行する。URL受付、動画・写真のデコード、二重検出、停止・再起動、言語切替、モックの権限要求ゼロを確認する。動画試験にはFFmpegを使う。
 
-単体58件、既定UIのChromium/WebKit検証、実API・MetaMask固定fixtureのChromium/WebKit検証が成功した。後者のreadonly専用URLの任意検証は未実施。integrationビルドへのカメラ設定引渡しと配信ヘッダーも確認した。
-
-iPhone Safari・Androidの実カメラ、実機ライト、実ウォレットによる登録はこの自動検証には含まれない。main統合・公開デプロイは行わない。
-
-`npm run verify:camera` の実行結果はChromium/WebKitとも成功。ネイティブBarcodeDetectorを除去したworker経路で写真を読み、表示したカードQRを再デコードしてIDの一致を確認した。Chromiumでは実APIモードの遅延初期化後もカメラ画面を保持し、読取りIDがカードAPIへ届くこと、API失敗を模擬成功に変えないことを確認した。仮想カメラでは言語変更時の動画・トラック維持、非表示時の停止、明示再開、閉じる操作、動画からの自動読取り後の全トラック終了が成功した。実機の映像ではなく生成した映像による検証である。スクリーンショットと結果JSONは無視対象の `prototypes/mobile-ui/artifacts/` に保存した。
+公開integrationは `node scripts/verify-camera-public.mjs` で確認する。API応答を試験用に置換し、動画・写真のQRからカードIDがAPIへ渡ることを検証する。試験結果は [INTEGRATION_CAMERA_PLAN.md](INTEGRATION_CAMERA_PLAN.md) と [変更記録](HACKATHON_CHANGES.md) に保存する。
