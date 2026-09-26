@@ -1,6 +1,6 @@
 # MetaMaskの接続準備とアプリ間の復帰
 
-2026-09-26。ユーザー承認済みの計画。作業ブランチは `feat/test-card-batch`。最新main `5f93c2e` を取り込み、専用integration環境に反映する。UIモックWorkerは変更しない。
+2026-09-26。ユーザー承認済みの計画。作業ブランチは `feat/test-card-batch`。最新main `0a59574` を取り込み、専用integration環境に反映する。UIモックWorkerは変更しない。
 
 ## 体験
 
@@ -37,7 +37,7 @@ GitHub APIでは旧コミットをSHA指定で取得できた。GitHub内部の�
 
 ## 検証結果
 
-- UI単体66件成功。接続・未追加・追加時の自動切替・各段階の拒否・外部の保留要求・前面60秒・非表示中の長時間待機・遅延応答・重複操作・再読込み・破棄後の応答を含む。
+- UI単体74件成功。接続・未追加・追加時の自動切替・各段階の拒否・外部の保留要求・前面60秒・非表示中の長時間待機・遅延応答・重複操作・再読込み・破棄後の応答を含む。
 - Chromium 149 / WebKit 26.5で既存モック全フローと実接続分岐の合成試験に成功。登録済みカードの復帰で準備を起動しないこと、証跡再取得でカードDOMを置換しないこと、503表示を確認。
 - 同ブラウザで準備の接続/追加/切替ごとにアプリ移動を模擬し、戻った後に次の承認を明示操作で進めること、同じブラウザでの下書き復元、接続拒否後もフォームを残すことを確認。日英の320/390/1365pxで描画し、画像と横はみ出し・固定フッターの重なり・コンソールを確認した。
 - 実MetaMask SDKの動的読込み、relay接続開始、アプリ起動リンクを確認。アプリへの移動は直前で抑止し、登録APIへの要求は0件。ローカル検証では公開APIのGETのみNodeから中継してCORSを分離した。
@@ -49,7 +49,7 @@ GitHub APIでは旧コミットをSHA指定で取得できた。GitHub内部の�
 
 ## 専用integration公開
 
-2026-09-26、最終Worker version `e2f4e9fe-84aa-4ce5-9a10-78c9e30b9ca5` を専用integrationへ配置した。UIモックWorkerは変更していない。[公開資産確認](assets/metamask-preparation/public-assets.json)ではJS/CSS/HTML 22ファイルがビルドと一致し、接続APIはready、旧公開一覧2ファイルは404。個別カードのURLとチェーン記録は維持した。
+2026-09-26、最終Worker version `caadbc80-87ac-414f-9024-ed63342b7344` を専用integrationへ配置した。UIモックWorkerは変更していない。[公開資産確認](assets/metamask-preparation/public-assets.json)ではJS/CSS/HTML 24ファイルがビルドと一致し、接続APIはready、旧公開一覧2ファイルは404。個別カードのURLとチェーン記録は維持した。
 
 公開URLで実SDK起動を両ブラウザで再確認し、登録API要求0件・エラー0件。[公開SDK結果](assets/metamask-preparation/public-sdk-results.json)。
 
@@ -60,3 +60,7 @@ CSP付きのアプリ復帰試験で、ウォレット状態更新時のカー�
 復帰照合の遅延した成功・失敗が、新しく完了した接続を上書きしないことをウォレット境界と準備状態の両方で試験した。
 
 公開URLの準備操作・復帰・再読込みも両ブラウザで成功し、QRのCSPエラーは0件。[公開ブラウザ結果](assets/metamask-preparation/public-browser-results.json)。閲覧専用モードに切り替えた際は、保存済みの実接続フォームを復元しない。既存の下書きを残した両ブラウザで、接続ボタン・入力欄・ウォレット初期化がないことを確認した。[閲覧専用結果](assets/metamask-preparation/readonly-results.json)。再現は `verify-live-ui.mjs` の `LIVE_READONLY_UI_URL` を閲覧専用ビルドに指定する。
+
+## 並行作業との合流
+
+main `0a59574` の実カメラ機能とホームQRのアニメーションを維持してリベースした。カメラの遅延初期化と準備下書きの復元を両立させ、Chromium/WebKitで再読込みを再検証した。単体74件成功。カメラは既定mockのまま、独立した `UI_CAMERA_MODE` を維持する。[合流後の準備試験](assets/metamask-preparation/combined-browser-results.json)、[カメラ試験](assets/metamask-preparation/combined-camera-results.json)。

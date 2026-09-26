@@ -1,90 +1,98 @@
 {
-  "verifiedAt": "2026-09-26T04:15:41.630Z",
-  "version": "e2f4e9fe-84aa-4ce5-9a10-78c9e30b9ca5",
+  "verifiedAt": "2026-09-26T04:24:53.120Z",
+  "version": "caadbc80-87ac-414f-9024-ed63342b7344",
   "assets": [
     {
       "name": "app.js",
-      "sha256": "81b07bc9458dd816212ee180050cc517c6ed97d421fef5f53a10ef3cce76cc21"
+      "sha256": "d43aea8de13644ea5ca93c55caea7888a6703a074c9ae61fa4238fe270af5cb5"
     },
     {
-      "name": "browser-AJCBSDSQ.js",
-      "sha256": "de7cab5c2306a0e4151f3ea871ac27582c4114912a644dd553e3758c0683c456"
+      "name": "browser-NMUK3GQS.js",
+      "sha256": "ba0134b2237262d5a69819d6c45cf15bc23697692ac7cb21d56c19f9e0424adf"
     },
     {
-      "name": "chunk-2PCGLHZ7.js",
-      "sha256": "dd00f73c01558352b85f8ba567d215ef92a53c85da44b23f9148944d150c00e0"
+      "name": "camera-messages.js",
+      "sha256": "6624cb7664cb9c49f0f26ecf722a1340acc13b06324c6d151438c2aa2f89f391"
     },
     {
-      "name": "chunk-L2SF5VCX.js",
-      "sha256": "1f07e746f67af49975cf920136cb5798def972aa2114114db63490c80bc38827"
+      "name": "chunk-4Y7OPXAS.js",
+      "sha256": "ed8f91f2bec8d2ac20ae22dc387da9e3ff4d833fdef5f20c3d07f6897c64d695"
     },
     {
-      "name": "chunk-ONAUXFU7.js",
-      "sha256": "e9f0e57c765005b780838f72ed9abb58c86eea69e108ad2132c5ecb8228913ce"
+      "name": "chunk-5DXWNKIO.js",
+      "sha256": "bf4054bb25df49930d2e1c28d2768aa84c9fa9d3b5b0deafb83490dbe5033441"
     },
     {
-      "name": "chunk-SUI7RU4U.js",
-      "sha256": "f672282ba446a22b3aeb180c09548a139e94552bcc778ea66b7f2624cabf853b"
+      "name": "chunk-5SR2PWDO.js",
+      "sha256": "51464db9fd932781e0511a11cd35aa71b2ee5055d132f4a859f82bcf86fc943c"
     },
     {
-      "name": "chunk-U74SQKG7.js",
-      "sha256": "c948aeb3e9268c423bb7fb67f0a8081440f3e0bdec8d01f8aea6cb5eb763b85e"
+      "name": "chunk-AA5IPAUG.js",
+      "sha256": "25374841770d0465370496bfd2491f073b253bc714bf07f8d798635698c7bbd6"
     },
     {
-      "name": "chunk-ZU2Q7TWR.js",
-      "sha256": "d3350ecadb1ceb1764ac0249aaa823f5b875125ff40bd6b7af8663d4bb169522"
+      "name": "chunk-AQDV2KRC.js",
+      "sha256": "34f1adbb73b6a4ed0ac447975f928882e7bc772d7731f3df2029b82f87ec2b16"
     },
     {
-      "name": "connect-evm-VXDPFD3C.js",
-      "sha256": "97b0b474a1ab976bcf1fd113f9cd8ef392c8edca983f41760bfad9bfa2faca7b"
+      "name": "chunk-ZEREMZOK.js",
+      "sha256": "fd679f4310ebbeef0cbe481c0f4dda0ca00db17426fa0207a86590819b2e75ce"
     },
     {
-      "name": "dist-VYF3ARA3.js",
-      "sha256": "7e31268d6b411b4fb989b51f8a74be39725969a9cb8c310b863b8b554e92d143"
+      "name": "connect-evm-LWXFLP2J.js",
+      "sha256": "7b8c3c9191deb9948a88ccbf9c77d9f8c55b1686ef43557f915fa1e959110ee0"
     },
     {
-      "name": "dist-XBDQUVHH.js",
-      "sha256": "91731a18d001d651d8aa46e6d08552e369b745170e8cf2fdf24fa77885c37707"
+      "name": "dist-LONI3FUE.js",
+      "sha256": "71eb09446ddb53001bec62b216a86fc681a44793d76fbc75159948e480a91b05"
+    },
+    {
+      "name": "dist-U47XN42P.js",
+      "sha256": "3316d3d1ec8dd9b317d83fcb4fe48dda3ae1d954f94d56eb233acbf2c788692c"
     },
     {
       "name": "index.html",
       "sha256": "5e6298cafb79160438a42dee524523d71ec2726c4c1796abbebc259ce95a2c27"
     },
     {
-      "name": "live-api-NVMYNB2N.js",
-      "sha256": "766de04606a974803abecbbdf5e8ec8abac5ba199691ae03f0bc0d738cfec570"
+      "name": "live-api-O6S4JODH.js",
+      "sha256": "e343a10b22e97e5091bb16987b8848ffbf48e7c3852cbacb1ea1c497cd914277"
     },
     {
       "name": "live-messages.js",
       "sha256": "5dcfe0f836ec9f445ebe5c27fb6d3ff611722f4c00f3b4d7bfc5655a44fc11a0"
     },
     {
-      "name": "live-registration-2YPWGKJN.js",
-      "sha256": "9034c02c7832d6dfc5b37a82fcae72e99a2523e8225e06b6137b0d3b2cc85fc3"
+      "name": "live-registration-C55Q6AWB.js",
+      "sha256": "76fa38d6238ade337c55b4c83c477f41f7ae8a04fa44a15694323485ba2cb25d"
     },
     {
-      "name": "loader-2K3C2C7R.js",
-      "sha256": "937f7b1257e4e9da8954314192edc623de4cb39bd4ce84aa6724a8c718526808"
+      "name": "loader-XJK26MJS.js",
+      "sha256": "489915b846aa1f6c465c4e6171e878ff2908861e3b584603425b7715efba1ee2"
     },
     {
       "name": "messages.js",
       "sha256": "d9eac4bfb1f74ae06d7d3ff2ef29a866406997a275274dce20c7d5448244ad65"
     },
     {
-      "name": "metamask-ecies-62UAK5XK.js",
-      "sha256": "9446f71c99b334706dddb9309a4c0a34e98355e5652f7b3077c15c9fb7bb0cae"
+      "name": "metamask-ecies-EXB3E4R3.js",
+      "sha256": "57ef7ec9fd1fa9ce864d4caf9cb3dcdd1c3d0da36fe77d3e63643b75151617f1"
     },
     {
-      "name": "metamask-wallet-S5LAL55N.js",
-      "sha256": "055346b98271537c30d77411f37cb3b987ce685ebd6a00f2525f05916b6ac48b"
+      "name": "metamask-wallet-STMXXVGV.js",
+      "sha256": "c780d14af674ae96331cbd6cde141e43cac4149096eb83fb288a8118d67620ee"
     },
     {
-      "name": "mm-install-modal_2.entry-A2ZPVQTV.js",
-      "sha256": "dfaa805ccebee9ffbca25ebddac738430a3f51e4a4be1fe0edfd03603de3e88d"
+      "name": "mm-install-modal_2.entry-L4H7XRZS.js",
+      "sha256": "442f67cbad5d67292934e1abaec976737b87097be9c717d03d73000426e9a562"
+    },
+    {
+      "name": "qr-scanner-worker.min-N4LT4H4Z.js",
+      "sha256": "721c98975711227f381bd1ee68c70e719ae28d90a01ac1387e990e48442cbc7d"
     },
     {
       "name": "style.css",
-      "sha256": "6194633c66e377500d67dd71884ea8e6dfbc15a5863f1256772476995cdcb7b2"
+      "sha256": "2b3c9940b8e3c25a2defc61c7582842401de9b3f48e7b4241940446b9f85bdd7"
     },
     {
       "name": "wallet-messages.js",
@@ -93,13 +101,16 @@
   ],
   "removed": [
     {
-      "asset": "test-cards.html",
+      "name": "test-cards.html",
       "status": 404
     },
     {
-      "asset": "test-card-urls.txt",
+      "name": "test-card-urls.txt",
       "status": 404
     }
   ],
-  "chainId": 2017072401
+  "connection": {
+    "status": "ready",
+    "chainId": 2017072401
+  }
 }

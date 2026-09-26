@@ -486,7 +486,7 @@ async function handleLiveAction(action) {
 if (liveEnabled) {
   import('../src/live-registration.js').then(({ createLiveRegistration }) => {
     live = createLiveRegistration(config, receiveLive);
-    if (currentCardId) return live.open(currentCardId);
+    if (currentCardId) return openLiveCard(currentCardId);
   }).catch(() => { liveSnapshot = { read: { kind: 'unavailable' }, wallet: { kind: 'disconnected' }, registration: { kind: 'idle' } }; state.card = 'unavailable'; render(); });
   const resume = () => {
     live?.setVisible(!document.hidden);
