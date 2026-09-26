@@ -1,0 +1,239 @@
+{
+  "creator_name": "おじいちゃんコンビニ",
+  "github_id": "asagohann777",
+  "organized_date": "2026-09-26",
+  "source_directory": "/Users/takagi.shoichi/Downloads",
+  "files": [
+    {
+      "file": "screens/qr-result-ja.jpg",
+      "original_name": "S__32833552.jpg",
+      "received_batch": "2026-09-25",
+      "bytes": 283188,
+      "sha256": "52f30f6acd99a811ac0c610a1b0209b44bcea7c08c085e6f09bb3c1727811eea"
+    },
+    {
+      "file": "screens/qr-result-en.jpg",
+      "original_name": "S__32833551.jpg",
+      "received_batch": "2026-09-25",
+      "bytes": 285097,
+      "sha256": "8c704df0ec9323da15b87aa70e60b9e09e942fdbeb618031e2fce07136dc5628"
+    },
+    {
+      "file": "screens/qr-scan-ja.jpg",
+      "original_name": "S__32833545.jpg",
+      "received_batch": "2026-09-25",
+      "bytes": 219323,
+      "sha256": "7ee24dd43eeb75d963bf23dad82c03f91047b051be1d190155188cad0e89d993"
+    },
+    {
+      "file": "screens/qr-scan-en.jpg",
+      "original_name": "S__32833544.jpg",
+      "received_batch": "2026-09-25",
+      "bytes": 221468,
+      "sha256": "64b32da21c371d461c2255b999d4abacb1d5f6a1abb485e3b2a4a2a702bad40d"
+    },
+    {
+      "file": "screens/home-ja.jpg",
+      "original_name": "S__32833543.jpg",
+      "received_batch": "2026-09-25",
+      "bytes": 336317,
+      "sha256": "62216af5388fa36a4ea6e6ad791ab94aecb38a021fb1e980be206b6accad4b8f"
+    },
+    {
+      "file": "screens/home-en.jpg",
+      "original_name": "S__32833542.jpg",
+      "received_batch": "2026-09-25",
+      "bytes": 355762,
+      "sha256": "3e8be46142b9d7cff2df75ab528c7283be97938f94130efd1c5280a481b2b45a"
+    },
+    {
+      "file": "screens/splash-ja-02.jpg",
+      "original_name": "S__32833541.jpg",
+      "received_batch": "2026-09-25",
+      "bytes": 320850,
+      "sha256": "c741bc232d99fd8fd742f5ff1b9343983ad7cc48c7e803c0d662d6fcc761fbb6"
+    },
+    {
+      "file": "screens/splash-ja-01.jpg",
+      "original_name": "S__32833539.jpg",
+      "received_batch": "2026-09-25",
+      "bytes": 417596,
+      "sha256": "f6d5f9272f999ce5791db34c638945611dfbecf7551ee9331520449b7996a959"
+    },
+    {
+      "file": "screens/splash-en-01.jpg",
+      "original_name": "S__32833538.jpg",
+      "received_batch": "2026-09-25",
+      "bytes": 321854,
+      "sha256": "fc02dff6043840d471a0e2975d6b1a5588b2147974c7592619ee4f85bd2a17c3"
+    },
+    {
+      "file": "screens/registration-complete-ja.jpg",
+      "original_name": "S__32841733.jpg",
+      "received_batch": "2026-09-26",
+      "bytes": 326886,
+      "sha256": "5971cabc6ac9771d1092e023f5c8564c6ef90071207134e20254152c7ef0c6fd"
+    },
+    {
+      "file": "screens/registration-complete-en.jpg",
+      "original_name": "S__32841732.jpg",
+      "received_batch": "2026-09-26",
+      "bytes": 328130,
+      "sha256": "40cb0db9e0dd27cd4dfa97acba34ef6f1593d3a4452e8725925690a6196997d1"
+    },
+    {
+      "file": "screens/registering-ja.jpg",
+      "original_name": "S__32841731.jpg",
+      "received_batch": "2026-09-26",
+      "bytes": 322109,
+      "sha256": "61ac54c3915e9ecabeebe67416c9dc7f782d16300aa7c0bdd6c7cc7950e9f3ba"
+    },
+    {
+      "file": "screens/registering-en.jpg",
+      "original_name": "S__32841730.jpg",
+      "received_batch": "2026-09-26",
+      "bytes": 327705,
+      "sha256": "e8e7f8e0b49847ad6dfb4cd4944eb88df585a6f904de773f273b2bfb5f0b7ed4"
+    },
+    {
+      "file": "screens/registration-confirm-ja.jpg",
+      "original_name": "S__32833561.jpg",
+      "received_batch": "2026-09-26",
+      "bytes": 284319,
+      "sha256": "4e8ce6135b5e72f751ebbd7876f7d38701e497e10920ef5e956ee64fe6b3ef86"
+    },
+    {
+      "file": "screens/registration-confirm-en.jpg",
+      "original_name": "S__32833560.jpg",
+      "received_batch": "2026-09-26",
+      "bytes": 283705,
+      "sha256": "e8a0c64086f16bc872770b6bdbc29078e7ab14992dc6bdb51532f920c6662f58"
+    },
+    {
+      "file": "screens/owner-input-ja.jpg",
+      "original_name": "S__32833557.jpg",
+      "received_batch": "2026-09-26",
+      "bytes": 268301,
+      "sha256": "0a08d6db0b57b1fa654c75245fafa30dddeca0baf046f290be68005e90645d83"
+    },
+    {
+      "file": "screens/owner-input-en.jpg",
+      "original_name": "S__32833556.jpg",
+      "received_batch": "2026-09-26",
+      "bytes": 267428,
+      "sha256": "52393e08b1424aac5dc04467d819085215ec52cecef2975f4bd680405e409f9e"
+    },
+    {
+      "file": "backgrounds/waterfront-platform-01.jpg",
+      "original_name": "S__32849926.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "水辺と円形台座・別案01",
+      "bytes": 319547,
+      "sha256": "9d5e2538a5e2be0d9a41a9876d1489ef7b97b69bf82ea9379c7c6b30ccf3a437"
+    },
+    {
+      "file": "backgrounds/garden-city-01.jpg",
+      "original_name": "S__32849927.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "緑の都市と水路・別案01",
+      "bytes": 483269,
+      "sha256": "e2a731e1ae3657f3bc1473f9afb7c29a852f01e2c676ccef31af1ab9a862d77d"
+    },
+    {
+      "file": "backgrounds/atrium-with-text.jpg",
+      "original_name": "S__32849928.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "文字入りアトリウム",
+      "bytes": 288693,
+      "sha256": "def987b93da7626375212c04a86f5c83074f544e7c9b7d9cd1445b97e62687db"
+    },
+    {
+      "file": "backgrounds/waterfront-platform-02.jpg",
+      "original_name": "S__32849929.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "水辺と円形台座・別案02",
+      "bytes": 325820,
+      "sha256": "98f403a6dcf99b51f7f5322e9fd5d0395b9574ae42ac39d541e99abd707857ac"
+    },
+    {
+      "file": "backgrounds/waterfront-platform-03.jpg",
+      "original_name": "S__32849930.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "水辺と円形台座・別案03",
+      "bytes": 335357,
+      "sha256": "c46236acc44235fdc23128811e88fc308e70c7e6090d8d00d0912a5416b49489"
+    },
+    {
+      "file": "backgrounds/atrium.jpg",
+      "original_name": "S__32849931.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "文字なしアトリウム",
+      "bytes": 278327,
+      "sha256": "a72f00606d11b668844e23392be52cbece0fe6df93c0e83745b1f20c19d9036f"
+    },
+    {
+      "file": "backgrounds/garden-city-02.jpg",
+      "original_name": "S__32849932.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "緑の都市と水路・別案02",
+      "bytes": 485486,
+      "sha256": "9a48f8b897a55a75e89de4bb9481a28d965bfa3ba90d739c531af77d2d530170"
+    },
+    {
+      "file": "backgrounds/garden-mountains-01.jpg",
+      "original_name": "S__32849933.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "緑の建物と山並み・別案01",
+      "bytes": 495236,
+      "sha256": "35f8dee2a7a825d82888229c0f1c2c8d702e90ee51bc3c325832bfd4c9c5d0f7"
+    },
+    {
+      "file": "backgrounds/waterfront-platform-04.jpg",
+      "original_name": "S__32849934.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "水辺と円形台座・別案04",
+      "bytes": 350943,
+      "sha256": "eabeb4bea7f6daed49fd387fafad4aee239177d92b350564636dc3632c400a75"
+    },
+    {
+      "file": "backgrounds/garden-mountains-02.jpg",
+      "original_name": "S__32849936.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "緑の建物と山並み・別案02",
+      "bytes": 499184,
+      "sha256": "bf15dc97a56ae61ef63cac15bf133c2a58540dec0be72ed3d8fa60d6d103fc1c"
+    },
+    {
+      "file": "backgrounds/waterfront-platform-aircraft.jpg",
+      "original_name": "S__32849940.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "水辺と円形台座・飛行物体あり",
+      "bytes": 313184,
+      "sha256": "dbf4b148df0f466c3ba6e698a28324096d0991988c7fb23419170b862adaaf28"
+    },
+    {
+      "file": "logos/shomeikun-qr-proof-ja.jpg",
+      "original_name": "S__32849941.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "証明くん QR Proof・白背景",
+      "bytes": 85305,
+      "sha256": "21fdc83159b7de9459413dbb3c6f6aaf0001b322d4793d13443c3e50f749233d"
+    },
+    {
+      "file": "illustrations/qr-scan.jpg",
+      "original_name": "S__32849942.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "QRとスキャン光・白背景",
+      "bytes": 117304,
+      "sha256": "4ff4deb862b792378d5a8d4ecbb584ac63747c32d14c85e3ba450148a3f1379d"
+    },
+    {
+      "file": "cards/shomei-ichiro.jpg",
+      "original_name": "S__32849943.jpg",
+      "received_batch": "2026-09-26-materials",
+      "description": "証明一郎カード・市松模様背景",
+      "bytes": 374713,
+      "sha256": "937c773c6eb826f2f6f2c9a610f403fd3b1cac6e3728e8c5da9c7c8ef0447fb5"
+    }
+  ]
+}

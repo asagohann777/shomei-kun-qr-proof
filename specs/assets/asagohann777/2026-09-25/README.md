@@ -6,15 +6,15 @@
 
 ## 画像
 
-- [S__32833552.jpg](S__32833552.jpg)
-- [S__32833551.jpg](S__32833551.jpg)
-- [S__32833545.jpg](S__32833545.jpg)
-- [S__32833544.jpg](S__32833544.jpg)
-- [S__32833543.jpg](S__32833543.jpg)
-- [S__32833542.jpg](S__32833542.jpg)
-- [S__32833541.jpg](S__32833541.jpg)
-- [S__32833539.jpg](S__32833539.jpg)
-- [S__32833538.jpg](S__32833538.jpg)
+- [S__32833552.jpg](../screens/qr-result-ja.jpg)
+- [S__32833551.jpg](../screens/qr-result-en.jpg)
+- [S__32833545.jpg](../screens/qr-scan-ja.jpg)
+- [S__32833544.jpg](../screens/qr-scan-en.jpg)
+- [S__32833543.jpg](../screens/home-ja.jpg)
+- [S__32833542.jpg](../screens/home-en.jpg)
+- [S__32833541.jpg](../screens/splash-ja-02.jpg)
+- [S__32833539.jpg](../screens/splash-ja-01.jpg)
+- [S__32833538.jpg](../screens/splash-en-01.jpg)
 
 ## プロンプトと出典
 
@@ -25,3 +25,5 @@
 [manifest.json](manifest.json)にファイル名、バイト数、SHA-256を記録した。[SHA256SUMS](SHA256SUMS)はこのディレクトリで `shasum -a 256 -c SHA256SUMS` を実行して確認できる。保存時に9点すべてがコピー元とバイト単位で一致することを確認した。
 
 Codexはコピー、一覧・出典・検証記録の作成を担当した。画像の生成・編集は行っていない。
+
+2026-09-26にユーザーの依頼で画像を分類・改名した。画像の内容は変更していない。元の名前はmanifestの `original_name` に残した。[全素材の一覧](../README.md)を参照。
