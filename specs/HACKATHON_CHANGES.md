@@ -439,3 +439,6 @@ Chromium/WebKitの日英320px・390pxで表示と操作を確認し、カメラ�
 ## 2026-09-26: トップページQRアニメーションの公開
 
 ユーザーのデプロイ指示により、CodexがUIモックWorker `shomei-kun-ui-mock` をversion `868c8bae-286a-4cb3-a22d-a8abed90edf0` へ更新した。公開URLは https://shomei-kun-ui-mock.dptr.workers.dev 。公開CSSとローカルビルドのバイト一致を確認し、Chromium/WebKitの公開トップページで拡大・縮小の倍率と動きを減らす設定での停止を確認した。実接続Workerは更新していない。今回commit・pushは行っていない。大会期間との対応は未確認。
+## 2026-09-26: テスト環境の表示を短縮
+
+ユーザーの指示で実接続の環境ラベルを「テスト環境」/「Test environment」に短縮した。既定モックと閲覧専用表示は維持した。Codexが日英の文言・表示条件を更新した。大会期間との対応は未確認。
