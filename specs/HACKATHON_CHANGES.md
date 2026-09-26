@@ -396,3 +396,7 @@ UI境界43件・API66件と型検査、Chromium/WebKitのmock/live画面試験�
 図案保存commit `ca1bb1c` のpush後にUIを修正。登録確認はカードを小さくし、名前・ウォレット・カードIDにアイコンを追加。同意文を太字の「公開内容を確認しました」と変更・削除不可の補足に分けた。承認画面は半透明の情報パネルと青い輪郭の「承認しない」ボタンへ調整。英語も同じ構成。実接続時はMetaMask内の承認を維持し、模擬ボタンを追加していない。Codexが `public/app.js`、`public/messages.js`、`styles/input.css`、計画と説明資料を更新した。大会期間との対応は未確認。
 
 ビルドとChromium 149・WebKit 26.5の既存モック操作フロー検証に合格。情報パネルの白さと列幅の最終調整後、両ブラウザ・日英・320px/390pxの確認・承認画面を追加撮影し、横はみ出しなし、キーボードでの同意チェックによる登録ボタンの有効・無効切替、承認拒否で取引が作られないことを確認した。画像は `prototypes/mobile-ui/artifacts/revised-*` に保存。実ウォレットの新規署名や取引は行っていない。このUI修正はローカルのみで、未commit・未デプロイ。
+
+## 2026-09-26: 修正図案を反映した確認・承認画面の公開
+
+ユーザーの承認後、共同制作者付きcommit `8101edd` をorigin/mainへpushし、UIモックWorkerをversion `b85a11b3-7f5b-43c3-9c43-c62f986dc6b4` へ更新した。公開URLでapp.js・messages.js・style.cssとローカルビルドのバイト一致を確認。Chromium/WebKitで項目アイコン、同意文、同意チェック前の登録不可、承認画面、拒否後に取引が作られないことを確認した。公開画面のスクリーンショットは `prototypes/mobile-ui/artifacts/public-revised-*` に保存。Codexが公開・検証・記録を担当。実接続Workerは更新していない。
