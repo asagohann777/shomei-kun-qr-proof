@@ -48,13 +48,12 @@
   .phone { --scene-image: url("./assets/flow-background.jpg"); max-width: 480px; min-height: 100svh; margin: auto; background-color: #eaf4ff; position: relative; isolation: isolate; padding-top: env(safe-area-inset-top); padding-bottom: max(28px, env(safe-area-inset-bottom)); }
   .phone::before { content: ""; position: fixed; z-index: -1; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%, 480px); pointer-events: none; background-color: #eaf4ff; background-image: linear-gradient(180deg, #ffffffed 0%, #ffffff99 25%, #ffffff14 55%, #ffffff8c 100%), var(--scene-image); background-size: cover; background-position: center; }
   .app-header { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 10px; padding: 22px 20px 8px; }
-  .brand { display: grid; text-align: center; color: #080e48; line-height: 1.15; text-decoration: none; }
+  .brand { min-width: 0; display: grid; text-align: center; color: #080e48; line-height: 1.15; text-decoration: none; }
   .home-scene { --scene-image: url("./assets/home-background.jpg"); }
-  .brand-art { display: block; width: 150px; height: 77px; position: relative; overflow: hidden; margin: auto; mix-blend-mode: multiply; }
-  .brand-art img { position: absolute; width: 206px; max-width: none; left: -28px; top: -69px; }
+  .brand-art { display: block; width: min(150px, 100%); aspect-ratio: 940 / 505; position: relative; overflow: hidden; margin: auto; mix-blend-mode: multiply; }
+  .brand-art img { position: absolute; width: calc(1236 / 940 * 100%); max-width: none; height: auto; left: calc(-160 / 940 * 100%); top: calc(-410 / 505 * 100%); }
   .home-scene .app-header { padding-top: 32px; align-items: start; }
-  .home-scene .brand-art { width: 240px; height: 123px; }
-  .home-scene .brand-art img { width: 330px; left: -45px; top: -110px; }
+  .home-scene .brand-art { width: min(240px, 100%); }
   .home-scene .app-header { grid-template-columns: 36px minmax(0, 1fr) 36px; gap: 0; padding-inline: 12px; }
   .home-scene .round-button { width: 36px; height: 36px; }
   .intro-qr { display: block; width: 240px; max-width: 85%; margin: auto; mix-blend-mode: multiply; }
@@ -193,7 +192,7 @@
   .decline-button { display: flex; min-width: 154px; min-height: 44px; margin: 12px auto 0; border-radius: 28px; border: 1px solid #73a9ed; background: linear-gradient(150deg, #ffffffd9, #d9eaff99); color: #3988d4; font-size: 16px; }
   .result-page .trading-card { width: 50%; margin-block: 16px; }
   .result-page .info-panel { padding: 14px 12px; }
-  .result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .result-actions { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 14px; }
   .result-actions .btn { min-height: 48px; height: auto; padding: 10px; font-size: 13px; }
   .recorded-note { display: flex; align-items: center; gap: 10px; background: #f1fbf5; color: #13683d; border: 1px solid #8dc8a6; padding: 12px; border-radius: 10px; margin-top: 12px; }
   .recorded-note.evidence-status-pending { background: #eaf4ff; color: #080e48; border-color: #dce4ed; }
@@ -273,8 +272,6 @@
   .camera-page { padding-top: 50px; }
   .app-header { padding-inline: 16px; }
   .bottom-actions { padding-inline: 30px; }
-  .home-scene .brand-art { width: 210px; height: 108px; }
-  .home-scene .brand-art img { width: 288px; left: -39px; top: -96px; }
   .register-page .page-title, .panel-title { font-size: 21px; }
   .record-table { font-size: 12px; }
   .record-table dt, .record-table dd { padding: 8px; }
