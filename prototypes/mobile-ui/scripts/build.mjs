@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { mkdir, rm, cp, writeFile, readFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';

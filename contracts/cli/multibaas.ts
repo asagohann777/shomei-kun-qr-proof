@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { z } from 'zod';
 import { Fragment, Interface, ZeroAddress, getAddress } from 'ethers';
 import artifact from '../abi/OwnershipRegistry.json';

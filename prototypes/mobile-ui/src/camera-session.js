@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 export function parseCardQr(value, config) {
   let url;
   try { url = new URL(value); } catch { return null; }

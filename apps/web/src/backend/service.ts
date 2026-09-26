@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { sample } from "../generated/fixtures";
 import {
   ApiError,

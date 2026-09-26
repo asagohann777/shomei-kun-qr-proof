@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 @import "tailwindcss" source("../public");
 @plugin "daisyui" {
   themes: false;

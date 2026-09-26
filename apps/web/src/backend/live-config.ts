@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { ApiError } from "./domain";
 
 export function parseLiveConfig(env: Record<string, string | undefined>) {

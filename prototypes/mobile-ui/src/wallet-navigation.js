@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 export function hasMetaMaskProvider(ethereum = globalThis.window?.ethereum) {
   return Boolean(ethereum?.isMetaMask || ethereum?.providers?.some(provider => provider.isMetaMask));
 }

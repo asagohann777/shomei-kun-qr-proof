@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 export const walletMessages = {
   ja: {
     walletPreparationTitle: 'ウォレット',

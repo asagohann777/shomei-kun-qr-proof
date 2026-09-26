@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 export const cameraMessages = {
   ja: {
     cameraStarting: 'カメラを起動中', cameraPaused: 'カメラを停止しました', cameraResume: 'カメラを再開', cameraRetry: 'カメラを再試行',

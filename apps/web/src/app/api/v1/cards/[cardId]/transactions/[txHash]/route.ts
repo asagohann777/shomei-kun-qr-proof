@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { handleTransactionRequest } from "@/backend/http";
 
 export async function GET(

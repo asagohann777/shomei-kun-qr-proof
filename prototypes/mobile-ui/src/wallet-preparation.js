@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 export function walletErrorCode(error) {
   const queue = [error];
   const seen = new Set();

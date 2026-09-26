@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import assert from "node:assert/strict";
 
 const [origin, cardId, hash] = process.argv.slice(2);

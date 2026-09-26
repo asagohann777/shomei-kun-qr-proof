@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { uiConfig } from '../scripts/ui-config.mjs';

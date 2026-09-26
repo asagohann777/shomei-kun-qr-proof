@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 const fs = require('node:fs');
 const artifact = require('../artifacts/src/OwnershipRegistry.sol/OwnershipRegistry.json');
 const output = JSON.stringify({ contractName: artifact.contractName, compiler: '0.8.30', evmVersion: 'paris', abi: artifact.abi, bytecode: artifact.bytecode, deployedBytecode: artifact.deployedBytecode }, null, 2) + '\n';

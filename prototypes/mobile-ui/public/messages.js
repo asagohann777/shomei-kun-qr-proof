@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 export const messages = {
   "ja": {
     "brand": "証明くん",

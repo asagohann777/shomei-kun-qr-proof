@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // Generated from specs/openapi.yaml. Run npm run generate.
 export const sample = {
   "cardId": "SK-2026-001",
