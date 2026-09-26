@@ -65,7 +65,7 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
       if (current !== generation || disposed) return;
       const context = identity(card, connection);
       state.read = { kind: 'ready', card, connection };
-      try { restore(load(context)); } catch (error) {
+      try { if (card.status === 'unregistered') restore(load(context)); } catch (error) {
         if (code(error) !== 'STORAGE_UNAVAILABLE') registration({ kind: 'unknown', errorCode: code(error) });
       }
       emit();
@@ -153,6 +153,7 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
       attempt = { ...attempt, hash, status: 'unknown' };
       try { save(attempt); } catch (error) { registration({ kind: 'unknown', hash, errorCode: code(error) }); return; }
     }
+    if (!attempt?.hash && state.read.card.status === 'registered') return;
     if (!attempt?.hash) {
       try {
         const stored = load(identity(state.read.card, state.read.connection));

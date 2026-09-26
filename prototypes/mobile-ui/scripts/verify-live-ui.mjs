@@ -125,7 +125,6 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     assert.equal(walletCalls.filter(method => method === 'eth_sendTransaction').length, 1);
     assertions.push('approval and pending use injected provider result; reload checks same hash without resend');
     phase = 'confirmed'; evidencePending = true;
-    await page.reload();
     await page.locator('.processing-page').waitFor();
     await page.waitForTimeout(2700);
     assert.equal(await page.locator('.result-page').count(), 0, 'wait for indexed evidence before completion');
@@ -147,9 +146,14 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     await page.locator('.result-page').waitFor();
     assert.equal(walletCalls.filter(method => method === 'eth_sendTransaction').length, 1);
     assertions.push('confirmed ownership and evidence survive fresh API read at 390, 320 and desktop');
-    await page.evaluate(() => localStorage.clear());
     evidencePending = true;
+    const readsBeforeRegisteredReload = txReads;
     await page.reload(); await action('refresh-evidence').waitFor();
+    assert.equal(await page.locator('.processing-page').count(), 0);
+    assert.equal(txReads, readsBeforeRegisteredReload, 'registered card must not resume cached transaction');
+    await page.evaluate(() => window.dispatchEvent(new Event('pageshow')));
+    assert.equal(await page.locator('.processing-page').count(), 0);
+    assertions.push('registered card with saved registration opens directly without registration loading, including pending evidence');
     await page.evaluate(() => { window.originalTable = document.querySelector('.record-table'); window.originalCard = document.querySelector('.trading-card'); });
     let releaseCard;
     cardGate = new Promise(resolve => { releaseCard = resolve; });

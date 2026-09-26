@@ -68,13 +68,13 @@ for (const savedStatus of ['confirmed', 'reverted']) {
     assert.deepEqual(resumed.counts(), { sent: 0, prepared: 0, factories: 0 });
   });
 }
-test('restored confirmed is confirmed only after fresh matching evidence', async () => {
+test('registered card opens as a public read without resuming saved registration', async () => {
   const seed = fixture();
   await ready(seed);
   await seed.controller.register(nickname);
   const resumed = fixture({ values: seed.values, walletMode: 'mock', card: seed.controller.getSnapshot().read.card });
   await resumed.controller.open(id);
-  assert.equal(resumed.controller.getSnapshot().registration.kind, 'confirmed');
+  assert.equal(resumed.controller.getSnapshot().registration.kind, 'idle');
   assert.deepEqual(resumed.counts(), { sent: 0, prepared: 0, factories: 0 });
 });
 test('malformed durable attempt stays unknown and cannot resend', async () => {
@@ -109,28 +109,22 @@ for (const walletMode of ['mock', 'metamask']) {
     assert.equal(f.counts().prepared, 0);
   });
 }
-test('reopening while an older confirmation is in flight starts its own confirmation', async () => {
-  const seed = fixture();
-  await ready(seed);
-  await seed.controller.register(nickname);
+test('reopening a registered card discards an older registration check', async () => {
+  const seed = fixture(); await ready(seed); await seed.controller.register(nickname);
   let releaseOld;
   const older = new Promise(resolve => { releaseOld = resolve; });
   let checks = 0;
-  const f = fixture({
-    values: seed.values,
-    walletMode: 'mock',
-    card: seed.controller.getSnapshot().read.card,
-    beforeTransaction: () => ++checks === 1 ? older : Promise.resolve(),
-  });
+  const f = fixture({ values: seed.values, walletMode: 'mock', beforeTransaction: () => { checks++; return older; } });
   const first = f.controller.open(id);
   for (let i = 0; i < 10 && checks === 0; i++) await Promise.resolve();
   assert.equal(checks, 1);
+  f.setCard(seed.controller.getSnapshot().read.card);
   await f.controller.open(id);
-  assert.equal(checks, 2);
-  assert.equal(f.controller.getSnapshot().registration.kind, 'confirmed');
-  releaseOld();
-  await first;
-  assert.equal(f.controller.getSnapshot().registration.kind, 'confirmed');
+  assert.equal(checks, 1);
+  assert.equal(f.controller.getSnapshot().registration.kind, 'idle');
+  releaseOld(); await first;
+  assert.equal(f.controller.getSnapshot().registration.kind, 'idle');
+  assert.equal(f.controller.getSnapshot().read.card.status, 'registered');
 });
 
 const registered = { cardId: id, registry, playerName: '証明一郎', status: 'registered', owner: { address: account, nickname }, evidence: { status: 'pending' } };
@@ -199,3 +193,18 @@ test('late refresh cannot overwrite navigation', async () => {
   assert.equal(f.controller.getSnapshot().read.kind, 'not-found');
   assert.equal(f.controller.getSnapshot().refresh.kind, 'idle');
 });
+
+for (const evidence of [{ status: 'pending' }, { status: 'available', transactionHash: hash, blockNumber: 2 }]) {
+  test(`registered ${evidence.status} card ignores saved attempt on open and foreground`, async () => {
+    const seed = fixture(); await ready(seed); await seed.controller.register(nickname);
+    let transactionReads = 0;
+    const snapshots = [];
+    const resumed = fixture({ values: seed.values, card: { ...registered, evidence }, changed: value => snapshots.push(value), beforeTransaction: () => { transactionReads++; } });
+    await resumed.controller.open(id); await resumed.controller.recheck();
+    assert.equal(resumed.controller.getSnapshot().registration.kind, 'idle');
+    assert.equal(resumed.controller.getSnapshot().read.card.status, 'registered');
+    assert.equal(snapshots.some(value => value.registration.kind === 'pending'), false);
+    assert.equal(transactionReads, 0);
+    assert.equal(resumed.counts().sent, 0);
+  });
+}
