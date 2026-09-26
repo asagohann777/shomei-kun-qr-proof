@@ -1,114 +1,116 @@
-# 証明くん QR所有者登録
+English | [日本語](SPEC.ja.md)
 
-カードのQRから、現在の登録所有者を確認するサービス。架空の野球選手「証明一郎」のカードを使い、本人のウォレットとニックネームを記録する。
+# Shomei-kun QR owner registration
 
-## 対象と証明範囲
+This service uses a card's QR code to show its currently registered owner. A card for the fictional baseball player Shomei Ichiro records the user's wallet and nickname.
 
-- 現在のデモはCurvegrid Testnetを使う。状態取得と取引準備はMultiBaas API、署名・送信はMetaMaskで行う。
-- 登録できるのは発行済みの未登録カード。新規発行はウォレット制限なしとする。最初の登録だけを保存する。
-- 所有者とニックネームは公開する。登録後の変更・削除・移転は提供しない。
-- 証明するのはカードIDと登録ウォレットの対応。現物の所持、真贋、実名は判定しない。QRをコピーしても同じ記録が表示される。
-- 既存「証明くん」の写真・動画登録、アルバム、公開設定、保存データには接続しない。既存成果は [PRE_EXISTING_WORK.md](PRE_EXISTING_WORK.md) に記録する。
+## Scope and what the record proves
 
-## 役割
+- The current demo uses Curvegrid Testnet. MultiBaas API reads state and prepares transactions. MetaMask signs and sends them.
+- Only issued, unregistered cards can be registered. New cards have no wallet restriction. Only the first registration is stored.
+- The owner and nickname are public. Changes, deletion, and transfers after registration are not provided.
+- The record proves the association between a card ID and its registered wallet. It does not establish physical possession, authenticity, or a real name. A copied QR code shows the same record.
+- This app does not connect to the existing Shomei-kun project's photo/video registration, albums, visibility settings, or stored data. [PRE_EXISTING_WORK.md](PRE_EXISTING_WORK.md) records that work.
 
-| 利用者 | 操作 |
+## Roles
+
+| User | Actions |
 | --- | --- |
-| 発行者 | CLIでカードIDを発行する。所有者の上書きや利用者の代理署名はできない |
-| 登録者 | MetaMaskで接続し、ニックネームと公開内容を確認して登録する |
-| 第三者 | ウォレット未接続でカード、所有者、登録の根拠を閲覧する |
+| Issuer | Issues card IDs through the CLI. Cannot overwrite an owner or sign for a user |
+| Registrant | Connects MetaMask, reviews the nickname and public information, and registers |
+| Third party | Views cards, owners, and registration evidence without connecting a wallet |
 
-## 機能要件
+## Functional requirements
 
-| ID | 要件 |
+| ID | Requirement |
 | --- | --- |
-| F01 | カードはチェーン・コントラクト・カードIDで識別する。ID重複と未発行カードへの登録を拒否する |
-| F02 | QRには公開ページのURLを入れる。秘密鍵・認証情報・ニックネームを含めない |
-| F03 | 固定の発行者だけがカードを発行できる。発行直後は未登録。新規発行は全員許可とし、ENS名・受取人アドレスによる登録制限を設けない |
-| F04 | ウォレットの実アドレスとチェーンを確認する。アドレス手入力を本人の操作として扱わない |
-| F05 | 本人の署名取引だけを受け付ける。二重登録と上書きをコントラクトで拒否する |
-| F06 | ニックネームはUTF-8で1〜96バイト。所有者と同じ取引に保存し、別カードでの同名を許可する |
-| F07 | 公開情報はチェーンから取得する。再読込みや別端末でも同じ記録を表示する |
-| F08 | チェーン、コントラクト、カードID、発行者、登録取引を確認できる。RPCで照合できる |
-| F09 | 未発行・未登録・処理中・確認済み・失敗・確認不能を区別する。通信失敗を未登録や成功に置き換えない |
-| F11 | ENS名またはウォレットアドレスから、そのアドレスに登録されているカードを検索する。未接続で閲覧できる |
-| F12 | 登録画面でSepolia Primary nameを逆引きし、正引き一致時だけ名前を主表示する。失敗時はアドレス表示を維持し、登録を妨げない |
-| F13 | ENSは検索・名前表示に任意で利用し、カード登録先の制限には使わない。新規発行は全ウォレット許可とする |
-| F10 | 仕様、計画、プロンプト、変更履歴、試験結果、AI利用をリポジトリに残す |
+| F01 | Identify a card by its chain, contract, and card ID. Reject duplicate IDs and registration of unissued cards |
+| F02 | Put the public page URL in the QR code. Include no private keys, credentials, or nicknames |
+| F03 | Only the fixed issuer can issue cards. A newly issued card is unregistered. New cards allow everyone and have no ENS-name or recipient-address restriction |
+| F04 | Check the wallet's actual address and chain. Do not treat a manually entered address as action by that wallet's owner |
+| F05 | Accept only transactions signed by the registrant. The contract rejects duplicate registration and overwrites |
+| F06 | Nicknames contain 1–96 UTF-8 bytes. Store them in the same transaction as the owner. Allow the same nickname on different cards |
+| F07 | Read public information from the chain. Show the same record after reloads and on other devices |
+| F08 | Expose the chain, contract, card ID, issuer, and registration transaction for RPC verification |
+| F09 | Distinguish unissued, unregistered, processing, confirmed, failed, and unverifiable states. Never turn a network failure into unregistered or success |
+| F11 | Search an ENS name or wallet address for cards registered to that address. Allow viewing without a wallet connection |
+| F12 | Reverse-resolve the Sepolia Primary name on the registration screen. Show the name prominently only when forward resolution matches. On failure, keep the address and allow registration |
+| F13 | ENS is optional for search and name display. Do not use it to restrict card registration. New cards allow all wallets |
+| F10 | Keep specifications, plans, prompts, change history, test results, and AI-use records in the repository |
 
-## 画面と操作
+## Screens and actions
 
-スマートフォン・iPad・PCで利用する。QRスキャンを主操作とし、ENS名・アドレス検索を補助操作とする。発行者用Web画面は設けない。
+The app supports phones, iPads, and PCs. QR scanning is the main action. ENS-name and address search is secondary. There is no issuer web screen.
 
-| 画面 | 操作 |
+| Screen | Actions |
 | --- | --- |
-| QRスキャン | ボタンを押してカメラを起動する。QRを自動で読み、写真からも選べる |
-| カード確認・公開確認 | カード画像、ID、登録状態を表示する。未登録なら登録へ進み、登録済みなら所有者と証跡を表示する |
-| カード検索 | ENS名またはアドレスを入力し、登録カード一覧から詳細・登録記録へ進む。途中までの検索と0件を区別する |
-| 所有者登録 | ニックネーム入力、ウォレット準備、公開内容への同意、登録内容の確認を行う |
-| 登録処理 | 承認待ち、記録確認中、完了、拒否、失敗、結果未確認を表示する |
+| QR scan | Press the button to start the camera. Read QR codes automatically or select a photo |
+| Card/public verification | Show the card image, ID, and registration state. Continue to registration for an unregistered card, or show the owner and evidence for a registered card |
+| Card search | Enter an ENS name or address, then open details and registration records from the list. Distinguish incomplete searches from zero results |
+| Owner registration | Enter a nickname, prepare the wallet, consent to publication, and review the registration |
+| Registration progress | Show awaiting approval, checking the record, completed, rejected, failed, and unknown-result states |
 
-### カメラ
+### Camera
 
-画像・動画は端末内で解析する。対象の公開ページURLまたはカードAPI URLだけを受け付ける。外部URLへは移動しない。読取り成功・画面離脱・ページ非表示でカメラを停止し、復帰後は利用者が再開する。[受付形式と停止条件](CAMERA_SCAN.md)。
+Images and video are analyzed on the device. Accept only the target public page URL or card API URL. Do not navigate to external URLs. Stop the camera after a successful read, screen navigation, or page hiding. The user resumes it after returning. See [accepted formats and stop conditions](CAMERA_SCAN.md).
 
-### ウォレット
+### Wallet
 
-iPhone・iPadの外部ブラウザでは、未登録カードの「MetaMaskで開く」から同じカードをMetaMask内ブラウザで開く。ニックネームは移動後に入力する。開かなければカードURLをコピーしてMetaMask内へ貼り付ける。
+In an external browser on iPhone or iPad, use **Open in MetaMask** on an unregistered card to open the same card in MetaMask's browser. Enter the nickname after switching. If the page does not open, copy the card URL into MetaMask's browser.
 
-MetaMask内ではそのまま接続する。それ以外の外部ブラウザはMetaMask Connectを使う。接続後にチェーンを確認し、必要な場合だけ追加・切替を求める。接続準備と登録取引は別の状態として表示する。
+Connect directly inside MetaMask. Other external browsers use MetaMask Connect. After connecting, check the chain and request network addition or switching only when necessary. Show connection preparation separately from the registration transaction.
 
-登録前に、ニックネームとウォレットの公開、登録後の変更・削除ができないことを説明する。氏名・メール・所有者アドレスの入力欄は設けない。
+Before registration, explain that the nickname and wallet become public and cannot be changed or deleted afterward. Do not provide real-name, email, or owner-address input fields.
 
-### 登録と再取得
+### Registration and refresh
 
-初回送信後は最大60秒、取引結果と証跡を確認する。取引と所有者が確認でき、証跡の反映だけが遅れていれば完了画面で確認状況を表示する。取引成功を確認できなければ結果未確認とする。
+After the first submission, check the transaction result and evidence for up to 60 seconds. If the transaction and owner are confirmed but evidence indexing is delayed, show the evidence state on the completion screen. If transaction success cannot be confirmed, show an unknown result.
 
-登録済みカードの読込みや「再取得」を「登録中」と表示しない。再取得中もカードと所有者情報を残し、ステータス欄だけを更新する。再読込み・アプリ復帰では保存済み取引を照会し、自動再送しない。
+Do not label a registered card's load or refresh as registration in progress. Keep the card and owner visible during refresh and update only the status area. On reload or app return, query the saved transaction without automatically resending it.
 
-### 言語
+### Language
 
-日本語・英語を切り替え、選択を保存する。未選択ならブラウザの優先順で最初に一致する日本語・英語を使い、どちらもなければ英語にする。ニックネーム、ID、アドレスは翻訳しない。
+Allow Japanese/English switching and save the choice. Without a saved choice, use the first matching Japanese or English language in browser preference order, otherwise English. Do not translate nicknames, IDs, or addresses.
 
-## 動作モード
+## Operating modes
 
-| API | ウォレット | 動作 |
+| API | Wallet | Behavior |
 | --- | --- | --- |
-| mock | mock | UI検討用。外部API・実ウォレットへ接続しない |
-| live | mock | 実データの閲覧専用 |
-| live | metamask | 本人ウォレットによる登録 |
+| mock | mock | UI review. No external API or real wallet connection |
+| live | mock | Read-only access to real data |
+| live | metamask | Registration with the user's wallet |
 
-既定はmock/mock。mock APIと実ウォレットの組合せは拒否する。カメラは独立した `UI_CAMERA_MODE=mock|live` で切り替える。実接続の障害時にモックへ切り替えない。
+The default is mock/mock. Reject mock API combined with a real wallet. Camera mode is independent, `UI_CAMERA_MODE=mock|live`. Never fall back to mock data after a live connection failure.
 
-## 受け入れ条件
+## Acceptance criteria
 
-| ID | 確認内容 |
+| ID | Verification |
 | --- | --- |
-| A01 | 発行権限、ID重複、発行直後の未登録状態 |
-| A02 | 未発行カードの拒否、QR受付形式、カメラ停止・再開 |
-| A03 | 実アドレス・チェーンの照合、アカウント変更の検出 |
-| A04 | 連打・別タブ・直接取引でも初回登録だけが成立すること |
-| A05 | 公開への同意、ニックネームの範囲、所有者との同一取引保存 |
-| A06 | 未接続・別端末・再読込みで同じ所有者を取得できること |
-| A07 | RPCの状態・登録イベント・レシートと画面の一致 |
-| A08 | 拒否・失敗・同期遅延・通信障害の区別と自動再送の防止 |
-| A09 | iPhone/iPadからMetaMask内で開く導線と、本人の接続・承認 |
-| A10 | 日英切替と保存、320px・390px・iPad・デスクトップ幅の表示 |
-| A11 | 実装、試験、プロンプト、既存成果、AI利用の追跡 |
-| A12 | ENS未設定でも発行・QR読取り・登録・アドレス検索ができ、新規カードの登録先を限定しないこと |
-| A13 | ENS名と解決先アドレスの検索結果が一致し、一覧から既存の登録記録を開けること |
-| A14 | Primary nameの正引き照合、取得失敗時のアドレス表示、ウォレット切替時の旧名・古い応答の破棄 |
+| A01 | Issuance permissions, duplicate IDs, and unregistered state immediately after issuance |
+| A02 | Rejection of unissued cards, accepted QR formats, and camera stop/resume |
+| A03 | Actual address/chain matching and account-change detection |
+| A04 | Only the first registration succeeds, including repeated taps, other tabs, and direct transactions |
+| A05 | Publication consent, nickname limits, and storage in the same transaction as the owner |
+| A06 | The same owner is returned without a wallet connection, on another device, and after reload |
+| A07 | The screen matches RPC state, registration events, and receipts |
+| A08 | Rejection, failure, indexing delays, and network errors stay distinct. No automatic resend |
+| A09 | iPhone/iPad entry into MetaMask's browser and the user's connection and approval |
+| A10 | Japanese/English switching and persistence, with 320px, 390px, iPad, and desktop layouts |
+| A11 | Traceable implementation, tests, prompts, existing work, and AI use |
+| A12 | Issuance, QR reading, registration, and address search work without ENS configuration. New cards do not restrict the registrant |
+| A13 | An ENS name and its resolved address return the same search results. Existing registration records open from the list |
+| A14 | Forward verification of Primary names, address fallback on lookup failure, and discarding old names/responses on wallet changes |
 
-構成は [ARCHITECTURE.md](ARCHITECTURE.md)、実演は [DEMO.md](DEMO.md)、試験結果は [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md) を参照する。
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the architecture, [DEMO.md](DEMO.md) for the demonstration, and [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md) for test results.
 
-## ENSとアドレス検索
+## ENS and address search
 
-ENSは任意機能。名前はSepolia、カード登録はCurvegrid Testnetで扱う。アドレス入力はENSを使わず登録イベントを検索する。登録画面のPrimary nameは正引き一致時だけ採用し、ウォレット切替時は前の名前を消す。所有者と権限判定はアドレスで管理し、ENS変更で既存カードを書き換えない。
+ENS is optional. Names use Sepolia, while card registration uses Curvegrid Testnet. Address input searches registration events without ENS. The registration screen uses a Primary name only after matching forward resolution and clears the old name on wallet changes. Ownership and permissions use addresses. ENS changes never rewrite existing cards.
 
-受け入れ条件は、ENS・アドレス検索結果の一致、未設定・通信失敗でも従来操作が使えること、Primary nameの正引き照合、口座切替時の古い応答の破棄、ページング中のアドレス変更・チェーン再編時の再検索。詳細と実接続結果は [ENS_INTEGRATION.md](ENS_INTEGRATION.md) に記録する。
+Acceptance covers matching ENS/address results, continued conventional operation when ENS is absent or unavailable, forward verification, stale-response rejection on account changes, and restarting paginated searches after address changes or chain reorganization. [ENS_INTEGRATION.md](ENS_INTEGRATION.md) records details and live results.
 
-## 2026-09-26の仕様変更と実装状況
+## Requirement changes and implementation status on 2026-09-26
 
-ENSによる受取人限定発行は要件から外す。新規カードは全員許可で発行し、ENSは検索・表示の補助だけに使う。現行CLIには旧 `--recipient-ens` と `--wallet` が残っているため、削除は未完了。既存コントラクトと過去の制限付きカードは変更していない。
+ENS-restricted recipient issuance is removed from the requirements. New cards allow everyone, and ENS only assists search and display. The current CLI still has the old `--recipient-ens` and `--wallet` options. Their removal is unfinished. Existing contracts and previously restricted cards are unchanged.
 
-制限なしの `demo-open-20260926-02` はユーザーから登録成功の報告があり、公開APIでも登録済み・証跡ありを確認した。一方、旧カードでのアプリ終了後の「結果を確認できません」は未解決。別カードの登録成功と復旧処理の修正を区別する。
+The user reported successful registration of unrestricted card `demo-open-20260926-02`. The public API also confirmed registration with evidence. The old card's "結果を確認できません" message after app termination remains unresolved. Successful registration of another card does not establish that recovery is fixed.

@@ -1,68 +1,70 @@
-# デモ手順
+English | [日本語](DEMO.ja.md)
 
-## 開くURL
+# Demo instructions
 
-| 用途 | URL |
+## URLs
+
+| Purpose | URL |
 | --- | --- |
-| 実登録とカメラ読取り | https://shomei-kun-integration.dptr.workers.dev/ui/ |
-| UI検討用モック | https://shomei-kun-ui-mock.dptr.workers.dev/ |
+| Real registration and camera scanning | https://shomei-kun-integration.dptr.workers.dev/ui/ |
+| UI review mock | https://shomei-kun-ui-mock.dptr.workers.dev/ |
 
-## 撮影用カード
+## Cards for filming
 
-前回のQR付きカード5枚の一覧: https://shomei-video-cards.dptr.workers.dev/g/gvPyRGJ6r3Q80h8WQ070Irl11lg0UXC0/
+Previous gallery of five QR cards: https://shomei-video-cards.dptr.workers.dev/g/gvPyRGJ6r3Q80h8WQ070Irl11lg0UXC0/
 
-一覧からカードを開き、QRを読み取って登録情報の確認へ進む。各カードの登録状態はアプリで確認する。登録済みなら閲覧、未登録なら登録へ進む。
+Open a card from the gallery, scan its QR code, and view its registration information. Check each card's state in the app. View registered cards or continue to registration for unregistered cards.
 
-今回登録に成功した制限なしカード: https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=demo-open-20260926-02
+The unrestricted card successfully registered in this session: https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=demo-open-20260926-02
 
-このカードは登録済みなので閲覧撮影用に使う。前回の5枚とは別のカードで、上の一覧には含まれない。登録操作を撮り直す場合は別の未登録カードを用意する。
+This card is already registered and can be used to film viewing. It is separate from the previous five and is not in the gallery above. Use another unregistered card to film registration again.
 
-## ENS・アドレス検索を試す
+## Try ENS/address search
 
-1. 実接続URLで「ENS名・アドレスで探す」を押す。英語表示は「Find by ENS or address」。
-2. `shomeikun.eth` を検索する。登録済みカードの画像・ID・登録名を確認する。
-3. 「登録記録を見る」でカード詳細を開く。閲覧にはMetaMask接続もガスも不要。
-4. `0xc22D961e56b70a73f6dCB1EC0a47b7Da1Fe38FDd` を入力して同じ一覧を確認する。
+1. On the live app, select **Find by ENS or address**, shown as **ENS名・アドレスで探す** in Japanese.
+2. Search `shomeikun.eth`. Check the registered cards' images, IDs, and nicknames.
+3. Select **View registration** to open card details. Viewing requires neither MetaMask connection nor gas.
+4. Enter `0xc22D961e56b70a73f6dCB1EC0a47b7Da1Fe38FDd` and check that the same list appears.
 
-登録画面でこのウォレットを接続すると、Sepoliaで逆引き・正引き一致を確認した `shomeikun.eth` をアドレスの上に表示する。未設定ならアドレスのみ。登録に使うネットワークは引き続きCurvegrid Testnetで、ENS確認のためにウォレットをSepoliaへ切り替える必要はない。
+Connecting this wallet on the registration screen shows `shomeikun.eth` above the address after matching Sepolia reverse and forward resolution. An unset name leaves the address alone. Registration still uses Curvegrid Testnet. ENS lookup does not require switching the wallet to Sepolia.
 
-## 実登録を試す
+## Try real registration
 
-MetaMaskを用意し、登録に使うウォレットへCurvegrid TestnetのテストETHを補充する。カードは発行済み・未登録のものを使う。既存カードのQRやURLを利用できる。
+Prepare MetaMask and fund the registration wallet with Curvegrid Testnet test ETH. Use an issued, unregistered card. Existing card QR codes or URLs can be used.
 
-1. 実登録用URLを開き、「QRコードをスキャン」からカメラを許可する。写真からの読取り、カードURLの直接表示も使える。
-2. カードIDと未登録の表示を確認する。
-3. iPhone・iPadでは「MetaMaskで開く」を押す。同じカードがMetaMask内ブラウザで開いたら登録へ進む。
-4. ニックネームに「おじいちゃんコンビニ」を入力する。
-5. 「MetaMaskで準備する」を押し、接続と必要なネットワーク追加・切替を許可する。対象はCurvegrid Testnet、チェーンID `2017072401`。
-6. 公開情報と登録内容を確認し、MetaMaskで取引を承認する。
-7. 記録の確認を待ち、表示された所有者・ニックネームを確認する。
-8. 別端末で同じQRを開く。ウォレット未接続でも同じ登録情報を読める。
+1. Open the real registration URL, select **Scan QR code**, and allow the camera. You can also read a photo or open the card URL directly.
+2. Check the card ID and unregistered state.
+3. On iPhone/iPad, select **Open in MetaMask**. Continue to registration when the same card opens inside MetaMask.
+4. Enter `おじいちゃんコンビニ` as the nickname.
+5. Select **Prepare with MetaMask** and approve the connection and any necessary network addition/switch. The target is Curvegrid Testnet, chain ID `2017072401`.
+6. Review the public information and registration details, then approve the transaction in MetaMask.
+7. Wait for record verification and check the displayed owner and nickname.
+8. Open the same QR on another device. The same registration information is readable without connecting a wallet.
 
-登録は一度限り。登録済みカードでは再登録できない。別の登録を試すときは未登録カードを使う。
+Registration is one-time. A registered card cannot be registered again. Use an unregistered card for another attempt.
 
-## 進まないとき
+## If the flow stops
 
-| 状態 | 操作 |
+| State | Action |
 | --- | --- |
-| カメラを使えない | 「写真から」でQR画像を選ぶ |
-| MetaMaskだけ開き、ページが出ない | 「ページが開かないとき」からURLをコピーし、MetaMask内ブラウザのアドレス欄に貼り付ける |
-| ネットワークが違う | 接続準備の案内に従い、追加・切替を許可する |
-| 残高不足 | 登録ウォレットへテストETHを補充する |
-| 承認を拒否した | 入力を確認して再度操作する |
-| 送信後の結果が分からない | 保存済み取引を再確認する。新しい取引を重ねて送らない |
-| 証跡の反映待ち | 「再取得」を押す。所有者情報は表示したまま更新する |
+| Camera unavailable | Choose the QR image through **From photo** |
+| MetaMask opens without the page | Copy the URL from the page-opening help and paste it into MetaMask's browser address bar |
+| Wrong network | Follow connection preparation and approve the addition/switch |
+| Insufficient balance | Fund the registration wallet with test ETH |
+| Approval rejected | Review the input and try again |
+| Unknown result after submission | Recheck the saved transaction. Do not submit another transaction on top of it |
+| Evidence not yet indexed | Select **Refresh**. Owner information remains visible during the update |
 
-エラーが続く場合は画面の診断情報をコピーする。秘密鍵やシードフレーズは送らない。
+If errors persist, copy the on-screen diagnostics. Do not send private keys or seed phrases.
 
-## UIモックを試す
+## Try the UI mock
 
-モック用URLでは実際の登録は行わない。メニューから未登録・登録済み・処理中・失敗などのシナリオと言語を切り替える。サンプルウォレットで入力・確認・完了まで試せる。実APIとMetaMaskは呼び出さない。
+The mock URL does not make real registrations. Use the menu to switch language and scenarios such as unregistered, registered, processing, or failure. Try input, review, and completion with a sample wallet. It calls neither the real API nor MetaMask.
 
-## 発行と照合
+## Issuance and verification
 
-カード発行は [CLI手順](../contracts/README.md)、環境設定は [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md) に従う。新規カードは全員許可で発行し、同じIDを再発行しない。現行CLIの `--recipient-ens` と `--wallet` は使わない。ENSの登録・設定は不要。
+Follow the [CLI instructions](../contracts/README.md) to issue cards and the [runbook](CURVEGRID_INTEGRATION_RUNBOOK.md) to configure the environment. Issue new cards without restrictions and never reuse an ID. Do not use the current CLI's `--recipient-ens` or `--wallet` options. ENS registration/configuration is unnecessary.
 
-公開画面のチェーン・コントラクト・カードID・取引ハッシュを使い、RPCでカード状態と登録レシートを照合できる。MultiBaasの管理キーや発行者の鍵は不要。
+Use the public screen's chain, contract, card ID, and transaction hash to verify card state and the registration receipt through RPC. No MultiBaas admin key or issuer key is needed.
 
-このデモが示すのはカードIDと登録ウォレットの対応。現物の所持や真贋は判定しない。
+This demo establishes the association between a card ID and its registered wallet. It does not establish physical possession or authenticity.

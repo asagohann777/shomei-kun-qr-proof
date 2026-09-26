@@ -1,39 +1,41 @@
-# デモの登録許可を全員へ変更
+English | [日本語](OPEN_REGISTRATION_DEMO.ja.md)
 
-2026-09-26。ユーザーの訂正により、発行済み・未登録のデモカードは誰でも自分のウォレットで登録できる。従来の許可アドレス指定をデモの前提にしない。本人ウォレットの署名、発行者のみのカード発行、未発行カード拒否、最初の登録後の上書き・二重登録拒否は維持する。
+# Allow anyone to register demo cards
 
-ABIの `allowedWallet` がゼロアドレスなら全員を許可する。発行CLIは `--wallet` を省略すると全員許可にする。既存の指定アドレス付きカードの記録も読み取れる形式を保つ。所有者は送信者 `msg.sender` から決まり、ゼロアドレスや画面で入力したアドレスを所有者にはしない。
+2026-09-26. Following the user's correction, anyone can register an issued, unregistered demo card with their own wallet. The demo no longer requires a designated allowed address. Retain user-wallet signatures, issuer-only issuance, rejection of unissued cards, and rejection of overwrites or duplicate registration after the first registration.
 
-配置済みコントラクトは変更できないため、修正版を新しいアドレス・MultiBaas Library version 1.1.0で配置し、専用integrationの記録先を切り替える。旧コントラクトの登録記録は削除・上書きしない。過去の試験証跡は旧アドレスとともに保存する。既存の未登録手動URLに対応するカードIDを新しい発行単位で再発行し、複数人の試行用に追加カードも発行する。
+A zero-address ABI `allowedWallet` permits everyone. Omitting `--wallet` from the issuer CLI makes issuance unrestricted. Keep the format readable for existing cards with designated addresses. The owner comes from `msg.sender`, never the zero address or an address entered in the UI.
 
-実装と並行して、API失敗に受付IDを付け、ブラウザの直近20件の診断情報をコピーできるようにする。APIキー、RPC URL、秘密鍵、ニックネーム、署名前の取引本文は記録しない。サーバーでは拒否コードと許可先・接続アドレスを照合できる。ガス代は接続ウォレットに必要である。
+The deployed contract cannot be changed. Deploy the revision at a new address with MultiBaas Library version 1.1.0 and switch the dedicated integration's registry. Do not delete or overwrite old registration records. Preserve past evidence with the old address. Reissue card IDs for existing unregistered manual URLs under the new issuance scope, and issue additional cards for multiple testers.
 
-## 公開先
+Alongside implementation, attach request IDs to API failures and allow copying the last 20 browser diagnostic events. Do not log API keys, RPC URLs, private keys, nicknames, or unsigned transaction bodies. Server logs can compare rejection codes, allowed addresses, and connected addresses. The connected wallet needs gas funds.
 
-- [手動用カード](https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=mobile-ui-20260926-manual)
-- [予備カード1](https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=demo-open-001)
-- [予備カード2](https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=demo-open-002)
+## Public URLs
 
-記録先は `0x0721F6260a83577015F71a50BB46c09B5e15BcAA`、version1.1.0、開始block18773。配置取引は [配置記録](assets/curvegrid-connectivity/open-demo-deployment.json) を参照。過去の登録済み試験カードは旧記録先 `0xE226ABd4e3866568C7bd53a57f2CA4b619EFB47e` に残り、今回のAPI既定記録先には移していない。
+- [Manual card](https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=mobile-ui-20260926-manual)
+- [Spare card 1](https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=demo-open-001)
+- [Spare card 2](https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=demo-open-002)
 
-公開APIで2つの別アドレスの登録準備が200になった。自動試験で登録後の照合に残る旧許可先比較を検出し、登録準備・イベント・取引照合を同じ許可判定へ揃えた。登録後は実際のownerと取引送信者も照合する。
+The registry is `0x0721F6260a83577015F71a50BB46c09B5e15BcAA`, version 1.1.0, starting at block 18773. See the [deployment record](assets/curvegrid-connectivity/open-demo-deployment.json). Previously registered test cards remain at old registry `0xE226ABd4e3866568C7bd53a57f2CA4b619EFB47e` and were not moved to the API's new default registry.
 
-ブラウザの失敗画面に「エラー詳細をコピー」を追加した。コード、受付ID、カードID、接続アドレス、チェーン、取引ハッシュと発生時刻を最大20件コピーできる。Clipboardが使えない場合は画面にテキストを表示する。サーバーは4xxも構造化ログに残し、レスポンスの `X-Request-ID` と照合できる。Cloudflare Observabilityを専用Workerで有効にした。
+The public API returned 200 for registration preparation from two different addresses. Automated tests found an old allowed-address comparison in post-registration verification. Preparation, events, and transaction verification were aligned to the same permission rule. After registration, the actual owner is also compared with the transaction sender.
 
-ログの確認は `apps/web` で `npx wrangler tail --config wrangler.integration.jsonc --format json`。CloudflareのWorker Logsからも受付IDを照合できる。デモの全員許可カードではWALLET_NOT_ALLOWEDは発生しない。ガス不足は専用文言で案内する。
+Added **Copy error details** to browser failure screens. It copies up to 20 events containing the code, request ID, card ID, connected address, chain, transaction hash, and timestamp. If Clipboard is unavailable, text appears on screen. The server now logs 4xx responses as structured records, matched by response `X-Request-ID`. Cloudflare Observability was enabled on the dedicated Worker.
 
-## 最終検証
+To inspect logs, run `npx wrangler tail --config wrangler.integration.jsonc --format json` in `apps/web`. Request IDs can also be matched in Cloudflare Worker Logs. Unrestricted demo cards do not produce WALLET_NOT_ALLOWED. Insufficient gas has dedicated guidance.
 
-専用Worker version `c8456faa-b0d6-4e7b-a9c4-9d0862d8610b` を公開。以前の手動カード許可先とは別の試験アドレス `0xf12904Ef7aBfD79b68dcCdc7b30cFDE2D6BEeeb8` で `demo-open-check-2` を実登録した。取引 `0xf0b1133e12c01606a52783eb64179d8a2529f8fcd088f43ebd9f8cb3dc2b2362` がconfirmedになり、送信は1回、再読込・第三者の別ブラウザ表示も成功した。実スマホMetaMaskの操作とは区別する。
+## Final verification
 
-[実登録結果](assets/open-registration-2026-09-26/chain-results.json)、[公開API検証](assets/open-registration-2026-09-26/api-verification.json)、[未登録カード3枚とエラー受付ID](assets/open-registration-2026-09-26/manual-cards.json)、[画面試験](assets/open-registration-2026-09-26/browser-results.json)を保存した。API70件・UI43件・コントラクトとCLI17件、型検査、OpenSpec strict、秘匿情報検査が成功。Chromium/WebKitの320・390・1365pxで診断コピーとエラー表示を確認した。
+Published dedicated Worker version `c8456faa-b0d6-4e7b-a9c4-9d0862d8610b`. Registered `demo-open-check-2` with test address `0xf12904Ef7aBfD79b68dcCdc7b30cFDE2D6BEeeb8`, different from the previous manual card's allowed address. Transaction `0xf0b1133e12c01606a52783eb64179d8a2529f8fcd088f43ebd9f8cb3dc2b2362` became confirmed after one submission. Reload and viewing in a separate third-party browser succeeded. This is distinct from physical-phone MetaMask operation.
 
-## 残高0ウォレットの登録準備エラー
+Saved [real registration results](assets/open-registration-2026-09-26/chain-results.json), [public API verification](assets/open-registration-2026-09-26/api-verification.json), [three unregistered cards and error request IDs](assets/open-registration-2026-09-26/manual-cards.json), and [screen tests](assets/open-registration-2026-09-26/browser-results.json). Passed 70 API tests, 43 UI tests, 17 contract/CLI tests, type checks, OpenSpec strict validation, and secret checks. Verified diagnostic copy and errors at 320, 390, and 1365px in Chromium/WebKit.
 
-ユーザーの受付ID `8a68ed80-3b6b-46f3-9c00-12a50dfb6952` の報告を受け、接続アドレス `0xc22d961e56b70a73f6dcb1ec0a47b7da1fe38fdd` の残高0と、MultiBaasのHTTP400 `insufficient funds for transfer` を再現した。旧APIは全ての上流400を503へ変換していた。registerの当該応答だけを422 `INSUFFICIENT_FUNDS` へ変換し、その他の400は上流障害として扱う。OpenAPI・生成validatorも更新した。
+## Registration preparation for a zero-balance wallet
 
-[再現結果](assets/gas-diagnostics-2026-09-26/upstream-reproduction.json)、[画面試験](assets/gas-diagnostics-2026-09-26/browser-results.json)、[320pxの案内](assets/gas-diagnostics-2026-09-26/320-insufficient-funds.png)を保存した。残高不足の準備段階ではウォレットへの送信要求を出さず、取引も作らない。補充後は登録内容へ戻って再試行できる。API71件・UI43件、Chromium/WebKitと型検査・ビルドに成功。
+Following the user's request-ID report `8a68ed80-3b6b-46f3-9c00-12a50dfb6952`, reproduced a zero balance at connected address `0xc22d961e56b70a73f6dcb1ec0a47b7da1fe38fdd` and MultiBaas HTTP 400 `insufficient funds for transfer`. The old API converted all upstream 400 responses to 503. Now only this register response becomes 422 `INSUFFICIENT_FUNDS`. Other 400 responses remain upstream failures. Updated OpenAPI and generated validators.
 
-補充はMultiBaas管理画面の Blockchain → Faucet で対象の接続アドレスに Request 1 ETH を実行する。ETHはCurvegrid Testnet用であり、別チェーンの残高は使えない。今回の原因確認ではユーザーアドレスへの送金や所有者登録は行っていない。
+Saved [reproduction results](assets/gas-diagnostics-2026-09-26/upstream-reproduction.json), [screen tests](assets/gas-diagnostics-2026-09-26/browser-results.json), and [320px guidance](assets/gas-diagnostics-2026-09-26/320-insufficient-funds.png). Insufficient balance during preparation makes no wallet submission request and creates no transaction. After funding, users can return to registration details and retry. Passed 71 API tests, 43 UI tests, Chromium/WebKit checks, type checks, and builds.
 
-修正版Workerは `f129bacf-35e0-47a4-9c0c-9478aed0bf6a`。[公開APIの422応答](assets/gas-diagnostics-2026-09-26/public-api-result.json)を同じ残高0アドレスで確認した。
+Fund the connected address through **Blockchain → Faucet → Request 1 ETH** in the MultiBaas dashboard. This ETH is for Curvegrid Testnet. A balance on another chain cannot be used. This diagnosis did not send funds to the user's address or register an owner.
+
+Fixed Worker version: `f129bacf-35e0-47a4-9c0c-9478aed0bf6a`. Confirmed the [public API's 422 response](assets/gas-diagnostics-2026-09-26/public-api-result.json) for the same zero-balance address.

@@ -1,19 +1,21 @@
-# ソースコードのMITライセンス
+English | [日本語](LICENSE_POLICY.ja.md)
 
-2026-09-26、ユーザーの指示により、本リポジトリのソースコードと付随する技術文書をMITで公開する方針を採用した。従来はルートLICENSEがなく、OwnershipRegistry.solはUNLICENSEDだった。
+# MIT license for source code
 
-- ルートの[LICENSE](../LICENSE)にMIT本文と `Copyright (c) 2026 Shomei-kun QR Proof contributors` を記載。
-- 管理対象のJS・TS・Solidity・Python・CSS・シェルソースにSPDX識別子を付与。shebangを先頭に保つ。既存の著作者表記は削除しない。
-- OpenAPI生成コードも同じ識別子を出力するよう生成元を更新。
-- Next.js管理の `next-env.d.ts` は自動生成のため手修正しない。
-- 3パッケージのpackage.jsonとlockfileのルートメタデータにMITを記載。依存ライブラリのライセンスは変更しない。
-- 提供された画像・ロゴ・カード等、外部資料・会話の引用、既存「証明くん」のコードやブランドは、このライセンス付与に含めない。画像等の提供者は[おじいちゃんコンビニ / asagohann777](https://github.com/asagohann777)。素材の個別許諾は従来どおり別途確認する。
-- ソースライセンス変更は配置済みコントラクトの更新を意味しない。Solidityのメタデータは再コンパイルで変わり得るが、既存の配置・証跡は書き換えない。
+On 2026-09-26, the user chose MIT for this repository's source code and accompanying technical documentation. Previously there was no root LICENSE, and OwnershipRegistry.sol was UNLICENSED.
 
-MIT本文の出典: https://opensource.org/license/mit 。2026-09-26確認。
+- The root [LICENSE](../LICENSE) contains the MIT text and `Copyright (c) 2026 Shomei-kun QR Proof contributors`.
+- Add SPDX identifiers to tracked JS, TS, Solidity, Python, CSS, and shell sources. Keep shebangs first and retain existing author notices.
+- Update the OpenAPI generator to emit the same identifier.
+- Do not manually edit Next.js-generated `next-env.d.ts`.
+- Set MIT in the three package.json files and root lockfile metadata. Dependency licenses remain unchanged.
+- This grant excludes supplied images, logos, cards, external materials and conversation quotations, and the existing Shomei-kun code and brand. Image materials were provided by [Ojii-chan Convenience Store / asagohann777](https://github.com/asagohann777). Permissions for individual assets still require separate confirmation.
+- A source-license change does not update a deployed contract. Recompilation may change Solidity metadata, but does not rewrite existing deployments or evidence.
 
-人間がMITの採用とREADME文言の変更を指定し、CodexがLICENSE、識別子、パッケージ情報と記録を整備した。今回の作業と大会期間との対応は未確認。
+MIT text source: https://opensource.org/license/mit . Checked on 2026-09-26.
 
-## 検証結果
+The human selected MIT and the README wording changes. Codex prepared the LICENSE, identifiers, package metadata, and records. The relationship of this work to the hackathon period is unconfirmed.
 
-76ファイルの識別子と、生成ヘッダー以外の処理本体が変更されていないことを照合した。3パッケージの依存関係は変更なし。OpenAPI生成物の整合性検査が成功。Solidityのコンパイルが成功し、ABI・作成時コード・実行時コードは不変、末尾のメタデータのみ更新されたことを確認して `contracts/abi/OwnershipRegistry.json` を再生成した。生成物の再照合も成功。デプロイは行っていない。
+## Verification results
+
+Checked identifiers in 76 files and confirmed that processing logic was unchanged except for generated headers. Dependencies in all three packages were unchanged. OpenAPI generated-output consistency checks passed. Solidity compilation passed. The ABI, creation code, and runtime code were unchanged except for trailing metadata, then `contracts/abi/OwnershipRegistry.json` was regenerated. Regenerated-output comparison passed. No deployment was performed.

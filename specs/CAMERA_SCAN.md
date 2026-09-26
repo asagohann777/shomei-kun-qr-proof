@@ -1,29 +1,31 @@
-# カメラ読取り
+English | [日本語](CAMERA_SCAN.ja.md)
 
-## 設定と受付形式
+# Camera scanning
 
-`UI_CAMERA_MODE=mock|live` をビルド時に指定する。既定は `mock`。不正値はビルドエラー。API・ウォレットとは独立して設定できる。integrationビルドもこの公開設定を渡す。画像・動画は端末内だけで解析し、アップロードしない。
+## Configuration and accepted formats
 
-実モードは背面カメラを優先して起動し、QRを自動で読む。模擬読取りボタンは出さない。カメラを許可しない場合も「写真から」で読める。ライトは起動後に対応を確認して表示する。読取りエラー、権限拒否や端末なしの場合は案内と再試行を出し、モックの成功に置き換えない。
+Set `UI_CAMERA_MODE=mock|live` at build time. The default is `mock`. Invalid values fail the build. Configure it independently of API and wallet modes. Integration builds pass this public setting too. Images and video are analyzed only on the device and are never uploaded.
 
-受け付ける内容は次のとおり。
+Live mode prefers the rear camera and automatically reads QR codes. It has no simulated-read button. **From photo** works without camera permission. Check torch support after startup before showing the control. Decode failures, denied permission, and missing devices show guidance and retry. Never replace them with mock success.
 
-- `UI_PUBLIC_URL` と同じorigin・pathで、パラメータが `cardId` 一つだけのURL。
-- 設定された `UI_API_BASE_URL` の `/api/v1/cards/{id}`。追加パラメータなし。
-- APIモック時のみ、公開UIの `?scenario=registered` を既存サンプルとして扱う。
+Accepted content:
 
-IDは既存APIの `[A-Za-z0-9_-]{1,64}`。ID単体、外部URL、重複パラメータ、認証情報・フラグメント付きURLは受け付けない。読み取ったURLへ遷移せず、IDを現在のアプリで開く。APIモックではそのIDの未登録カードを表示し、表示IDとカードQRを揃える。これは所有・登録の実証ではない。API実接続では既存カード照会へIDを渡す。API・コントラクトの変更はない。
+- A URL with the same origin/path as `UI_PUBLIC_URL` and exactly one `cardId` parameter.
+- `/api/v1/cards/{id}` on the configured `UI_API_BASE_URL`, without extra parameters.
+- Only in mock API mode, the public UI's `?scenario=registered` represents the existing sample.
 
-## ライフサイクル
+IDs use the existing API's `[A-Za-z0-9_-]{1,64}` format. Reject bare IDs, external URLs, duplicate parameters, and URLs containing credentials or fragments. Open the ID in the current app without navigating to the scanned URL. Mock API mode shows an unregistered card for that ID and keeps the displayed ID and card QR consistent. This is not evidence of ownership or registration. Live API mode passes the ID to existing card lookup. No API or contract changes are involved.
 
-カメラを停止・起動中・読取り中・写真解析中・一時停止・エラーで管理する。セッション番号と読取り確定フラグで古い応答と二重遷移を防ぐ。画面離脱・読取り成功・ページ非表示でトラックを直ちに停止し、デコーダーを終了する。ページ復帰後は明示的な再開を待つ。写真選択キャンセルはエラーにせず、非表示になって停止した場合は再開ボタンを表示する。
+## Lifecycle
 
-一つの起動セッション内では、言語切替や状態表示の更新でも動画要素を保持する。再起動は新しい動画要素を使い、旧セッションの遅延停止や権限応答が新しいストリームに触れないようにする。遅れて到着した権限許可のストリームも `qr-scanner` の停止済みチェックで閉じる。
+Manage camera states as stopped, starting, scanning, photo decoding, paused, and error. A session number and accepted-read flag prevent stale responses and double navigation. Immediately stop tracks and destroy the decoder on screen exit, successful reading, or page hiding. Wait for explicit resume after the page returns. Canceling photo selection is not an error. If hiding the page stopped the camera, show a resume button.
 
-`qr-scanner` 1.4.2を固定し、workerは同一配信元にバンドルする。実モードのみ `camera=(self)`、画像・動画・workerのblobを許可する。外部CDNや `unsafe-inline` は追加しない。
+Within one startup session, retain the video element through language switches and status updates. A restart uses a new video element so delayed stops or permission responses from the old session cannot affect the new stream. `qr-scanner` also closes late permission-granted streams after its stopped-state check.
 
-## 検証手順
+Pin `qr-scanner` to 1.4.2 and bundle the worker on the same origin. Allow `camera=(self)` and image/video/worker blobs only in live mode. Add no external CDN or `unsafe-inline`.
 
-`prototypes/mobile-ui` で `npm test` と `npm run verify:camera` を実行する。URL受付、動画・写真のデコード、二重検出、停止・再起動、言語切替、モックの権限要求ゼロを確認する。動画試験にはFFmpegを使う。
+## Verification
 
-公開integrationは `node scripts/verify-camera-public.mjs` で確認する。API応答を試験用に置換し、動画・写真のQRからカードIDがAPIへ渡ることを検証する。試験結果は [INTEGRATION_CAMERA_PLAN.md](INTEGRATION_CAMERA_PLAN.md) と [変更記録](HACKATHON_CHANGES.md) に保存する。
+In `prototypes/mobile-ui`, run `npm test` and `npm run verify:camera`. Check accepted URLs, video/photo decoding, duplicate detection, stop/restart, language changes, and zero permission requests in mock mode. Video tests use FFmpeg.
+
+Check the public integration with `node scripts/verify-camera-public.mjs`. Tests replace API responses and verify that video/photo QR decoding sends the card ID to the API. Results are recorded in [INTEGRATION_CAMERA_PLAN.md](INTEGRATION_CAMERA_PLAN.md) and the [change log](HACKATHON_CHANGES.md).

@@ -1,48 +1,50 @@
-# iPhone・iPadはMetaMask内で登録する
+English | [日本語](APPLE_METAMASK_BROWSER_PLAN.ja.md)
 
-2026-09-26。SafariからMetaMaskへ移動してもホーム画面だけが表示され、接続が `REQUEST_EXPIRED` で失敗するとの報告を受けた。ログでは接続アドレス・チェーンは未取得で、ネットワーク追加には進んでいない。アプリ側で接続要求が処理されない原因は未特定。ユーザーはMetaMask内ブラウザへの移動を提案し、iPadも同じ対応を依頼した。
+# Register inside MetaMask on iPhone and iPad
 
-## 決定
+2026-09-26. The user reported that switching from Safari to MetaMask showed only the home screen and failed with `REQUEST_EXPIRED`. Logs had no connected address or chain and had not reached network addition. The cause of the app not handling the connection request is unidentified. The user proposed MetaMask's browser and requested the same behavior on iPad.
 
-実接続モードのiPhone/iPad外部ブラウザでは、未登録カードの確認画面に「MetaMaskで開く」を表示する。MetaMask公式の `https://link.metamask.io/dapp/{url}` を通常のリンクとして開き、同じ公開URLとカードIDを渡す。接続要求を外部ブラウザから開始しない。ニックネームは移動後に入力する。保存済みの接続下書きからSDKを自動再開しない。
+## Decision
 
-iPadはiPadのUser-Agentに加え、MacintoshのUser-Agentと複数タッチ点で判定する。MetaMask providerがある場合はアプリ内として扱い、再び開く導線を出さず既存の接続・追加・登録を使う。実接続以外のモック・閲覧専用と通常のMacは維持する。登録済みカードの閲覧にアプリ移動を求めない。
+In live mode, show **Open in MetaMask** on the unregistered-card review screen in external iPhone/iPad browsers. Open MetaMask's official `https://link.metamask.io/dapp/{url}` as a regular link with the same public URL and card ID. Do not start a connection request in the external browser. Enter the nickname after switching. Do not automatically resume the SDK from a saved connection draft.
 
-既存の白・淡青・青ボタン、書体、カード、中央レイアウトを維持する。確認画面の次の操作をアプリ移動へ変え、新しい画面を増やさない。MetaMask内では「Safariへ戻る」と案内しない。
+Detect iPad through its User-Agent, or a Macintosh User-Agent with multiple touch points. An available MetaMask provider indicates the in-app browser. Use the existing connection, addition, and registration flow without another app-opening link. Preserve mock/read-only modes and ordinary Mac behavior. Do not require switching apps to view a registered card.
 
-## 検証
+Keep the white, pale-blue, and blue buttons, typeface, card, and centered layout. Change the review screen's next action to opening the app, without adding a screen. Do not instruct users inside MetaMask to return to Safari.
 
-単体テストでiPhone/iPad/デスクトップ表示のiPad、通常Mac、MetaMask provider、モック・閲覧専用を確認。Chromium/WebKitで日英320/390/1365pxとiPad 820pxを描画し、アプリ移動リンクのカードID、SDK未起動、MetaMask providerでの接続を確認する。実アプリへの移動は自動試験では止めるため、実機でのリンク処理・承認完了は未確認。
+## Verification
 
-## 参照
+Unit-test iPhone, iPad, desktop-mode iPad, ordinary Mac, MetaMask provider, mock, and read-only cases. Render Japanese/English at 320/390/1365px and iPad 820px in Chromium/WebKit. Check the card ID in the app link, no SDK startup, and connection through a MetaMask provider. Automated tests stop before launching the real app, so physical-device link handling and completed approval remain unverified.
 
-[MetaMaskの公式対応環境とdappリンク](https://docs.metamask.io/metamask-connect/supported-platforms/)を確認した。外部ブラウザとアプリ内ブラウザは別の保存領域なので、ニックネームや接続セッションをURLへ含めない。
+## References
 
-## 実装・公開結果
+Reviewed [MetaMask's supported platforms and dapp links](https://docs.metamask.io/metamask-connect/supported-platforms/). External and in-app browsers have separate storage, so nicknames and connection sessions must not appear in URLs.
 
-単体76件成功。Chromium/WebKitでiPhoneとデスクトップ表示のiPadを模擬し、同じカードへのリンク、保存済みSDK接続を再開しないこと、MetaMask providerでは接続へ進むことを確認。日英320/390/1365pxとiPad 820pxを描画し、画像・横はみ出し・操作位置を確認した。アプリのコンソールエラー0件。WebKit撮影中の一時的なstylesheet CSP警告のみ既存試験と同じ扱いで除外した。[試験結果](assets/apple-metamask-browser/results.json)。
+## Implementation and publication results
 
-integration Worker version `77d732e4-0ad2-424c-88ad-bd6466962351` に反映。公開JS/CSS/HTML24件がビルドと一致。実カメラとモックの切替は維持した。
+All 76 unit tests passed. Chromium/WebKit simulated iPhone and desktop-mode iPad, verified links to the same card, no saved SDK-session resume, and connection when a MetaMask provider exists. Rendered Japanese/English at 320/390/1365px and iPad 820px, checking images, overflow, and action positions. There were zero app console errors. Only temporary stylesheet CSP warnings during WebKit capture were excluded, consistently with existing tests. [Test results](assets/apple-metamask-browser/results.json).
 
-公開URLでも両ブラウザの同じ試験が成功した。[公開試験結果](assets/apple-metamask-browser/public-results.json)。アプリへのリンク移動は直前で抑止し、実機検証とは区別した。
+Published integration Worker version `77d732e4-0ad2-424c-88ad-bd6466962351`. All 24 public JS/CSS/HTML assets matched the build. Live/mock camera switching was preserved.
 
-## 実機報告を受けた再調査
+The same checks passed on the public URL in both browsers. [Public results](assets/apple-metamask-browser/public-results.json). App-link navigation was stopped immediately before launch and is distinct from physical-device verification.
 
-ユーザーから、アプリは開くがブラウザは開かないと再報告があった。前提「正しいHTTPSリンクを生成できれば、アプリ側も行き先を処理する」は実機では成立していない。確認範囲を分ける。
+## Reinvestigation after a device report
 
-| 段階 | 確認できたこと | 未確認・失敗 |
+The user again reported that the app opened without its browser. The assumption that a correctly generated HTTPS link would make the app handle the destination did not hold on the device. Separate the verification stages.
+
+| Stage | Confirmed | Unverified or failed |
 | --- | --- | --- |
-| アプリのWeb UI | iPhone/iPad判定とカードID付きリンクの生成 | なし |
-| SafariからOSへの移動 | ユーザー実機でMetaMask起動 | アプリへ届いたURL全体は取得できない |
-| MetaMaskのリンク処理 | 公式ソースはdappをブラウザへ渡す | ユーザー実機はホーム画面で停止 |
-| 自動ブラウザ試験 | hrefとクリックを検証 | 実アプリ起動前で抑止しており、この失敗を検出できない |
+| App web UI | iPhone/iPad detection and card-ID link generation | None |
+| Safari-to-OS handoff | MetaMask launched on the user's device | Full URL delivered to the app cannot be inspected |
+| MetaMask link handling | Official source passes dapps to its browser | User's device stopped on the home screen |
+| Automated browser test | href and click verified | Stops before real app launch, so cannot detect this failure |
 
-MetaMask公式の `parseDeeplink.ts` は `metamask://` を `https://link.metamask.io/` に正規化し、`handleDappUrl.ts` がブラウザへ対象URLを渡す。この直接スキームを使う形へ変更する。ただし、アプリ内で止まる原因の特定・解消を断定しない。開かなかった場合は同じカードのHTTPS URLをコピーしてアプリ内ブラウザへ貼り付けられるようにする。コピーAPIが失敗しても読取り専用欄から手動コピーできる。
+MetaMask's official `parseDeeplink.ts` normalizes `metamask://` to `https://link.metamask.io/`, and `handleDappUrl.ts` passes the URL to the browser. Switch to this direct scheme. Do not claim the internal app cause has been identified or fixed. If opening fails, provide the same card's HTTPS URL for copying into the in-app browser. If Clipboard fails, retain a read-only field for manual copying.
 
-参照: [公式リンク解析](https://github.com/MetaMask/metamask-mobile/blob/main/app/core/DeeplinkManager/utils/parseDeeplink.ts)、[公式dapp処理](https://github.com/MetaMask/metamask-mobile/blob/main/app/core/DeeplinkManager/handlers/intent/handleDappUrl.ts)。
+References: [official link parsing](https://github.com/MetaMask/metamask-mobile/blob/main/app/core/DeeplinkManager/utils/parseDeeplink.ts), [official dapp handling](https://github.com/MetaMask/metamask-mobile/blob/main/app/core/DeeplinkManager/handlers/intent/handleDappUrl.ts).
 
-直接スキーム版をversion `f356b57a-c981-4ce6-975d-9d5e0d4f7a21` へ公開。単体76件成功、Chromium/WebKitで直接リンクのクリック、カードURLコピー、iPad判定、アプリ内接続を確認した。公開資産24件がビルドと一致。[直接リンク版の結果](assets/apple-metamask-browser/direct-link-results.json)。実機のブラウザ起動成功は未確認。
+Published the direct-scheme version as `f356b57a-c981-4ce6-975d-9d5e0d4f7a21`. All 76 unit tests passed. Chromium/WebKit verified direct-link clicks, card URL copying, iPad detection, and in-app connection. All 24 public assets matched the build. [Direct-link results](assets/apple-metamask-browser/direct-link-results.json). Physical-device browser launch remained unverified.
 
-## ユーザー実機での確認
+## User device confirmation
 
-直接リンク版の公開後、ユーザーから「開いたわ」と報告があり、MetaMask内ブラウザが開いたことを確認した。端末種別はこの報告では未指定。iPhone・iPad両方の実機成功や、登録完了までを確認したとは扱わない。
+After publication, the user reported that it opened, confirming MetaMask's browser launch. The device type was not specified. This does not establish success on both iPhone and iPad or completion of registration.

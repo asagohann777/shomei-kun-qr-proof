@@ -1,47 +1,49 @@
-# Curvegrid連携の実装・検証記録
+English | [日本語](CURVEGRID_INTEGRATION_IMPLEMENTATION.ja.md)
 
-2026-09-26 JST。詳細設計 `453387e` の承認後、最新UIを含む `main` の `cdb1ffe` へリベースし、PR #1で実装した。元のUI作業場所と `prototypes/mobile-ui` は変更していない。
+# Curvegrid implementation and verification record
 
-## 実装した機能
+2026-09-26 JST. After approval of detailed design `453387e`, rebased onto main `cdb1ffe`, including the latest UI, and implemented in PR #1. The original UI workspace and `prototypes/mobile-ui` were unchanged.
 
-- `contracts/src/OwnershipRegistry.sol`: 発行者固定、カードIDと許可先の発行、一度限りの本人登録、照会・イベント。
-- `contracts/cli`: 配置、発行、照会、再開。ローカル署名、送信前の0600 state保存、同一取引の明示的な再送。
-- `apps/web/src/backend`: MultiBaas live Gateway、配置設定、未署名calldataと取引・receipt・イベント・正規ブロックの照合。
-- API: 既存3パスを維持し、`GET /api/v1/connection` とCORSを追加。liveの自由入力、設定不足、認証拒否、タイムアウトを区別する。
-- `wrangler.integration.jsonc`: `shomei-kun-integration` 専用構成。既存mock構成と別に選択する。
+## Implemented functions
 
-Solidityから生成するABIをCLIとAPIで共有する。OpenAPIから公開型とWorkers用validatorを生成する。試験用の設定ファイルを使い、ローカルlive診断試験に実環境の認証情報が混入しないようにした。
+- `contracts/src/OwnershipRegistry.sol`: fixed issuer, card-ID/allowed-wallet issuance, one-time registration by the permitted wallet, queries, and events.
+- `contracts/cli`: deployment, issuance, queries, and resume. Local signing, saving state with mode 0600 before submission, and explicit resend of the same transaction.
+- `apps/web/src/backend`: live MultiBaas Gateway, deployment settings, unsigned-calldata validation, and transaction/receipt/event/canonical-block verification.
+- API: retained the existing three paths and added `GET /api/v1/connection` and CORS. Distinguishes live free input, missing configuration, authentication rejection, and timeout.
+- `wrangler.integration.jsonc`: dedicated `shomei-kun-integration` configuration selected separately from the existing mock.
 
-## 検証結果
+Share the Solidity-generated ABI between CLI and API. Generate public types and Workers validators from OpenAPI. Test-specific configuration keeps real credentials out of local live-diagnostic tests.
 
-Node.js 22.23.1で実行。再実行するコマンドは [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md) と [CLI手順](../contracts/README.md) に記載した。
+## Verification results
 
-| 検証 | 結果 |
+Executed with Node.js 22.23.1. Reproduction commands are in the [runbook](CURVEGRID_INTEGRATION_RUNBOOK.md) and [CLI instructions](../contracts/README.md).
+
+| Check | Result |
 | --- | --- |
-| Web APIのサービス・入力・設定・Gateway | 63件成功 |
-| Next.js HTTP | mock 25件、live診断4件成功 |
-| ローカルCloudflare Workers HTTP | mock 25件、live診断4件成功 |
-| Solidity・CLIのローカルEVMとMultiBaas形式の試験 | 15件成功。実CLIの端末操作3件を含む |
-| 型検証 | Web API・CLIとも成功 |
-| ABI再生成一致 | 成功 |
-| OpenAPI | 4操作、応答例55件、既存mock 19シナリオ、不正入力10件の検証に成功 |
-| Next.js / OpenNext専用構成のビルド | 成功 |
-| OpenSpec strict検証 | 成功 |
+| Web API service/input/configuration/Gateway | 63 passed |
+| Next.js HTTP | 25 mock and 4 live-diagnostic tests passed |
+| Local Cloudflare Workers HTTP | 25 mock and 4 live-diagnostic tests passed |
+| Solidity/CLI local EVM and MultiBaas-format tests | 15 passed, including 3 actual CLI terminal tests |
+| Type checks | Web API and CLI passed |
+| Regenerated ABI match | Passed |
+| OpenAPI | Validated 4 operations, 55 response examples, 19 existing mock scenarios, and 10 invalid inputs |
+| Next.js / dedicated OpenNext build | Passed |
+| OpenSpec strict validation | Passed |
 
-CLI端末試験では、その場で作成した暗号化テストキーストアとローカルEVMを使用した。配置後のリンク失敗からresumeし、再配置せずに発行・照会まで実行した。パスワード入力前にraw modeと入力リスナーを設定するよう修正し、入力内容が端末出力に残らないことを試験した。
+CLI terminal tests used a newly generated encrypted test keystore and local EVM. Resumed after a post-deployment linking failure, then issued and queried without redeployment. Fixed raw mode and input-listener setup before password entry, and tested that input did not appear in terminal output.
 
-制限環境ではNext.jsの子プロセス出力を取得できず、TypeScript設定読取りに失敗した。通常権限のローカル実行でビルドし直した。HTTP試験の型推論エラーは明示的なResponse型で修正した。外部デプロイは行っていない。
+The restricted environment could not capture Next.js child-process output and failed to read TypeScript configuration. Rebuilt locally with normal permissions. Fixed HTTP-test type inference with an explicit Response type. No external deployment was performed.
 
-MultiBaasのAPI形式は公式SDK資料を参照し、合成応答でテストした。実環境で取得したfixtureではない。ライブの公開RPC・APIキー・権限・同期状態・スマホ署名は未検証である。
+MultiBaas API formats were taken from official SDK documentation and tested with synthetic responses, not fixtures from a real environment. Live public RPC, API keys, permissions, synchronization, and phone signing remain unverified.
 
-## 依存と残る確認
+## Dependencies and remaining checks
 
-Web APIのnpm監査は0件。CLIの実行時依存も0件。Hardhatなどの開発依存には18件の監査指摘が残る。内訳はhigh 5、moderate 2、low 11。互換範囲の修正版を適用し、追加のmajor更新は行っていない。公開WorkerにHardhatを含めない。
+Web API npm audit had zero findings, as did CLI runtime dependencies. Hardhat and other development dependencies retain 18 findings: 5 high, 2 moderate, and 11 low. Applied compatible fixes without additional major upgrades. Hardhat is excluded from the public Worker.
 
-実際のMultiBaas接続、コントラクト配置、専用URLへの公開、スマホのMetaMask復帰・別端末確認は未実施。[OpenSpec tasks](../openspec/changes/curvegrid-testnet-integration/tasks.md) 6章に残している。公開チェーンで独立に照合するA07は達成扱いにしない。
+Actual MultiBaas connectivity, contract deployment, dedicated URL publication, phone MetaMask return, and another-device verification were not performed. They remain in section 6 of [OpenSpec tasks](../openspec/changes/curvegrid-testnet-integration/tasks.md). Do not mark A07, independent verification on a public chain, complete.
 
-## AIと人間の担当
+## Human and AI roles
 
-ユーザーが仕様・担当分担を決め、詳細設計を承認し、最新UIへのリベースを指示した。CodexがAPI・コントラクト・CLI・試験・設定・生成物・手順書を作成した。コントラクト/CLIとGatewayを別エージェントが担当し、親エージェントがHTTP/OpenAPI/統合/変更記録を担当した。親側でもコントラクト試験を再実行した。別の読取り専用レビューで試験環境への設定混入を見つけ、試験用envで分離した。
+The user selected requirements and responsibilities, approved the detailed design, and requested the rebase onto the latest UI. Codex created the API, contract, CLI, tests, configuration, generated files, and instructions. Separate agents handled contract/CLI and Gateway work. The parent handled HTTP/OpenAPI/integration/change records and reran contract tests. An independent read-only review found real configuration leaking into tests, which was isolated through a test environment file.
 
-大会期間との対応は未確認。既存「証明くん」のコード・利用者データは変更していない。
+The relationship of this work to the hackathon period is unconfirmed. Existing Shomei-kun code and user data were unchanged.

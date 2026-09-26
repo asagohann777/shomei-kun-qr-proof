@@ -1,8 +1,10 @@
-# 現行仕様の整理
+English | [日本語](SPEC_SYNC_PLAN.ja.md)
 
-2026-09-26。main `ebb6aa7` を基準に、`curvegrid-testnet-integration` の差分をOpenSpecの現行仕様へ同期する。
+# Consolidate the current specifications
 
-- Curvegrid Testnet、全員許可の初回登録、実カメラ、iPhone/iPadのMetaMask内登録、証跡再取得を反映する。
-- 概要・構成・デモ手順を書き直し、古い未確定事項と重複した追記を削る。
-- 設計承認待ちなどの作業手続きは製品要件から外す。過去の計画・試験・既存成果は記録として保存する。
-- 要件と試験シナリオを検証し、リンク切れと差分・現行仕様の一致を確認する。変更のアーカイブとアプリの再デプロイは行わない。
+2026-09-26. Using main `ebb6aa7`, sync the `curvegrid-testnet-integration` deltas into the current OpenSpec specifications.
+
+- Reflect Curvegrid Testnet, unrestricted first registration, the live camera, registration inside MetaMask on iPhone/iPad, and evidence refresh.
+- Rewrite the overview, architecture, and demo instructions. Remove stale open questions and duplicate additions.
+- Remove workflow steps such as awaiting design approval from product requirements. Preserve past plans, tests, and existing-work records.
+- Validate requirements and scenarios. Check broken links and consistency between deltas and current specifications. Do not archive the change or redeploy the app.

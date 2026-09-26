@@ -1,85 +1,87 @@
-# スマホUIモックの採用計画
+English | [日本語](UI_MOCK_PLAN.ja.md)
 
-2026-09-25、ユーザーがチームメンバー「おじいちゃんコンビニ」と相談するためのUIモック作成を依頼し、計画の実装を指示した。選択回答を含む決定内容を手動保存した文書であり、hookによる回答の自動収集ではない。
+# Accepted mobile UI mock plan
 
-## 対象と完成条件
+On 2026-09-25, the user requested a UI mock for discussion with teammate Ojii-chan Convenience Store and instructed implementation. This document manually records decisions, including selected answers. It was not automatically collected by the response hook.
 
-スマホ縦画面専用の操作可能なモックを `prototypes/mobile-ui/` に作る。所有者の情報を主役とし、カードは補助的に表示する。未登録から模擬接続、登録確認、模擬承認、処理、公開確認まで操作できることを完成条件とする。チームで開けるCloudflareの公開プレビューも今回の承認範囲に含む。
+## Scope and completion criteria
 
-MultiBaas API、Amoy、MetaMask、カメラ、発行者CLIは接続しない。実接続版のNext.js・TypeScript構成は [ARCHITECTURE.md](ARCHITECTURE.md) を維持する。既存PoCのデータとコードを変更しない。
+Build an interactive portrait-phone mock in `prototypes/mobile-ui/`. Give owner information priority and show the card as supporting content. Completion requires interaction from unregistered through simulated connection, registration review, simulated approval, processing, and public verification. A public Cloudflare preview for team access is authorized within this scope.
 
-## 画面
+Do not connect MultiBaas API, Amoy, MetaMask, the camera, or issuer CLI. Keep the live version's Next.js/TypeScript architecture in [ARCHITECTURE.md](ARCHITECTURE.md). Do not change existing PoC data or code.
 
-| 画面 | モックでの操作 |
+## Screens
+
+| Screen | Mock actions |
 | --- | --- |
-| QRスキャン | 最初は「QRコードをスキャン」ボタンを表示する。押すと模擬カメラに進み、「サンプルを読み取る」でカード確認へ進む。実カメラは起動しない |
-| カード確認・公開確認 | 登録所有者、カード画像、カードID、状態。未登録時に登録導線、登録済み時に根拠の詳細を表示する |
-| 所有者登録 | ニックネーム、模擬ウォレット接続、公開情報の説明と同意。別ウォレット・別チェーンを修正できる |
-| 登録処理 | 承認待ち、送信済み、確認中、成功、拒否、失敗、確認不能。承認の模擬操作を同じ画面内に設ける |
+| QR scan | Initially show **Scan QR code**. Press it to enter a simulated camera, then **Read sample** to open the card. Do not start the real camera |
+| Card/public verification | Registered owner, card image, ID, and state. Show registration entry when unregistered and evidence details when registered |
+| Owner registration | Nickname, simulated wallet connection, publication explanation, and consent. Allow correction of wrong-wallet/wrong-chain states |
+| Registration progress | Awaiting approval, submitted, checking, success, rejected, failed, and unverifiable. Keep simulated approval actions on the same screen |
 
-接続説明、登録の根拠、相談用の状態選択はボトムシートで表示する。発行者画面は追加しない。UIモックの表示と実登録しない旨を各画面の上部に示す。
+Use bottom sheets for connection explanations, evidence, and discussion scenario selection. Add no issuer screen. Show the mock label and absence of real registration at the top of each screen.
 
-## 技術選定
+## Technologies
 
-Tailwind CSS 4とdaisyUI 5を採用する。ボタン、入力、ダイアログ、通知、処理ステップを既存部品で揃え、画面固有の余白や配置だけCSSで調整する。ビルド時にCSSを生成し、外部CDNは使わない。
+Use Tailwind CSS 4 and daisyUI 5 for consistent buttons, inputs, dialogs, notifications, and progress steps. Use custom CSS only for screen-specific spacing/layout. Generate CSS at build time without an external CDN.
 
-モックはHTML・JavaScriptの静的ファイルで構成する。Cloudflare WorkerのStatic Assetsとして独立公開し、UI確認のために本実装のサーバーや認証環境を導入しない。依存の正確なバージョンは [package-lock.json](../prototypes/mobile-ui/package-lock.json) に固定する。
+The mock consists of static HTML/JavaScript. Publish it separately as Cloudflare Worker Static Assets, without introducing the production server or authentication environment for UI review. Pin exact dependencies in [package-lock.json](../prototypes/mobile-ui/package-lock.json).
 
-カード画像とアイコンは今回作成するSVGとする。カード右下のQRは `qrcode` で公開サンプルURLから生成する。秘密情報や入力したニックネームは含めない。
+Create SVG card artwork and icons for this work. Generate the card's lower-right QR with `qrcode` from the public sample URL. Include no secrets or entered nickname.
 
-## 状態と保存
+## State and storage
 
-2案を比較し、1つのコントローラーでシナリオと画面状態を扱う構成を採用した。画面ごとの分散管理を避け、非同期処理には操作IDを付ける。承認拒否は未送信、送信後の確認不能は既存の操作IDを保持する。この区別により、再確認と再送を混同しない。
+Compared two options and chose one controller for scenarios and screen state. Avoid state scattered across screens and assign operation IDs to async work. Approval rejection means unsent. Unknown results after submission retain the existing operation ID, distinguishing rechecks from resends.
 
-- 日本語・英語に対応し、保存済みの言語、ブラウザの優先順、英語の順で決定する。言語設定はlocalStorageに保存する。
-- 模擬入力・進行状態はsessionStorageに保存し、同じタブでの再読込に対応する。実際のチェーン記録や端末間共有とは扱わない。
-- 登録の模擬送信後は約0.9秒で確認中、約2.4秒で成功に進む。再読込しても同じ操作を追跡する。実際の確定速度を表すものではない。
-- `?scenario=` で登録済み、未登録、未発行、許可外ウォレット、別チェーン、拒否、失敗、確認不能、根拠取得中、情報取得不能を直接開く。
-- URLで共有するのはサンプル状態だけとし、入力したニックネームは送らない。同じタブで再び開いた場合はそのタブの操作状態を復元する。初期状態に戻すには「表示を変更」から選び直す。
-- 実取引のように見える外部リンクは置かず、コントラクト未配置・模擬取引と明示する。
+- Support Japanese/English. Choose the saved language, then browser preference order, then English. Save the language in localStorage.
+- Save simulated input/progress in sessionStorage for reload within the same tab. Do not treat it as an actual chain record or cross-device sharing.
+- After simulated submission, move to checking at about 0.9 seconds and success at about 2.4 seconds. Track the same operation after reload. These timings do not represent real confirmation speed.
+- Use `?scenario=` to open registered, unregistered, unissued, unauthorized wallet, wrong chain, rejected, failed, unknown result, evidence pending, or information unavailable states directly.
+- URLs share sample states only, never entered nicknames. Reopening in the same tab restores that tab's progress. Reselect through **Change view** to reset.
+- Add no external links resembling actual transactions. Explicitly state that the contract is undeployed and transactions are simulated.
 
-## 検証とレビュー
+## Verification and review
 
-320・390・430pxの縦画面と、PCでスマホ幅が維持される状態を撮影する。ChromiumとWebKitで操作し、横はみ出し、画像欠落、コンソールエラー、下部操作の重なりを確認する。日英表示、再読込、登録導線、エラー復帰、同じ模擬取引の再確認を検証する。
+Capture portrait layouts at 320/390/430px and the retained phone-width layout on PC. Use Chromium and WebKit to check overflow, missing images, console errors, and overlapping bottom actions. Verify Japanese/English, reload, registration entry, error recovery, and rechecking the same simulated transaction.
 
-検証スクリプトは [verify.mjs](../prototypes/mobile-ui/scripts/verify.mjs)、実測結果と制約は [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md) に保存する。ブラウザエミュレーションの合格を、スマホ実機やF01〜F10の実接続試験の合格に置き換えない。
+Save the verification script as [verify.mjs](../prototypes/mobile-ui/scripts/verify.mjs), with results and limits in [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md). Browser emulation success is not physical-device or F01–F10 live-integration success.
 
-## 入力の出典
+## Input sources
 
-- [UIモック作成依頼](../docs/prompts/2026-09-25/125036-918190-48ca6ede27f84394b07d6186373ac9dc.json)
-- [スマホのみの指定](../docs/prompts/2026-09-25/125119-330106-4c7a94f195a54dc0a24ccff0186b35ee.json)
-- [QRスキャン画面への指摘](../docs/prompts/2026-09-25/125732-642145-82127e9814aa4e14af0f7d4165026777.json)
-- [CSSフレームワークの指定](../docs/prompts/2026-09-25/130020-061223-9fe219d1b00246e7a8784a7f6e035947.json)
-- [実装指示](../docs/prompts/2026-09-25/130205-446117-8447935530bf484793684183266bc2da.json)
+- [UI mock request](../docs/prompts/2026-09-25/125036-918190-48ca6ede27f84394b07d6186373ac9dc.json)
+- [Phone-only scope](../docs/prompts/2026-09-25/125119-330106-4c7a94f195a54dc0a24ccff0186b35ee.json)
+- [QR scan screen feedback](../docs/prompts/2026-09-25/125732-642145-82127e9814aa4e14af0f7d4165026777.json)
+- [CSS framework instruction](../docs/prompts/2026-09-25/130020-061223-9fe219d1b00246e7a8784a7f6e035947.json)
+- [Implementation instruction](../docs/prompts/2026-09-25/130205-446117-8447935530bf484793684183266bc2da.json)
 
-計画中の選択回答「所有者情報を優先」「QRは模擬読取り」「公開URLで共有」は会話から手動記録した。hookは選択回答やAIの計画本文を収集しない。
+The selected answers prioritizing owner information, simulated QR reading, and sharing a public URL were manually recorded from the conversation. The hook does not collect selected answers or the AI plan body.
 
-## 画面と文言の追加調整
+## Further screen and wording adjustments
 
-2026-09-25の追加指示により、QR画面は入口の「QRコードをスキャン」ボタンから模擬カメラ画面へ進む。実カメラを起動しない選択をユーザーが回答した。画面種別は4つのまま、スキャン画面の状態として切り替える。
+An additional instruction on 2026-09-25 makes **Scan QR code** lead from the entry screen to the simulated camera. The user selected no real camera startup. Keep four screen types, switching within the scan screen's state.
 
-同日のunslop・frontend-design指定では、短い文言と重複注釈の削除を優先する。白 `#ffffff`、紺 `#172b4d`、青 `#2457d6`、薄灰 `#f3f6fa`、緑 `#24734d` を継続する。文字はOS標準とArial・日本語ゴシックの代替指定を使い、見出し・本文・補助の3段階に絞る。
+The same day's unslop/frontend-design request prioritizes short text and removal of duplicate notes. Retain white `#ffffff`, navy `#172b4d`, blue `#2457d6`, light gray `#f3f6fa`, and green `#24734d`. Use OS fonts with Arial/Japanese Gothic fallbacks and only three text levels: heading, body, and supporting text.
 
-入口は説明ボックスを並べる案をやめ、カード画像と1つの操作を見せる。所有者の画面は氏名風の名札ではなく、ニックネームと登録ウォレットを先に表示する。装飾の盾と重複説明を削る。カードと記録の根拠は下にまとめ、左揃えを基準にする。
+Replace entry-screen explanation boxes with a card image and one action. On the owner screen, show nickname and registered wallet first, without a real-name-style badge. Remove the decorative shield and repeated explanations. Group the card and record evidence below and use left alignment.
 
 ```text
-入口                 公開確認
-カードの所有者を確認  現在の登録所有者   登録済み
-                     ニックネーム
-  カード画像          ウォレット
-QRの位置             カード画像 / 証明一郎 / ID
-                     登録の根拠
-[QRコードをスキャン] [別のカードを読み取る]
+Entry                         Public verification
+Check the card owner          Current registered owner  Registered
+                              Nickname
+  Card image                  Wallet
+QR position                   Card image / Shomei Ichiro / ID
+                              Registration evidence
+[Scan QR code]                [Scan another card]
 ```
 
-モック表示、公開前の同意、変更・削除不可、現物の真贋・所持を証明しない説明は残す。同じ説明を各所で繰り返さず、詳細な実装注釈はこの文書へ移す。
+Keep the mock label, consent before publication, no-change/no-deletion notice, and limits on authenticity/physical-possession proof. Avoid repeating the same explanation everywhere. Move detailed implementation notes into this document.
 
-追加指示の出典は [スキャンの順序](../docs/prompts/2026-09-25/133305-362290-1af42c9b40cd45918eead71b975ec28d.json)、[模擬カメラの選択](../docs/prompts/2026-09-25/133405-218861-0eaa93d1c4074fa89b1c3f9e037e3643.json)、[文言・UIの調整](../docs/prompts/2026-09-25/133453-350394-3efe7376916043b88b58fab38eab2445.json)。今回の選択回答はhookのJSONにも保存されている。
+Sources: [scan sequence](../docs/prompts/2026-09-25/133305-362290-1af42c9b40cd45918eead71b975ec28d.json), [simulated-camera selection](../docs/prompts/2026-09-25/133405-218861-0eaa93d1c4074fa89b1c3f9e037e3643.json), [wording/UI adjustments](../docs/prompts/2026-09-25/133453-350394-3efe7376916043b88b58fab38eab2445.json). These additional selected answers are also saved in hook JSON.
 
-## 2026-09-26の図案反映
+## Applying the 2026-09-26 designs
 
-現在のローカルUIは [UI_WIREFRAME_PLAN.md](UI_WIREFRAME_PLAN.md)を優先する。中央カード、登録内容の確認画面、パネル内の操作へ変更した。従来の所有者を先に見せる左揃え構成と固定フッターは初版の記録として残す。この段階では公開URLを更新していない。その後の追加指示で2026-09-26に公開した。
+[UI_WIREFRAME_PLAN.md](UI_WIREFRAME_PLAN.md) takes precedence for the current local UI. It changes to a centered card, a registration-review screen, and actions inside panels. Retain the earlier owner-first, left-aligned layout and fixed footer as the original-plan record. The public URL was not updated at that stage. A later instruction authorized publication on 2026-09-26.
 
-## 2026-09-26: トップページQRのアニメーション
+## 2026-09-26: Home QR animation
 
-ユーザーの指示により、トップページのQRイラストを白い枠ごと4秒周期で等倍から1.035倍へ滑らかに拡大・縮小する。CSSのtransformで周囲の配置を動かさず、動きを減らす設定では停止する。
+At the user's request, smoothly scale the home QR illustration and its white frame between 1 and 1.035 over a four-second cycle. Use CSS transform without moving surrounding layout. Stop for reduced-motion preferences.

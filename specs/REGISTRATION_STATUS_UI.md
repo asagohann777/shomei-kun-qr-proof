@@ -1,71 +1,73 @@
-# 登録と再取得の表示
+English | [日本語](REGISTRATION_STATUS_UI.ja.md)
 
-2026-09-26。対象はスマホ向け実接続 UI。初回登録と登録後の読取りを別の状態として扱う。
+# Registration and refresh display
 
-## 表示計画
+2026-09-26. This change targets the mobile live UI. Treat initial registration and subsequent reads as separate states.
 
-既存の証明一郎カードを主役にする。カード画像・所有者情報・画面タイトルは再取得中も残す。変更は情報パネル内のステータスに限定する。
+## Display plan
 
-色は既存の白 #ffffff、背景 #eaf4ff、本文 #080e48、操作 #0068f5、確認済み #24734d、境界 #dce4ed を使う。書体は既存の Arial / Hiragino Kaku Gothic ProN / Yu Gothic。ステータス本文は既存本文サイズ、見出しのみ太字。カードと画面見出しは中央、所有者情報とステータス本文は左揃え。
+Keep the existing Shomei Ichiro card prominent. Retain its image, owner information, and screen title during refresh. Limit changes to the status within the information panel.
 
+Use existing white #ffffff, background #eaf4ff, text #080e48, action #0068f5, confirmed #24734d, and border #dce4ed. Retain Arial / Hiragino Kaku Gothic ProN / Yu Gothic. Status text uses the existing body size, with only its heading bold. Center the card and screen heading. Left-align owner information and status text.
+
+```text
+       Registration complete
+       Shomei Ichiro card
+┌──────────────────────────────┐
+│ Card ID / Owner / Wallet     │ ← Retained during refresh
+│ ○ Checking                   │ ← Only this area updates
+│   Owner information verified.│
+│                   [Refresh]  │
+│ [Registration details] [Home]│
+└──────────────────────────────┘
 ```
-       登録しました
-       証明一郎カード
-┌──────────────────┐
-│ カードID / 所有者 / ウォレット │ ← 再取得中も維持
-│ ○ 確認中                    │ ← この領域だけ更新
-│   所有者情報は確認済みです。   │
-│                 [再取得]    │
-│ [登録の詳細] [ホーム]        │
-└──────────────────┘
-```
 
-画面全体のローディング案と局所更新案を比較し、ユーザー指定どおり局所更新を採用。新しい装飾や警告パネルは足さない。取引情報の反映待ちは青の中立表示にまとめ、登録失敗と区別する。日本語・英語で同じ意味にする。
+Compared full-screen loading with local updates and chose local updates as requested. Add no decoration or warning panel. Present pending transaction indexing neutrally in blue, distinct from registration failure. Japanese and English must mean the same thing.
 
-## 動作
+## Behavior
 
-- 再取得は GET のみ。登録処理を再開せず、既存表示を消さない。連打を無効化する。
-- 再取得失敗でも取得済みの所有者情報を残す。確認失敗と再試行をステータス内に表示する。
-- 初回送信後は最大60秒、取引結果と所有者情報、外部証跡を確認する。
-- 所有者と取引成功を確認済みで証跡の反映だけ遅れる場合、期限後は登録完了と確認状況を表示する。
-- 取引成功が未確認のまま期限になれば結果未確認とし、再送しない。
-- モック用の API / ウォレット切替は維持する。
+- Refresh uses GET only. Do not restart registration or clear existing content. Disable repeated taps.
+- Keep previously fetched owner information after refresh failure. Show the failure and retry within the status area.
+- After first submission, verify the transaction result, owner information, and evidence for up to 60 seconds.
+- If the owner and transaction success are confirmed but evidence indexing is delayed, show registration completion with the evidence state after the deadline.
+- If transaction success remains unconfirmed at the deadline, show an unknown result without resending.
+- Preserve mock API/wallet switches.
 
-## 検証
+## Verification
 
-コントローラの時計を制御して60秒の境界と反映遅延を検証する。ブラウザで再取得中・失敗時の既存内容保持と局所表示を確認し、320px / 390px / デスクトップの画像、横はみ出し、コンソールを確認する。
+Control the controller clock to test the 60-second boundary and indexing delay. In browsers, verify retained content and local status during refresh/failure. Check 320px, 390px, and desktop images, horizontal overflow, and console output.
 
-## 実装と検証結果
+## Implementation and results
 
-- `prototypes/mobile-ui/src/live-registration.js` に登録とは独立した `refresh` 状態と読取りを追加。再取得はカードID・発行者・コントラクト・所有者を照合し、不一致や通信失敗で既存情報を置き換えない。
-- 初回の確認は送信ハッシュ取得後から60秒。各APIの待機上限も残り時間に合わせる。確認済み取引でも証跡が未反映なら待機を続け、期限後は登録完了と中立の「取引情報の反映待ち」を表示する。取引自体が未確認なら結果未確認を表示する。通信障害は期限内で再照会する。
-- `public/app.js` は再取得中に `#evidence-status` だけを更新する。カード画像と所有者テーブルのDOM保持をブラウザ試験で検証。詳細ダイアログは開く際に最新情報を使う。
-- `public/live-messages.js` と `styles/input.css` で日英の確認表示と局所スピナーを追加。動きを減らす設定では回転しない。
-- UIの `npm test` は48件成功。59秒で待機、60秒で確認済み・未確認をそれぞれ表示する境界、再取得の連打防止、失敗からの復帰、画面遷移後の応答破棄を含む。
-- `scripts/verify-live-ui.mjs` はChromiumとWebKitで成功。初回の証跡待ち、局所更新、日英表示、再取得失敗、詳細更新を確認。320px・390px・1365pxで横はみ出しと固定要素の重なりなし。ブラウザエラーなし。
-- モックの `npm run build` と `npm run verify` も両ブラウザで成功。OpenNextビルド、認証情報埋込み検査、OpenSpec strict検査に成功。
-- 画像を確認し、再取得スピナーを明確な輪に調整した。既存のカード画像、配色、配置を維持した。
+- Added a registration-independent `refresh` state and read operation to `prototypes/mobile-ui/src/live-registration.js`. Refresh checks card ID, issuer, contract, and owner. Mismatches or network failures do not replace existing information.
+- Initial verification lasts 60 seconds from receipt of the submission hash. API timeouts also follow the remaining time. Confirmed transactions continue waiting if evidence is absent. At the deadline, show registration completion with neutral pending-indexing text. Unconfirmed transactions show an unknown result. Retry network failures within the deadline.
+- `public/app.js` updates only `#evidence-status` during refresh. Browser tests verified retained card-image and owner-table DOM. Details dialogs use the latest information when opened.
+- `public/live-messages.js` and `styles/input.css` add Japanese/English status text and a local spinner. Reduced-motion settings disable rotation.
+- All 48 UI `npm test` cases passed, including waiting at 59 seconds, confirmed/unknown outcomes at 60 seconds, repeated-refresh prevention, failure recovery, and stale-response rejection after navigation.
+- `scripts/verify-live-ui.mjs` passed in Chromium and WebKit. Covered initial evidence wait, local updates, Japanese/English text, refresh failure, and updated details. At 320/390/1365px, there was no overflow or fixed-element overlap. No browser errors.
+- Mock `npm run build` and `npm run verify` passed in both browsers. OpenNext build, embedded-credential check, and OpenSpec strict validation passed.
+- Visually reviewed images and changed the refresh spinner to a clear ring. Retained existing card imagery, colors, and layout.
 
-[ブラウザ検証結果](assets/registration-status-2026-09-26/results.json) と同じディレクトリに検証画像を保存。
+Verification images are stored beside the [browser results](assets/registration-status-2026-09-26/results.json).
 
-専用Workerへ2026-09-26に反映。バージョンは `362baa6a-7dd8-4210-a7d1-fb58a523bd73`。署名、APIの公開契約、コントラクトは変更しない。今回の境界・遅延・通信失敗の試験はfixtureで制御し、新しい実登録は行っていない。
+Published to the dedicated Worker on 2026-09-26 as `362baa6a-7dd8-4210-a7d1-fb58a523bd73`. Signing, the public API contract, and the smart contract are unchanged. Boundary, delay, and network-failure tests used controlled fixtures and made no new real registration.
 
-公開URLで `demo-open-check-2` の実API読取りを確認した。配置済みUIでの再取得は証跡待ちfixtureを使い、カードのDOM保持と局所表示を確認した。[公開確認記録](assets/registration-status-2026-09-26/public-check.json)。
+Confirmed real API reads of `demo-open-check-2` at the public URL. Tested deployed UI refresh with an evidence-pending fixture, checking retained card DOM and local status. [Public verification record](assets/registration-status-2026-09-26/public-check.json).
 
-## 登録済みカードの再読込
+## Reloading registered cards
 
-登録履歴の保存されたブラウザでカードを開き直すと、登録中表示へ戻る経路が残っていた。再取得ボタンだけでなく `open` と画面復帰時の `recheck` も修正した。
+A remaining path returned to the registration-progress screen when reopening a card in a browser with saved registration history. Fixed `open` and return-time `recheck` as well as the refresh button.
 
-実APIで登録済みを確認したカードは、保存履歴から登録処理を再開しない。読込み中は「確認しています」、取得後は登録済みカードを表示する。証跡が未反映でも所有者を表示し、必要な再取得はステータス内で行う。未登録カードの送信済み取引は従来どおり照会して二重送信を防ぐ。
+Cards confirmed registered by the real API do not resume registration from saved history. Show checking while loading, then the registered card. Show the owner even while evidence is pending, and refresh within the status area. Submitted transactions for unregistered cards are still queried to prevent duplicate submission.
 
-UIテストは50件成功。登録済みカードの証跡あり・証跡待ちの両方で、保存履歴と画面復帰による取引照会が起きないこと、以前の登録照会の遅い応答が表示を上書きしないことを確認。
+All 50 UI tests passed. For registered cards with both available and pending evidence, verified no transaction query from saved history or page return, and no overwritten display from delayed previous queries.
 
-## 最新UIとの合流
+## Integration with the latest UI
 
-main `e675119` の背景・ロゴ・カード画像を取り込んだ。競合は新しい画像・背景と実API用の動的QR、実接続時の操作制約を両方残して解消した。既定の `UI_API_MODE=mock` と `UI_WALLET_MODE=mock` を維持する。UI改善は `prototypes/mobile-ui` で設定なしの `npm run dev` を使える。実API閲覧専用とMetaMask接続は従来どおり明示設定する。
+Merged main `e675119`'s backgrounds, logo, and card images. Resolved conflicts by retaining new images/backgrounds, dynamic real-API QR codes, and live-operation constraints. Preserved defaults `UI_API_MODE=mock` and `UI_WALLET_MODE=mock`. UI work can use `npm run dev` without settings in `prototypes/mobile-ui`. Live read-only and MetaMask modes still require explicit configuration.
 
-マージ前にGitHub Actionsのworkflowが0件、repository rulesetが0件、mainのbranch protectionが404であることをAPIで確認。Cloudflare Workers Builds APIで `shomei-kun-ui-mock` と `shomei-kun-integration` のbuild triggerがともに空であることを確認した。マージと専用integration Workerへの手動デプロイは別操作。
+Before merging, API checks found zero GitHub Actions workflows, zero repository rulesets, and a 404 for main branch protection. Cloudflare Workers Builds API returned no build triggers for either `shomei-kun-ui-mock` or `shomei-kun-integration`. Merging and manual dedicated-integration deployment are separate actions.
 
-統合後、UIテスト50件、実接続fixtureと既定モックのChromium/WebKit操作試験、OpenNextビルド、秘匿情報検査、OpenSpec strictに成功。320px・390px・1365pxの画像を確認した。専用Workerのversion `d105e655-2dcd-456a-bb18-39dcf05285c1` にデプロイし、実APIの登録済みカードに保存履歴を用意して再読込した。登録中画面の出現と取引の再照会はいずれも0件。新しい登録取引は送っていない。
+After integration, 50 UI tests, live-fixture/default-mock Chromium/WebKit flows, OpenNext build, secret checks, and OpenSpec strict validation passed. Reviewed 320/390/1365px images. Deployed dedicated Worker version `d105e655-2dcd-456a-bb18-39dcf05285c1`, prepared saved history for a real registered card, and reloaded it. Neither registration-progress display nor transaction requery occurred. No new registration transaction was sent.
 
-[統合後のブラウザ結果](assets/registered-read-2026-09-26/results.json)、[モック結果](assets/registered-read-2026-09-26/mock-results.json)、[公開読込み結果](assets/registered-read-2026-09-26/public-check.json)。
+[Integrated browser results](assets/registered-read-2026-09-26/results.json), [mock results](assets/registered-read-2026-09-26/mock-results.json), [public read results](assets/registered-read-2026-09-26/public-check.json).

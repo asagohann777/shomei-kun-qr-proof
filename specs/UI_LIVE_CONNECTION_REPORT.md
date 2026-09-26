@@ -1,40 +1,42 @@
-# 最新UIと実APIの接続結果
+English | [日本語](UI_LIVE_CONNECTION_REPORT.ja.md)
 
-更新: デモの登録許可は全員へ変更した。[最新の記録先・デモカード・検証結果](OPEN_REGISTRATION_DEMO.md)を参照。以下は指定ウォレット方式での過去の実測記録。旧チェーン記録は保存されているが、公開APIの既定記録先は新しいコントラクトである。
+# Latest UI and live API connection results
 
-2026-09-26 JST。PR #1の専用worktreeで、`origin/main` の `3598094` を基準に実装した。終了前にも同じSHAを確認した。既存UIモックのWorkerは更新していない。大会期間との対応は未確認。
+Update: demo registration now allows everyone. See [current registry, demo cards, and results](OPEN_REGISTRATION_DEMO.md). The following is historical evidence from the designated-wallet approach. Old chain records remain, but the public API's default registry is now a new contract.
 
-## 公開先と操作
+2026-09-26 JST. Implemented in PR #1's dedicated worktree, based on origin/main `3598094`. Rechecked the same SHA before completion. The existing UI mock Worker was not updated. The relationship to the hackathon period is unconfirmed.
 
-- [入口](https://shomei-kun-integration.dptr.workers.dev/ui/)
-- [未登録の手動用カード](https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=mobile-ui-20260926-manual)
-- [自動試験用カード](https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=mobile-ui-20260926-001)
+## Public URLs and actions
 
-カード固有URLから所有者を未接続で確認できる。未登録カードでは名前、MetaMask接続、公開内容の確認、登録取引の承認へ進む。最初の入口はスキャンボタンからカメラ画面の模擬へ進み、試験カードを開く。実カメラ撮影は対象外。
+- [Entry](https://shomei-kun-integration.dptr.workers.dev/ui/)
+- [Unregistered manual card](https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=mobile-ui-20260926-manual)
+- [Automated-test card](https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=mobile-ui-20260926-001)
 
-発行者の許可先と接続アドレスが一致した場合だけ登録できる。実登録の確認はAPIで行い、画面タイマーで成功にしない。取引ハッシュはカード・チェーン・記録先・API originと合わせて保存する。復帰・再読込では照会だけを再開する。ハッシュ取得前に応答が不明になった場合は、自動再送せずMetaMaskの履歴からハッシュを確認する。
+A card URL shows its owner without wallet connection. Unregistered cards proceed through nickname, MetaMask connection, review of public information, and transaction approval. The entry scan button opens a simulated camera and then the test card. Real camera capture is out of scope.
 
-## 試験ウォレット
+Registration requires the connected address to match the issuer's allowed address. The API confirms actual registration; no screen timer declares success. Save the transaction hash with card, chain, registry, and API origin. Return/reload resumes queries only. If a response becomes unknown before receiving a hash, check MetaMask history for the hash without automatically resending.
 
-ユーザーの指示で専用ウォレットを新規作成した。[公開情報](assets/curvegrid-connectivity/mobile-ui-wallet.json)にアドレスと公開鍵を保存した。
+## Test wallet
 
-アドレス `0x208Fa3cd72959b2562c898B3b7Fc75C0C6fcA99E`。Curvegrid Testnet、chain ID `2017072401`。発行者ウォレットから試験通貨0.05 ETHを補充した。
+Created a dedicated wallet at the user's request. Its address and public key are in the [public information](assets/curvegrid-connectivity/mobile-ui-wallet.json).
 
-秘密鍵は `/tmp/shomei-kun-curvegrid-integration/contracts/.issuer-state/mobile-ui/wallet.keystore.json` に暗号化して保存。パスワードは同じディレクトリの `password`。ディレクトリ0700・ファイル0600で、どちらもGit管理外。Worker・ブラウザ・提出資料には含めない。実機で同じアドレスを操作するには、ユーザー側のMetaMaskにこの試験アカウントを取り込む必要がある。公開アドレスだけでは署名できない。
+Address `0x208Fa3cd72959b2562c898B3b7Fc75C0C6fcA99E`. Curvegrid Testnet, chain ID `2017072401`. The issuer wallet supplied 0.05 test ETH.
 
-| カード | 用途 | 発行取引 |
+The private key is encrypted at `/tmp/shomei-kun-curvegrid-integration/contracts/.issuer-state/mobile-ui/wallet.keystore.json`. The password is in `password` in the same directory. Directory mode is 0700, files 0600, both outside Git. They are excluded from Workers, browsers, and submission materials. To operate the same address on a device, the user must import this test account into their MetaMask. A public address alone cannot sign.
+
+| Card | Purpose | Issuance transaction |
 | --- | --- | --- |
-| `mobile-ui-20260926-001` | ブラウザからの実取引試験 | `0xd435fd7751f81da80bb26e29f208d2759afab5e5d679b407405773ed5c019c20` |
-| `mobile-ui-20260926-manual` | スマホ手動試験。未登録を維持 | `0xa53a0d295af58b86879e1d1f0a04298233cbfdabaab33d20242ae5c12e8cd85e` |
+| `mobile-ui-20260926-001` | Real transaction test through the browser | `0xd435fd7751f81da80bb26e29f208d2759afab5e5d679b407405773ed5c019c20` |
+| `mobile-ui-20260926-manual` | Manual phone test, kept unregistered | `0xa53a0d295af58b86879e1d1f0a04298233cbfdabaab33d20242ae5c12e8cd85e` |
 
-## 再現手順
+## Reproduction
 
 ```sh
 cd prototypes/mobile-ui
 npm ci
 npm run build
 npm test
-# 別ターミナルで npm run dev を起動
+# Start npm run dev in another terminal
 npm run verify
 
 cd ../../apps/web
@@ -43,50 +45,50 @@ BACKEND_MODE=live npm run build:integration
 npx wrangler deploy --config wrangler.integration.jsonc
 ```
 
-デプロイ先は専用integration Worker。必要設定は既存の [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md) を参照。UIビルドはAPIモードlive・MetaMask接続を既定にし、`UI_WALLET_MODE=mock` で閲覧専用にできる。APIアプリの `.env.local` からはビルドに必要な公開設定だけを抽出する。`runtime-env-only.mjs` がOpenNextの環境値埋込みを消去し、成果物内の既知の認証情報を検査する。
+Deploy to the dedicated integration Worker. See the [runbook](CURVEGRID_INTEGRATION_RUNBOOK.md) for required settings. UI builds default to live API and MetaMask; `UI_WALLET_MODE=mock` enables read-only mode. Extract only required public build settings from the API app's `.env.local`. `runtime-env-only.mjs` removes OpenNext's embedded environment values and checks output for known credentials.
 
-通常のUIデザイン用ビルドは引き続きmock/mock。環境変数の一覧は [UI README](../prototypes/mobile-ui/README.md#apiウォレットの切替) を参照。
+Normal UI-design builds remain mock/mock. See the [UI README](../prototypes/mobile-ui/README.md#apiウォレットの切替) for environment variables.
 
-## 検証した範囲
+## Verified scope
 
-- UI境界43件、API66件と型検査に成功。APIレスポンスはOpenAPI由来のvalidatorで検証する。
-- モックの既存シナリオをChromium/WebKitで検証。外部通信、console errorは0件。
-- 実接続分岐を両ブラウザのfixture試験で検証。承認、pending、API confirmed、再読込、二重送信防止、API障害、閲覧専用モードを確認。
-- 320px・390px・1365pxの画像を確認。横はみ出し、固定要素の重なり、壊れた画像、console errorなし。
-- 公開WorkerのルートはカードIDを保って `/ui/` に遷移。UI・JSは200。CSPは同一origin、指定API/RPC origin、MetaMask relayだけを通信先として許可。
-- 秘匿情報検査を含む専用Workerビルドが成功。初回公開version `841d26fa-2222-4c0c-854d-7d017a096cc7`。SDK修正後のversion `b380129d-60af-4240-a326-f52287daec89`。
+- Passed 43 UI boundary tests, 66 API tests, and type checks. Responses use OpenAPI-generated validators.
+- Verified existing mock scenarios in Chromium/WebKit with zero external requests or console errors.
+- Verified live branches with fixtures in both browsers, covering approval, pending, API-confirmed, reload, duplicate prevention, API failure, and read-only mode.
+- Reviewed 320/390/1365px images. No horizontal overflow, fixed-element overlap, broken images, or console errors.
+- The public Worker root redirects to `/ui/` while retaining card ID. UI/JS return 200. CSP permits only same origin, configured API/RPC origins, and MetaMask relay connections.
+- Dedicated Worker build and secret checks passed. Initial version `841d26fa-2222-4c0c-854d-7d017a096cc7`; after SDK fixes, `b380129d-60af-4240-a326-f52287daec89`.
 
-ブラウザfixture試験と、ローカルの試験鍵で署名する実チェーン試験を分ける。どちらも実スマホでMetaMaskアプリを往復した証明にはしない。
+Separate browser fixtures from real-chain tests signed with a local test key. Neither proves a round trip through MetaMask on a physical phone.
 
-## 公開UIからの実登録
+## Real registration through the public UI
 
-試験カード `mobile-ui-20260926-001` を「おじいちゃんコンビニ」で登録した。取引 `0x6e28d940225fb8a5ef0efc2020484d08275d87b33fbd8befa71253ccb077b9ee`、block `18772`。ウォレット送信は1回。APIがconfirmedを返した後、再読込みと未接続の別ブラウザコンテキストでも同じ所有者を確認した。
+Registered `mobile-ui-20260926-001` with nickname `おじいちゃんコンビニ`. Transaction `0x6e28d940225fb8a5ef0efc2020484d08275d87b33fbd8befa71253ccb077b9ee`, block `18772`. The wallet submitted once. After the API returned confirmed, reload and an unconnected separate browser context showed the same owner.
 
-[実測JSON](assets/ui-live-2026-09-26/chain-results.json)、[390pxの完了画面](assets/ui-live-2026-09-26/390-confirmed.png)、[320pxの第三者英語表示](assets/ui-live-2026-09-26/320-public-en.png)、[fixtureブラウザ試験](assets/ui-live-2026-09-26/browser-results.json)を保存した。秘密鍵はNodeプロセス内だけで扱い、EIP-1193を試験providerへ差し替えた。
+Saved [measured JSON](assets/ui-live-2026-09-26/chain-results.json), [390px completion](assets/ui-live-2026-09-26/390-confirmed.png), [320px third-party English view](assets/ui-live-2026-09-26/320-public-en.png), and [fixture browser tests](assets/ui-live-2026-09-26/browser-results.json). The private key stayed inside the Node process, with EIP-1193 replaced by a test provider.
 
-## SDKのブラウザ組込み修正
+## SDK browser-bundling fix
 
-実ウォレットを注入しないブラウザ試験で、MetaMask SDKの動的importがCommonJSのdefault exportだけを返し、SessionStoreとPrivateKeyの初期化に失敗した。coreとdapp-clientは同梱ESMへ解決し、CommonJSのみのeciesjsは小さいESM境界で必要なexportを明示した。依存バージョンを固定し、`scripts/verify-metamask-sdk.mjs` で実際の配信bundleを検証する。
+A browser test without injected real wallets found that MetaMask SDK dynamic import returned only a CommonJS default export, failing SessionStore and PrivateKey initialization. Resolve core and dapp-client to bundled ESM. For CommonJS-only eciesjs, expose required exports through a small ESM boundary. Pin dependencies and verify the actual served bundle with `scripts/verify-metamask-sdk.mjs`.
 
-この試験はiPhone相当のブラウザで、未接続状態からSDKを読み込み、MetaMaskのアプリ起動リンクとrelay接続開始を確認する。アプリへの移動は直前で止め、取引の準備・送信はしない。実スマホの復帰試験とは別の確認である。修正後の公開URLでChromium・WebKitとも成功し、エラーと取引準備要求は0件。[SDK実測JSON](assets/ui-live-2026-09-26/sdk-results.json)を保存した。
+This test loads the SDK from a disconnected state in an iPhone-like browser, then checks MetaMask app-launch links and relay initiation. It stops before switching apps and does not prepare/send transactions. This is distinct from physical-phone return testing. Both Chromium and WebKit passed against the fixed public URL with zero errors or transaction-preparation requests. Saved [SDK measurements](assets/ui-live-2026-09-26/sdk-results.json).
 
-## 残る確認
+## Remaining checks
 
-1. スマホ実機の外部ブラウザからMetaMaskへ移動し、接続・承認・拒否・ブラウザ復帰・切断・再照会を試す。SDKはHTTPS universal linkとrelayを使う。実OSの復帰動作は未確認。
-2. 別の物理端末で同じQRを開き、所有者と取引を確認する。別ブラウザコンテキストの試験とは区別する。
-3. MetaMask Connect EVM 2.1.1の依存関係にnpm auditのmoderate 6件が残る。原因は推移的依存uuidのv3/v5/v6バッファ境界検証で、直接の使用箇所はSDK内のNode用ファイル処理が呼ぶv4である。互換性未確認の強制overrideは行っていない。更新時にSDK対応版と監査を再確認する。
+1. On a physical phone, move from an external browser to MetaMask and test connection, approval, rejection, browser return, disconnection, and requery. The SDK uses HTTPS universal links and relay. Actual OS return behavior is unverified.
+2. Open the same QR on another physical device and check owner/transaction, separately from browser-context tests.
+3. MetaMask Connect EVM 2.1.1 dependencies retain six moderate npm audit findings. They concern transitive uuid v3/v5/v6 buffer-boundary validation. Its direct usage in the SDK's Node file handling is v4. No forced override was applied without compatibility checks. Recheck supported SDK versions and audits on update.
 
-実機確認が残るためOpenSpec 6.2/6.3とA07全体は完了扱いにしない。
+Physical-device checks remain, so OpenSpec 6.2/6.3 and A07 as a whole are not complete.
 
-実チェーン試験を繰り返す場合は、CLIで同じ試験ウォレットを許可した新しいカードを発行する。登録済みカードや同じ送信stateでは新しい送信をしない。
+To repeat real-chain tests, issue a new card allowing the same test wallet through the CLI. Do not submit a new transaction for a registered card or reuse the same submission state.
 
 ```sh
 cd prototypes/mobile-ui
-LIVE_TEST_CARD_ID=新しく発行したID \
+LIVE_TEST_CARD_ID=NEWLY_ISSUED_ID \
 LIVE_TEST_KEYSTORE=../../contracts/.issuer-state/mobile-ui/wallet.keystore.json \
 LIVE_TEST_PASSWORD_FILE=../../contracts/.issuer-state/mobile-ui/password \
-LIVE_TEST_TRANSACTION_FILE=../../contracts/.issuer-state/mobile-ui/新しい試験名.json \
+LIVE_TEST_TRANSACTION_FILE=../../contracts/.issuer-state/mobile-ui/NEW_TEST_NAME.json \
 node scripts/verify-live-chain.mjs
 ```
 
-この環境のWebKit検証では不足するOSライブラリを `/tmp/shomei-webkit-deps` に展開し、既存の `/tmp/shomei-browser-runtime` ランチャーを使った。実行環境に必要なライブラリがある場合は標準のPlaywrightでよい。`PLAYWRIGHT_BROWSERS_PATH=/tmp/shomei-browser-runtime PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1` はこの検証環境での指定であり、アプリの要件ではない。
+In this verification environment, missing WebKit OS libraries were unpacked into `/tmp/shomei-webkit-deps`, using the existing `/tmp/shomei-browser-runtime` launcher. Standard Playwright suffices where required libraries are installed. `PLAYWRIGHT_BROWSERS_PATH=/tmp/shomei-browser-runtime PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1` applies to this test environment and is not an app requirement.

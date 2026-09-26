@@ -1,43 +1,45 @@
-# 既存成果
+English | [日本語](PRE_EXISTING_WORK.ja.md)
 
-## 分かっていること
+# Pre-existing work
 
-天地愛プロジェクトの「証明くん」は既存プロジェクトであり、ユーザーの説明によるとハッカソン以前から個人向けPoCが存在する。本リポジトリは、そのプロジェクトを出発点に、QRから登録所有者を確認する追加機能の参照実装とデモアプリを作るためのもの。
+## Known facts
 
-2026-09-25の整備開始時、本リポジトリにはコミットと実装ファイルがなかった。これは既存「証明くん」に成果がないことを意味しない。既存プロジェクトのソースは今回確認・移植していない。
+Shomei-kun is an existing project in the Tennchiai project. According to the user, an individual-user PoC existed before the hackathon. This repository starts from that project and creates a reference implementation and demo for an additional QR-based registered-owner lookup.
 
-## 2026-09-25に整理した既存機能
+When preparation began on 2026-09-25, this repository had no commits or implementation files. That does not mean the existing Shomei-kun project had no prior work. Its source code was not reviewed or ported for this work.
 
-次の表は、ユーザーが提示した既存資料の説明に基づく。資料原本・対象バージョン・実際の動作は未確認であり、公式サイトだけから実装済みと判断したものではない。
+## Existing functions documented on 2026-09-25
 
-| 既存機能・要素 | ユーザーが提示した内容 | 今回の扱い |
+This table is based on the user's descriptions of existing materials. The original materials, applicable version, and actual behavior are unverified. The website alone was not used to claim implementation.
+
+| Existing function or element | User-provided description | Treatment here |
 | --- | --- | --- |
-| 写真・動画の登録 | 端末内の写真・動画の選択、撮影したデータの登録 | 既存機能。新規成果に数えない |
-| アルバム管理 | 登録データの整理、アルバムによる管理 | 既存機能。中心的な改修対象にしない |
-| 公開・非公開 | 利用者が公開範囲を選ぶ | 既存機能。既存データの公開設定を変更しない |
-| 第三者への提示 | 共有URLから証明情報を提示する | 第三者公開の考え方・既存機能を新規と主張しない |
-| ブロックチェーンによる外部証跡 | 登録データに対応する照合用情報と登録・証明情報を扱う | 既存の仕組み。コードや記録先を今回流用したとは扱わない |
-| 既存利用者・保存データ | 利用者、写真・動画、アルバム、証明記録 | 削除・初期化・無断公開を行わない |
+| Photo/video registration | Select device photos/videos and register captured data | Existing work, not counted as new |
+| Album management | Organize registered data into albums | Existing work, not the main modification target |
+| Public/private visibility | Users select visibility | Existing work. Do not change visibility of existing data |
+| Third-party presentation | Present proof information through shared URLs | Do not claim the idea or existing sharing function as new |
+| Blockchain evidence | Handle verification data and registration/proof information corresponding to registered data | Existing mechanism. Do not claim reuse of its code or storage destination |
+| Existing users and stored data | Users, photos/videos, albums, and proof records | Do not delete, initialize, or publish without authorization |
 
-新規開発の予定範囲は、カード固有ID、QRからの確認画面、発行者CLIによる登録許可、本人ウォレットによる登録、カードと所有者の対応記録、第三者による照合である。この記載は実装済み成果の申告ではない。
+The planned new scope comprises unique card IDs, QR verification pages, registration authorization through an issuer CLI, registration by the user's wallet, card-owner association records, and third-party verification. This is not a claim that those functions are already implemented.
 
-## 参照元と流用状況
+## Sources and reuse
 
-| 参照元 | 確認範囲 | 流用・権利の状況 |
+| Source | Review scope | Reuse and rights |
 | --- | --- | --- |
-| [天地愛プロジェクト公式サイト](https://tennchiai.com/) | 2026-09-25に「証明の民主化」、記録と外部証跡に関する説明を参照 | 背景理解に使用。サイトのコード・画像は移植していない。利用許諾は未確認 |
-| [ユーザーの機能要件・既存機能の説明](../docs/prompts/2026-09-25/121716-439190-2cd0d9f92aa8468588e7978b39382568.json) | PoCの存在、既存機能、新規範囲、F01〜F10、画面、技術指定 | 仕様文書に反映。元の既存資料の原本・バージョンは未確認 |
-| 既存PoCのソース・データ | 未確認。所在や対象コミットを特定していない | 移植・接続なし。ライセンス未確認 |
-| 「証明一郎」のカード画像 | UIモック用にCodexが新規SVGを作成。既存画像を取り込んでいない | [player.svg](../prototypes/mobile-ui/public/player.svg)。実在選手の写真は使用していない。プロジェクトの公開ライセンスは未確定 |
+| [Tennchiai project website](https://tennchiai.com/) | On 2026-09-25, reviewed its explanation of democratizing proof, records, and external evidence | Used for background. No website code/images were ported. Usage permission is unverified |
+| [User requirements and existing-function description](../docs/prompts/2026-09-25/121716-439190-2cd0d9f92aa8468588e7978b39382568.json) | PoC existence, existing functions, new scope, F01–F10, screens, and specified technologies | Reflected in specifications. Original existing materials and their versions remain unverified |
+| Existing PoC source/data | Unverified. Location and target commit were not identified | No port or connection. License unverified |
+| Shomei Ichiro card image | Codex created a new SVG for the UI mock, without importing an existing image | [player.svg](../prototypes/mobile-ui/public/player.svg). No real player's photograph was used. Project publication license was undecided |
 
-既存PoCとのデータ連携は今回の完成条件に含めない。将来連携するときは、対象のAPI・データ・利用許諾を改めて確認する。
+Data integration with the existing PoC is not a completion requirement. Before future integration, review the APIs, data, and permissions again.
 
-## 参照・流用前に記録する項目
+## Record before reference or reuse
 
-- 参照元のURL、対象コミットまたはバージョン。
-- 既存のコード、仕様、設計、画像などの範囲。
-- 本リポジトリで参照・流用するファイルと変更内容。
-- 著作権、ライセンス、公開可能な範囲。
-- 大会前に行った本リポジトリ向けの準備作業。
+- Source URL and target commit or version.
+- Scope of existing code, specifications, designs, and images.
+- Files referenced or reused in this repository and the changes made.
+- Copyright, license, and permitted publication scope.
+- Preparation performed for this repository before the hackathon.
 
-上記の詳細と参加トラックは未確認。参照実装という名称だけで新規成果と扱わない。
+These details and the participation track are unconfirmed. Calling this a reference implementation does not establish it as new work.

@@ -1,85 +1,87 @@
-# 構成とデータの流れ
+English | [日本語](ARCHITECTURE.ja.md)
 
-## 構成
+# Architecture and data flow
+
+## Components
 
 ```text
-カードQR → モバイルUI → Next.js API → MultiBaas → Curvegrid Testnet
-                  └→ MetaMask ──本人署名・送信──→ 公開Web3 RPC
-発行者CLI ──未署名取引の作成──→ MultiBaas
-          └──発行者署名・送信──→ 公開Web3 RPC
+Card QR → Mobile UI → Next.js API → MultiBaas → Curvegrid Testnet
+                 └→ MetaMask ──user signature/submission──→ Public Web3 RPC
+Issuer CLI ──unsigned transaction preparation──→ MultiBaas
+          └──issuer signature/submission──→ Public Web3 RPC
 ```
 
-| 要素 | 実装と役割 |
+| Component | Implementation and role |
 | --- | --- |
-| モバイルUI | `prototypes/mobile-ui`。JavaScript、Tailwind CSS、daisyUI。カード表示、カメラ、日英切替、ウォレット操作 |
-| Web API | `apps/web`。Next.js・TypeScript。MultiBaas応答の検証、未署名取引の準備、登録結果の照合 |
-| 配信 | Cloudflare Workers・OpenNext。integrationではUIを `/ui/`、APIを `/api/v1/` に配信 |
-| コントラクト | `contracts/src/OwnershipRegistry.sol`。発行権限、初回登録、所有者・ニックネームの保存 |
-| 発行者CLI | `contracts`。配置、MultiBaasへの紐付け、カード発行、記録の確認 |
-| MultiBaas | 状態読取り、未署名取引作成、レシート・イベント取得 |
-| ENS | ethers 6.17.0でSepoliaのENSv2を正引き・逆引き。登録チェーンと分離し、登録先はアドレスを正本にする |
-| MetaMask | 登録者の鍵を保持し、取引を署名・送信 |
+| Mobile UI | `prototypes/mobile-ui`. JavaScript, Tailwind CSS, and daisyUI. Cards, camera, Japanese/English switching, and wallet operations |
+| Web API | `apps/web`. Next.js and TypeScript. Validates MultiBaas responses, prepares unsigned transactions, and verifies registration results |
+| Hosting | Cloudflare Workers and OpenNext. Integration serves the UI at `/ui/` and the API at `/api/v1/` |
+| Contract | `contracts/src/OwnershipRegistry.sol`. Issuance permissions, first registration, and owner/nickname storage |
+| Issuer CLI | `contracts`. Deployment, MultiBaas linking, card issuance, and record verification |
+| MultiBaas | State reads, unsigned transaction creation, and receipt/event retrieval |
+| ENS | ethers 6.17.0 resolves and reverse-resolves ENSv2 on Sepolia. It is separate from the registration chain, where addresses remain authoritative |
+| MetaMask | Holds the registrant's key and signs/sends transactions |
 
-既存PoCのコード・データ・保存先には接続しない。現在のintegrationはCurvegrid Testnet、チェーンID `2017072401` を使う。配置先はAPI設定で指定し、MultiBaas・RPC・ウォレットのチェーンを照合する。
+There is no connection to the existing PoC's code, data, or storage. The current integration uses Curvegrid Testnet, chain ID `2017072401`. API configuration selects the contract. MultiBaas, RPC, and wallet chains must match.
 
-## データと権限
+## Data and permissions
 
-カードの識別子はチェーンID・コントラクトアドレス・カードIDの組。チェーンが存在、登録許可、所有者、ニックネームの正本を保持する。
+A card is identified by its chain ID, contract address, and card ID. The chain is authoritative for existence, registration permission, owner, and nickname.
 
-発行者はコントラクト配置時に固定する。発行時の許可ウォレットがゼロアドレスなら全員許可、特定アドレスならその本人だけが登録できる。CLIの既定は全員許可。登録後は所有者・名前を変更できない。
+The issuer is fixed when the contract is deployed. A zero allowed wallet permits everyone; a specific address allows only that wallet to register. The CLI defaults to unrestricted issuance. The owner and nickname cannot change after registration.
 
-ニックネームはUTF-8で1〜96バイト。APIは入力を正規化せず、ABI引数と送信内容の一致を確認する。ブラウザ保存値だけで登録済みとは判定しない。
+Nicknames contain 1–96 UTF-8 bytes. The API does not normalize input and checks that ABI arguments match the submitted content. Browser storage alone never establishes registration.
 
 ## API
 
-| 操作 | エンドポイント |
+| Operation | Endpoint |
 | --- | --- |
-| 接続設定と状態 | `GET /api/v1/connection` |
-| カードの公開情報 | `GET /api/v1/cards/{cardId}` |
-| 登録用の未署名取引 | `POST /api/v1/cards/{cardId}/registration/prepare` |
-| カード一覧検索 | `GET /api/v1/ens/cards?name={ENS名またはアドレス}` |
-| Primary name表示 | `GET /api/v1/ens/primary-name?address={address}` |
-| 登録取引の照合 | `GET /api/v1/cards/{cardId}/transactions/{hash}` |
+| Connection settings and status | `GET /api/v1/connection` |
+| Public card information | `GET /api/v1/cards/{cardId}` |
+| Unsigned registration transaction | `POST /api/v1/cards/{cardId}/registration/prepare` |
+| Card search | `GET /api/v1/ens/cards?name={ENS name or address}` |
+| Primary name display | `GET /api/v1/ens/primary-name?address={address}` |
+| Registration transaction verification | `GET /api/v1/cards/{cardId}/transactions/{hash}` |
 
-本文・応答・エラーの定義は [openapi.yaml](openapi.yaml)。未発行は404、入力不正は400/413/422、設定・上流障害は503。残高不足が確認できた場合は422 `INSUFFICIENT_FUNDS` を返す。
+[openapi.yaml](openapi.yaml) defines bodies, responses, and errors. Unissued cards return 404, invalid input returns 400/413/422, and configuration/upstream failures return 503. Confirmed insufficient balance returns 422 `INSUFFICIENT_FUNDS`.
 
-## 登録の流れ
+## Registration flow
 
-1. カードと接続設定をAPIから取得する。
-2. 本人のウォレットへ接続し、必要なネットワーク追加・切替を行う。
-3. 公開内容への同意後、APIがMultiBaasで未署名取引を作成する。
-4. APIとUIがチェーン・送信元・送信先・value・カードID・名前を検証する。
-5. MetaMaskが署名し、公開Web3 RPCへ送信する。
-6. APIが取引、レシート、登録イベント、現在の所有者・名前を照合する。
+1. Read the card and connection settings from the API.
+2. Connect the user's wallet and add or switch networks when necessary.
+3. After publication consent, the API prepares an unsigned transaction with MultiBaas.
+4. The API and UI verify the chain, sender, recipient, value, card ID, and nickname.
+5. MetaMask signs and submits to the public Web3 RPC.
+6. The API compares the transaction, receipt, registration event, and current owner/nickname.
 
-iPhone/iPadの外部ブラウザからは `metamask://dapp/<公開URL>?cardId=...` でMetaMask内ブラウザへ移る。注入providerがあればその場で接続し、なければMetaMask Connectを使う。SDK初回接続では対象チェーンを強制せず、接続後に追加・切替する。
+External browsers on iPhone/iPad open MetaMask's browser with `metamask://dapp/<public URL>?cardId=...`. Use an injected provider when available, otherwise MetaMask Connect. Do not force the target chain on the SDK's initial connection. Add or switch after connecting.
 
-送信結果はカード・チェーン・コントラクト単位で保存する。別タブや連打の重複送信を防ぎ、再表示では既存取引の照会だけを再開する。最終的な二重登録の拒否はコントラクトが担う。
+Save submission results per card, chain, and contract. Prevent repeated taps and other tabs from sending duplicates. Reopening only resumes queries of the existing transaction. The contract provides the final rejection of duplicate registrations.
 
-## 状態と再取得
+## State and refresh
 
-接続準備、登録取引、証跡再取得を別々に管理する。接続準備中の画面更新ではカードと入力欄を保持する。登録後の再取得ではステータス欄だけを更新する。
+Manage connection preparation, registration transactions, and evidence refresh separately. Preserve the card and inputs during connection updates. After registration, update only the status area during refresh.
 
-初回登録は最大60秒の照合を行う。取引成功と所有者が一致し、イベント検索の反映だけが遅れている場合は、登録完了と証跡待ちを分けて表示する。通信失敗を未登録や成功に変換しない。
+Verify the initial registration for up to 60 seconds. If transaction success and the owner match but event indexing is delayed, show registration completion separately from pending evidence. Never convert a network failure into unregistered or success.
 
-## カメラ
+## Camera
 
-`qr-scanner` が端末内で動画・写真を解析する。デコーダーworkerは同一配信元にバンドルする。実カメラ時だけカメラ権限と必要なblobを許可する。画面離脱・ページ非表示・読取り完了でストリームを停止する。[カメラ仕様](CAMERA_SCAN.md)。
+`qr-scanner` analyzes video and photos on the device. Bundle its decoder worker on the same origin. Allow camera permissions and required blobs only in live camera mode. Stop streams on navigation, page hiding, and successful reads. See [camera requirements](CAMERA_SCAN.md).
 
-## モードと秘密情報
+## Modes and secrets
 
-`UI_API_MODE`、`UI_WALLET_MODE`、`UI_CAMERA_MODE` はビルド時に指定する。APIの `BACKEND_MODE` は実行時設定。UIモックとintegrationは別Workerに配置する。
+Set `UI_API_MODE`, `UI_WALLET_MODE`, and `UI_CAMERA_MODE` at build time. The API's `BACKEND_MODE` is a runtime setting. Deploy the UI mock and integration to separate Workers.
 
-MultiBaasのアプリ用キーはCloudflare Secretへ保存する。管理キーと発行者の署名鍵はCLI側だけで扱う。登録者の鍵はMetaMaskから取得しない。公開Web3 RPCはウォレット接続用の公開設定で、管理APIキーを流用しない。
+Store the MultiBaas application key in a Cloudflare Secret. Keep the admin key and issuer signing key on the CLI side. Never retrieve the registrant's key from MetaMask. Public Web3 RPC settings are for wallet connections and never reuse an admin API key.
 
-CORSは許可したOriginだけに付与する。上流のエラー本文や認証値を公開せず、エラーコードと受付IDで診断する。
+Add CORS only for permitted origins. Do not expose upstream error bodies or credentials. Use error codes and request IDs for diagnosis.
 
-設定・ビルド・運用は [CURVEGRID_INTEGRATION_RUNBOOK.md](CURVEGRID_INTEGRATION_RUNBOOK.md)、コントラクトとCLIは [contracts/README.md](../contracts/README.md) を参照する。
+See [CURVEGRID_INTEGRATION_RUNBOOK.md](CURVEGRID_INTEGRATION_RUNBOOK.md) for configuration, builds, and operations, and [contracts/README.md](../contracts/README.md) for the contract and CLI.
 
-## ENSの読み取りとカード検索
+## ENS reads and card search
 
-ENS名はSepoliaで解決し、Curvegrid Testnetの`CardRegistered`イベントをownerで絞る。1範囲は最大2,000ブロック、1回は最大4範囲・20件。取引・レシート・現在のカード状態を照合して一覧を返す。カーソルは検索名・アドレス・レジストリ・基準ブロックhashを保持し、参照先や基準hashが変わった場合は再検索させる。アドレス入力はENS解決を省略する。
+Resolve ENS names on Sepolia, then filter Curvegrid Testnet `CardRegistered` events by owner. Each range covers at most 2,000 blocks. Each request scans at most four ranges and returns 20 records. Verify transactions, receipts, and current card state before returning the list. Cursors retain the search name, address, registry, and snapshot block hash. Changed targets or snapshot hashes require a fresh search. Address input skips ENS resolution.
 
-登録画面の逆引きは任意の表示補助。正引き一致時だけ表示し、失敗時はnullで返す。アカウント変更時は前の表示を即座に消し、古いリクエストの応答を破棄する。APIキーとENS RPC設定はWorkerの実行時Secretに置き、ブラウザへ渡さない。CCIP/RPCのHTTPリダイレクトはmanualで受けて3xxを拒否する。
+Reverse lookup on the registration screen is optional display assistance. Return a name only after matching forward resolution, otherwise null. Clear the old name immediately on account changes and discard stale responses. Keep API keys and ENS RPC settings in Worker runtime Secrets, out of the browser. Handle CCIP/RPC redirects manually and reject 3xx responses.
 
-新規カードは `allowedWallet` をゼロアドレスとして発行し、登録先を限定しない。ENSは検索・名前表示にのみ使用する。現行CLIの旧 `--recipient-ens` / `--wallet` 指定は削除予定で、今回の仕様更新ではコードを変更していない。既発行カードの制限や署名済み取引を書き換えず、過去の状態ファイルは照合用に保持する。カード別サブネーム、新規Registry/Resolver、永続検索インデックスは追加しない。[詳細](ENS_INTEGRATION.md)。
+Issue new cards with zero-address `allowedWallet`, without recipient restrictions. ENS is used only for search and name display. Removal of the current CLI's old `--recipient-ens` / `--wallet` options is planned. This specification update did not change code. Preserve existing restrictions, signed transactions, and historical state files for verification. Do not add per-card subnames, a new Registry/Resolver, or a persistent search index. See [details](ENS_INTEGRATION.md).

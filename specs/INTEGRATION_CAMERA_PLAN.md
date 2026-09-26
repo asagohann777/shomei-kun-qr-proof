@@ -1,19 +1,21 @@
-# integrationで実カメラを有効にする
+English | [日本語](INTEGRATION_CAMERA_PLAN.ja.md)
 
-2026-09-26。ユーザーが最新mainのカメラ機能をintegrationで試すことを依頼した。
+# Enable the live camera in integration
 
-## 方針
+2026-09-26. The user requested testing the latest main camera implementation in integration.
 
-最新main `0a59574` は既に作業ブランチへ取り込み済み。実カメラが使えなかった原因は、integrationを `UI_CAMERA_MODE=mock` でビルドしていたことだった。専用integrationは `UI_CAMERA_MODE=live` で再ビルドし、ローカルの `.env.local` にも保存する。既定mock、API・ウォレットのモード切替、UIモックWorkerは維持する。カメラの実装は変更しない。
+## Approach
 
-## 結果
+Latest main `0a59574` was already merged into the working branch. The camera was unavailable because integration was built with `UI_CAMERA_MODE=mock`. Rebuild the dedicated integration with `UI_CAMERA_MODE=live` and save it in local `.env.local`. Keep the mock default, API/wallet switches, and UI mock Worker. Do not change camera implementation.
 
-Worker version `7a4a7673-a63b-465e-8cc8-a648561931fe` を公開。公開JS/CSS/HTML 24件がビルドと一致。カメラのPermissions-Policyがselfを許可すること、ボタンを押す前にはカメラを要求しないことを確認した。
+## Results
 
-Chromiumでは生成した動画のQRを実デコーダで読み取り、カードIDがAPIへ渡り、カメラのトラックが終了した。WebKitではカメラ拒否を模擬した後、写真のQRを読み取れた。両方で通信失敗は未登録に置き換わらず、再取得導線を表示した。試験ではAPIを503応答へ置換し、カードの発行・登録取引は送っていない。iPhone実機でのカメラ確認は未実施。
+Published Worker version `7a4a7673-a63b-465e-8cc8-a648561931fe`. All 24 public JS/CSS/HTML assets matched the build. Camera Permissions-Policy allowed self, and no camera request occurred before pressing the button.
 
-再現スクリプトは `prototypes/mobile-ui/scripts/verify-camera-public.mjs`。[公開試験結果](assets/metamask-preparation/camera-public-results.json)。
+Chromium decoded a QR from generated video using the real decoder, passed the card ID to the API, and ended camera tracks. WebKit decoded a photo QR after simulated camera denial. Both retained communication failures as failures and displayed refresh controls. Tests replaced the API with 503 responses and sent no issuance or registration transactions. Physical iPhone camera verification was not performed.
 
-## 試し方
+Reproduction script: `prototypes/mobile-ui/scripts/verify-camera-public.mjs`. [Public test results](assets/metamask-preparation/camera-public-results.json).
 
-https://shomei-kun-integration.dptr.workers.dev/ui/ を開き、「QRコードをスキャン」からカメラを許可する。既存カードのQRを読み取る。カメラを使えない場合は「写真から」を使う。
+## Try it
+
+Open https://shomei-kun-integration.dptr.workers.dev/ui/ , select **Scan QR code**, and allow the camera. Scan an existing card QR. If the camera is unavailable, use **From photo**.
