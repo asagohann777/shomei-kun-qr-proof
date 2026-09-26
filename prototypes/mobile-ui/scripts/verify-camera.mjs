@@ -49,7 +49,7 @@ try {
       folder = 'mock'; await page.goto(base); await action('open-camera').click(); await action('scan').click(); await action('start-register').waitFor();
       assert.equal(await page.evaluate(() => window.cameraRequests), 0);
       folder = 'live'; await page.evaluate(() => sessionStorage.clear()); await page.goto(base);
-      await action('open-camera').click(); await page.locator('.scan-status').filter({ hasText: 'カメラを開けません' }).waitFor();
+      await action('open-camera').click(); await page.locator('.scan-status').filter({ hasText: 'カメラを開けませんでした' }).waitFor();
       assert.equal(await action('scan').count(), 0); assert.equal(await action('flash').count(), 0);
       for (const [width, language] of [[320, 'ja'], [390, 'en']]) {
         await page.setViewportSize({ width, height: 844 });
@@ -117,7 +117,9 @@ try {
     assert(await page.evaluate(() => window.startedTracks.every(track => track.readyState === 'ended')));
     await page.evaluate(() => { Object.defineProperty(document, 'hidden', { value: false, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); });
     assert.equal(await page.locator('[data-action="resume-camera"]').count(), 1);
-    await page.locator('[data-action="resume-camera"]').click();
+    assert.equal(await page.locator('.scanner [data-action="resume-camera"]').count(), 1);
+    await page.screenshot({ path: 'artifacts/camera-paused.png', fullPage: true });
+    await page.locator('.scanner [data-action="resume-camera"]').click();
     await page.waitForFunction(() => document.querySelector('#camera-video')?.srcObject?.active);
     await page.evaluate(() => { window.resumedTracks = document.querySelector('#camera-video').srcObject.getTracks(); });
     await page.locator('[data-action="close-camera"]').click();
