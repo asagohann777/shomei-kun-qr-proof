@@ -14,6 +14,7 @@ execFileSync(process.execPath, ['scripts/build.mjs', '--integration'], {
   stdio: 'inherit',
   env: {
     PATH: process.env.PATH, HOME: process.env.HOME,
+    UI_CAMERA_MODE: env.UI_CAMERA_MODE ?? 'mock',
     UI_API_MODE: 'live', UI_WALLET_MODE: env.UI_WALLET_MODE ?? 'metamask',
     UI_API_BASE_URL: origin, UI_PUBLIC_URL: env.UI_PUBLIC_URL ?? `${origin}/ui/`,
     UI_SAMPLE_CARD_ID: env.UI_SAMPLE_CARD_ID ?? 'mobile-ui-20260926-manual',

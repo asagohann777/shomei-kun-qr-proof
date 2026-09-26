@@ -408,3 +408,15 @@ Codexがユーザーの指示に従い `public/app.js` の結果画面からホ�
 ## 2026-09-26: ホームボタン・ロゴ修正版の公開
 
 ユーザーの指示でcommit `f4ccac9` をorigin/mainへpushし、UIモックをversion `81afa823-0c34-4bbc-826f-8a0a9c759f75` へ更新した。公開JS/CSSとビルドのバイト一致、Chromium/WebKitでホームボタン削除・詳細表示・ロゴ経由の画面遷移を確認。公開ロゴ画面を `prototypes/mobile-ui/artifacts/public-logo-fixed-*` に保存した。Codexが公開と検証を担当。実接続Workerは更新していない。
+
+## 2026-09-26 カメラ実スキャン切替
+
+- 人間の指示で専用worktree `shomei-kun-qr-proof-camera-scan` とブランチ `feat/camera-scan` を使用。元の作業フォルダを変更しない。
+- AIが `UI_CAMERA_MODE`、カメラ管理、ローカル写真デコード、ライト、QR受付制限、関連テストを実装。デザイン素材や作者帰属は変更していない。
+- `qr-scanner` 1.4.2と同梱workerを使用。設定・停止条件・受け付けるQR・実機未検証の範囲は [カメラ仕様](CAMERA_SCAN.md) に記録。
+- ユーザー入力は元チェックアウトのhookが保存した [実装依頼](../docs/prompts/2026-09-26/032930-685335-75407fed05314b13aceddf690f21b8df.json) と [計画実行指示](../docs/prompts/2026-09-26/033424-981583-b71e1b9dc3de4761b5d83c3dffea3cd6.json) を同じ相対パスへコピーした。コピーを新たな自動収集とは扱わない。
+- 大会期間との対応は未確認。実カメラを使った実登録、main統合、デプロイはこの変更の検証に含まれない。
+
+検証では単体58件が成功。既定UIの `npm run verify` と実API・MetaMaskの固定fixtureを使う `verify-live-ui.mjs` はChromium/WebKitとも成功し、consoleErrorsは0。後者のreadonly専用URLの任意検証は未実施。integrationビルドへのカメラ設定引渡しとCSP・Permissions-Policyを確認した。
+
+カメラ専用検証も成功。Chromium/WebKitの写真・workerデコード、表示IDと生成QR、拒否後の写真利用、日英320/390pxを確認。Chromiumの生成映像で自動読取りとトラック停止、言語切替時の動画保持、非表示・再開・閉じる、実API初期化の遅延と読取りIDの受渡しを確認した。実機検証ではない。

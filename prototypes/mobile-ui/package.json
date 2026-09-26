@@ -7,6 +7,7 @@
     "build": "node scripts/build.mjs",
     "dev": "npm run build && python3 -m http.server 4173 --directory dist --bind 0.0.0.0",
     "verify": "node scripts/verify.mjs",
+    "verify:camera": "node scripts/verify-camera.mjs",
     "deploy": "npm run build && wrangler deploy",
     "test": "node --test --experimental-test-isolation=none tests/*.test.mjs",
     "build:integration": "node scripts/build.mjs --integration"
@@ -23,6 +24,7 @@
   "dependencies": {
     "@metamask/connect-evm": "2.1.1",
     "ajv": "8.20.0",
-    "ethers": "6.17.0"
+    "ethers": "6.17.0",
+    "qr-scanner": "1.4.2"
   }
 }

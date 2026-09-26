@@ -114,3 +114,25 @@ LIVE_READONLY_UI_URL=http://127.0.0.1:4175 node scripts/verify-live-ui.mjs
 ## 承認・登録確認の追加図案
 
 2026-09-26受領の図案に合わせ、登録確認の項目アイコン・同意文・カードサイズと、ウォレット承認の情報パネル・拒否ボタンを調整した。`?scenario=unregistered` から「次へ」、サンプル接続、「次へ」で確認できる。同意チェック後の「登録する」で承認画面に進む。実接続では承認をMetaMask内で行う。日英・320px/390px・Chromium/WebKitで確認済み。この追加修正は2026-09-26に公開UIモックへ反映済み。
+
+## カメラの切替
+
+既定の `UI_CAMERA_MODE=mock` は現在のサンプル読取りを維持し、カメラ権限を要求しない。実カメラと写真内のQR読取りは次のようにビルド時の環境変数で有効にする。
+
+```sh
+UI_CAMERA_MODE=live npm run dev
+```
+
+`.env.example` は設定項目の例で、自動読込みはしない。`UI_API_MODE`・`UI_WALLET_MODE` は独立設定。カメラだけliveなら、読み取ったIDの模擬未登録カードを表示する。実APIも使う場合は既存の実接続設定を併用する。設定を変えたら再ビルドする。
+
+カメラはHTTPSまたはlocalhostで使用する。スマートフォンからLANのHTTPアドレスを開いても起動できない場合がある。カメラを許可できない場合は「写真から」を使う。画像はアップロードしない。ライトは対応端末のみ表示し、タブを隠した後は「再開」で起動する。
+
+受け付けるQRは `UI_PUBLIC_URL` の `?cardId=...` と、設定済みAPIの `/api/v1/cards/{id}`。公開URLにパスがある場合も一致が必要。APIモック時のみ従来の `?scenario=registered` も利用できる。詳細は [カメラ仕様](../../specs/CAMERA_SCAN.md)。
+
+```sh
+npm test
+# Chromium / WebKit と ffmpeg が必要
+npm run verify:camera
+```
+
+ブラウザ検証では実QR画像・仮想カメラ映像を使う。iPhone/Androidの実カメラとライトは実機で別途確認する。
