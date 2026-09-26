@@ -234,6 +234,22 @@
       "description": "証明一郎カード・市松模様背景",
       "bytes": 374713,
       "sha256": "937c773c6eb826f2f6f2c9a610f403fd3b1cac6e3728e8c5da9c7c8ef0447fb5"
+    },
+    {
+      "file": "screens/wallet-approval-ja-01.jpg",
+      "original_name": "S__32858119.jpg",
+      "received_batch": "2026-09-26-screen-revisions",
+      "description": "ウォレット承認・日本語・修正図案",
+      "bytes": 279298,
+      "sha256": "f46fa07b28477727b7695717a6a7ba3c89427c854bd24c444987f61ccd4b4b93"
+    },
+    {
+      "file": "screens/registration-confirm-ja-02.jpg",
+      "original_name": "S__32858117.jpg",
+      "received_batch": "2026-09-26-screen-revisions",
+      "description": "登録内容の確認・日本語・修正図案",
+      "bytes": 299057,
+      "sha256": "6a40402c4ca33cf8599140d45b714ca0fcdb566f0145fd10b59d015e7d09be2a"
     }
   ]
 }
