@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T20:27:46.820949+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0da40-abcb-79d2-bfb7-8c8ef59eac25",
+  "prompt": "UIの実装を並行して進めるのでブランチを切ってPRを作成して進める、まずはこの計画をmdに保存して、その後未実装箇所に関しては詳細設計を作って私が確認してから実装するステップとしてください $openspec-update-change",
+  "model": "gpt-6-astra"
+}

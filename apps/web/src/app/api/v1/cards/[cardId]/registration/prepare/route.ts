@@ -4,3 +4,5 @@ export async function POST(request: Request, context: { params: Promise<{ cardId
   const { cardId } = await context.params;
   return handlePrepareRequest(request, cardId);
 }
+
+export const OPTIONS = POST;

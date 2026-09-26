@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T21:57:58.492463+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0da77-6a64-7b01-bfd2-324d7b59d75d",
+  "prompt": "<send_user_message_question_reply>\n[{\"answer\":\"保存して疎通試験を進める\",\"question\":\"専用の疎通試験Worker（shomei-kun-integration.dptr.workers.dev）へ、アプリ用MultiBaas APIキーと接続設定をCloudflare Secretとして保存してよいですか？管理キー・ウォレット秘密鍵は送信しません。自動承認レビューが、この送信先への認証情報の保存には明示的な許可が必要として処理を拒否しました。\",\"questionItemId\":\"[\\\"request_user_input_async\\\",\\\"call_lTnansU8SK2kNsRN9DYBN8mG\\\",0]\"}]\n</send_user_message_question_reply>",
+  "model": "gpt-6-astra"
+}

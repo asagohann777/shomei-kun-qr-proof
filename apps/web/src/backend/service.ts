@@ -21,6 +21,10 @@ async function requireCard(gateway: RegistrationGateway, cardId: CardId): Promis
   return card;
 }
 
+function walletAllowed(card: CardRecord, wallet: string): boolean {
+  return card.allowedWallet === "0x0000000000000000000000000000000000000000" || sameHex(wallet, card.allowedWallet);
+}
+
 function eventMatchesCard(
   event: RegistrationEvent,
   card: Extract<CardRecord, { kind: "registered" }>,
@@ -30,7 +34,7 @@ function eventMatchesCard(
     event.cardId === card.cardId &&
     sameHex(event.emitter, gateway.registry.contractAddress) &&
     sameHex(event.owner, card.owner.address) &&
-    sameHex(event.owner, card.allowedWallet) &&
+    walletAllowed(card, event.owner) &&
     event.nickname === card.owner.nickname
   );
 }
@@ -43,7 +47,7 @@ export async function getCard({
   gateway: RegistrationGateway;
 }): Promise<Card> {
   const card = await requireCard(gateway, cardId);
-  if (card.cardId !== cardId || gateway.registry.chainId !== sample.chainId) {
+  if (card.cardId !== cardId || (gateway.mode !== "live" && gateway.registry.chainId !== sample.chainId)) {
     throw new ApiError(503, "UPSTREAM_UNAVAILABLE", "Gateway returned an invalid card");
   }
   const common = {
@@ -72,7 +76,7 @@ export async function prepareRegistration({
   gateway: RegistrationGateway;
 }): Promise<PreparedRegistration> {
   const card = await requireCard(gateway, cardId);
-  if (card.cardId !== cardId || gateway.registry.chainId !== sample.chainId) {
+  if (card.cardId !== cardId || (gateway.mode !== "live" && gateway.registry.chainId !== sample.chainId)) {
     throw new ApiError(503, "UPSTREAM_UNAVAILABLE", "Gateway returned an invalid card");
   }
   if (card.kind === "registered") {
@@ -81,10 +85,12 @@ export async function prepareRegistration({
   if (input.chainId !== gateway.registry.chainId) {
     throw new ApiError(422, "CHAIN_MISMATCH", "Wrong chain");
   }
-  if (!sameHex(input.walletAddress, card.allowedWallet)) {
-    throw new ApiError(422, "WALLET_NOT_ALLOWED", "Wallet not allowed");
+  if (!walletAllowed(card, input.walletAddress)) {
+    throw new ApiError(422, "WALLET_NOT_ALLOWED", "Wallet not allowed", undefined, {
+      cardId, walletAddress: input.walletAddress, allowedWallet: card.allowedWallet, chainId: input.chainId,
+    });
   }
-  if (input.nickname !== sample.nickname) {
+  if (gateway.mode !== "live" && input.nickname !== sample.nickname) {
     throw new ApiError(422, "MOCK_SAMPLE_UNSUPPORTED", "Only the sample nickname is available");
   }
   const transaction = await gateway.buildRegistrationTransaction({
@@ -119,7 +125,7 @@ export async function getRegistrationTransaction({
     status: "unknown",
     reason,
   });
-  if (card.cardId !== cardId || gateway.registry.chainId !== sample.chainId) {
+  if (card.cardId !== cardId || (gateway.mode !== "live" && gateway.registry.chainId !== sample.chainId)) {
     return unknown("RECORD_MISMATCH");
   }
   const transaction = await gateway.getTransaction(txHash);
@@ -130,15 +136,23 @@ export async function getRegistrationTransaction({
     !sameHex(transaction.hash, txHash) ||
     transaction.chainId !== gateway.registry.chainId ||
     !sameHex(transaction.to, gateway.registry.contractAddress) ||
-    !sameHex(transaction.from, card.allowedWallet)
+    !walletAllowed(card, transaction.from) ||
+    (card.kind === "registered" && !sameHex(transaction.from, card.owner.address))
   ) {
     return unknown("RECORD_MISMATCH");
+  }
+  if (gateway.mode === "live" && (
+    !transaction.registration || transaction.registration.cardId !== cardId ||
+    (card.kind === "registered" && transaction.registration.nickname !== card.owner.nickname)
+  )) return unknown("RECORD_MISMATCH");
+  if (transaction.pending === true) {
+    return { cardId, transactionHash: txHash.toLowerCase(), status: "pending" };
   }
   const receipt = await gateway.getReceipt(txHash);
   if (receipt === null) {
     return { cardId, transactionHash: txHash.toLowerCase(), status: "pending" };
   }
-  if (!sameHex(receipt.transactionHash, txHash)) {
+  if (!sameHex(receipt.transactionHash, txHash) || receipt.canonical === false) {
     return unknown("RECORD_MISMATCH");
   }
   if (receipt.status === "reverted") {

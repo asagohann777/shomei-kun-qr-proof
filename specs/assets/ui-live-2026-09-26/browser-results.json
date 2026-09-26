@@ -1,0 +1,36 @@
+{
+  "base": "http://127.0.0.1:4174",
+  "readonlyBase": "http://127.0.0.1:4175",
+  "api": "https://shomei-kun-integration.dptr.workers.dev",
+  "fixtureOnly": true,
+  "results": [
+    {
+      "browser": "chromium",
+      "assertions": [
+        "public read requires no wallet",
+        "approval and pending use injected provider result; reload checks same hash without resend",
+        "confirmed ownership and evidence survive fresh API read at 390, 320 and desktop",
+        "503 remains unavailable; explicit retry recovers"
+      ],
+      "readonly": "live/mock reads API fixture and offers no registration or wallet",
+      "screenshots": "artifacts/live-ui",
+      "screenshotWarnings": [],
+      "walletSends": 1,
+      "errors": []
+    },
+    {
+      "browser": "webkit",
+      "assertions": [
+        "public read requires no wallet",
+        "approval and pending use injected provider result; reload checks same hash without resend",
+        "confirmed ownership and evidence survive fresh API read at 390, 320 and desktop",
+        "503 remains unavailable; explicit retry recovers"
+      ],
+      "readonly": "live/mock reads API fixture and offers no registration or wallet",
+      "screenshots": "artifacts/live-ui",
+      "screenshotWarnings": [],
+      "walletSends": 1,
+      "errors": []
+    }
+  ]
+}

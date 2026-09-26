@@ -1,0 +1,130 @@
+{
+  "observedAt": "2026-09-25T21:55:56.809Z",
+  "origin": "http://127.0.0.1:3108",
+  "results": [
+    {
+      "path": "/connection",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "meta": {
+          "mode": "live"
+        },
+        "data": {
+          "status": "ready",
+          "network": {
+            "name": "Curvegrid Testnet",
+            "chainId": 2017072401,
+            "nativeCurrency": {
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18
+            }
+          },
+          "registry": {
+            "chainId": 2017072401,
+            "contractAddress": "0xe226abd4e3866568c7bd53a57f2ca4b619efb47e",
+            "issuer": "0x742685df0832515184334faa2d28931ad2605100"
+          },
+          "latestBlock": {
+            "number": 18768,
+            "hash": "0xb893e832b70678a0c24f0345e13820a8cc3f822743719264c3c4bc0dc118e570"
+          },
+          "nicknameMaxUtf8Bytes": 96
+        }
+      }
+    },
+    {
+      "path": "/cards/connectivity-20260926-001",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "meta": {
+          "mode": "live"
+        },
+        "data": {
+          "cardId": "connectivity-20260926-001",
+          "playerName": "証明一郎",
+          "registry": {
+            "chainId": 2017072401,
+            "contractAddress": "0xe226abd4e3866568c7bd53a57f2ca4b619efb47e",
+            "issuer": "0x742685df0832515184334faa2d28931ad2605100"
+          },
+          "status": "registered",
+          "owner": {
+            "address": "0xf12904ef7abfd79b68dccdc7b30cfde2d6beeeb8",
+            "nickname": "おじいちゃんコンビニ"
+          },
+          "evidence": {
+            "status": "available",
+            "transactionHash": "0x83f7601a0eae1123029e0f407ecd5e72ebd4d9b34e5181363bf8cabab6a9cb12",
+            "blockNumber": 18768
+          }
+        }
+      }
+    },
+    {
+      "path": "/cards/connectivity-20260926-001",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "meta": {
+          "mode": "live"
+        },
+        "data": {
+          "cardId": "connectivity-20260926-001",
+          "playerName": "証明一郎",
+          "registry": {
+            "chainId": 2017072401,
+            "contractAddress": "0xe226abd4e3866568c7bd53a57f2ca4b619efb47e",
+            "issuer": "0x742685df0832515184334faa2d28931ad2605100"
+          },
+          "status": "registered",
+          "owner": {
+            "address": "0xf12904ef7abfd79b68dccdc7b30cfde2d6beeeb8",
+            "nickname": "おじいちゃんコンビニ"
+          },
+          "evidence": {
+            "status": "available",
+            "transactionHash": "0x83f7601a0eae1123029e0f407ecd5e72ebd4d9b34e5181363bf8cabab6a9cb12",
+            "blockNumber": 18768
+          }
+        }
+      }
+    },
+    {
+      "path": "/cards/connectivity-20260926-001/transactions/0x83f7601a0eae1123029e0f407ecd5e72ebd4d9b34e5181363bf8cabab6a9cb12",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "meta": {
+          "mode": "live"
+        },
+        "data": {
+          "cardId": "connectivity-20260926-001",
+          "transactionHash": "0x83f7601a0eae1123029e0f407ecd5e72ebd4d9b34e5181363bf8cabab6a9cb12",
+          "status": "confirmed",
+          "owner": {
+            "address": "0xf12904ef7abfd79b68dccdc7b30cfde2d6beeeb8",
+            "nickname": "おじいちゃんコンビニ"
+          },
+          "blockNumber": 18768
+        }
+      }
+    },
+    {
+      "path": "/cards/connectivity-20260926-001/registration/prepare",
+      "method": "POST",
+      "status": 409,
+      "body": {
+        "meta": {
+          "mode": "live"
+        },
+        "error": {
+          "code": "ALREADY_REGISTERED",
+          "message": "Card is already registered."
+        }
+      }
+    }
+  ]
+}

@@ -7,14 +7,22 @@
     "build": "node scripts/build.mjs",
     "dev": "npm run build && python3 -m http.server 4173 --directory dist --bind 0.0.0.0",
     "verify": "node scripts/verify.mjs",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "test": "node --test --experimental-test-isolation=none tests/*.test.mjs",
+    "build:integration": "node scripts/build.mjs --integration"
   },
   "devDependencies": {
     "@tailwindcss/cli": "4.3.3",
     "daisyui": "5.7.46",
+    "esbuild": "0.28.2",
     "playwright": "1.61.1",
     "qrcode": "1.5.4",
     "tailwindcss": "4.3.3",
     "wrangler": "4.140.0"
+  },
+  "dependencies": {
+    "@metamask/connect-evm": "2.1.1",
+    "ajv": "8.20.0",
+    "ethers": "6.17.0"
   }
 }

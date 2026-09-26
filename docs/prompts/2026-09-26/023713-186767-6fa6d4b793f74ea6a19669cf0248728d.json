@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T02:37:13.186767+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0db92-e752-7092-8077-26e52c26c0f3",
+  "prompt": "登録済みのカードを読み込んだ時にローディングが登録中になってるのがおかしいです",
+  "model": "gpt-6-astra"
+}

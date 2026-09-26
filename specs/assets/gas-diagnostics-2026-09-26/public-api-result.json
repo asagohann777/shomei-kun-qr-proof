@@ -1,0 +1,13 @@
+{
+  "status": 422,
+  "requestId": "2a6be5f1-002e-4a41-9c02-78d343b3ba7a",
+  "body": {
+    "meta": {
+      "mode": "live"
+    },
+    "error": {
+      "code": "INSUFFICIENT_FUNDS",
+      "message": "Add test ETH to the connected wallet to pay for gas."
+    }
+  }
+}

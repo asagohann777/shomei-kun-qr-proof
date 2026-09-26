@@ -6,3 +6,5 @@ node_modules/
 .env*
 !.env.example
 .dev.vars*
+public/ui/
+public/_headers

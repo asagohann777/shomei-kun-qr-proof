@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T02:06:35.221092+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0db76-dbaa-7110-b0d5-e3a872b74bd6",
+  "prompt": "{\n  \"cardId\": \"mobile-ui-20260926-manual\",\n  \"walletAddress\": \"0xc22d961e56b70a73f6dcb1ec0a47b7da1fe38fdd\",\n  \"chainId\": 2017072401,\n  \"code\": \"UPSTREAM_UNAVAILABLE\",\n  \"errors\": [\n    {\n      \"time\": \"2026-09-26T02:06:24.095Z\",\n      \"operation\": \"prepareRegistration\",\n      \"code\": \"UPSTREAM_UNAVAILABLE\",\n      \"status\": 503,\n      \"requestId\": \"8a68ed80-3b6b-46f3-9c00-12a50dfb6952\"\n    },\n    {\n      \"time\": \"2026-09-26T02:06:24.097Z\",\n      \"operation\": \"registration\",\n      \"code\": \"UPSTREAM_UNAVAILABLE\",\n      \"state\": \"failed\",\n      \"cardId\": \"mobile-ui-20260926-manual\",\n      \"walletAddress\": \"0xc22d961e56b70a73f6dcb1ec0a47b7da1fe38fdd\",\n      \"chainId\": 2017072401,\n      \"transactionHash\": null\n    }\n  ]\n}",
+  "model": "gpt-6-astra"
+}

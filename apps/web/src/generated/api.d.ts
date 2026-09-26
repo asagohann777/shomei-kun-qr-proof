@@ -51,6 +51,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 設定したMultiBaasとRPCの接続確認 */
+        get: operations["getConnection"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -58,7 +75,7 @@ export interface components {
         Address: string;
         TransactionHash: string;
         CardId: string;
-        /** @description 今回はmockのみ返す。liveは将来の実接続用。mockの場合、実ウォレットへの引渡しと外部取引リンクを禁止する。 */
+        /** @description mockは模擬操作、liveは設定したチェーンの実記録。mockの取引は実送信不可。 */
         Meta: {
             /** @enum {string} */
             mode: "mock" | "live";
@@ -68,8 +85,7 @@ export interface components {
             nickname: string;
         };
         Registry: {
-            /** @constant */
-            chainId: 80002;
+            chainId: number;
             contractAddress: components["schemas"]["Address"];
             issuer: components["schemas"]["Address"];
         };
@@ -108,12 +124,12 @@ export interface components {
         PrepareRequest: {
             walletAddress: components["schemas"]["Address"];
             chainId: number;
+            /** @description liveでは1〜96 UTF-8バイト、不正Unicodeを拒否する。trim・正規化なし。mockは固定サンプルだけ受理。 */
             nickname: string;
         };
         /** @description 共通転送形式。valueはweiの10進文字列。この操作は送金しない。モックのdata=0xはABI未確定のプレースホルダーで、実送信不可。nonce・gas・手数料は含めない。 */
         UnsignedTransaction: {
-            /** @constant */
-            chainId: 80002;
+            chainId: number;
             from: components["schemas"]["Address"];
             to: components["schemas"]["Address"];
             data: string;
@@ -169,8 +185,47 @@ export interface components {
             meta: components["schemas"]["Meta"];
             error: {
                 /** @enum {string} */
-                code: "INVALID_INPUT" | "INVALID_MOCK_SCENARIO" | "CARD_NOT_FOUND" | "ALREADY_REGISTERED" | "WALLET_NOT_ALLOWED" | "CHAIN_MISMATCH" | "MOCK_SAMPLE_UNSUPPORTED" | "UPSTREAM_UNAVAILABLE" | "INTERNAL_ERROR" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE";
+                code: "INVALID_INPUT" | "INVALID_MOCK_SCENARIO" | "CARD_NOT_FOUND" | "ALREADY_REGISTERED" | "INSUFFICIENT_FUNDS" | "WALLET_NOT_ALLOWED" | "CHAIN_MISMATCH" | "MOCK_SAMPLE_UNSUPPORTED" | "UPSTREAM_UNAVAILABLE" | "INTERNAL_ERROR" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ORIGIN_NOT_ALLOWED" | "CONNECTION_MISMATCH" | "MULTIBAAS_AUTH_FAILED" | "UPSTREAM_TIMEOUT";
                 message: string;
+            } | {
+                /** @constant */
+                code: "CONFIGURATION_MISSING";
+                message: string;
+                details: {
+                    missingSettings: string[];
+                };
+            };
+        };
+        ConnectionResponse: {
+            meta: components["schemas"]["Meta"];
+            data: {
+                /** @constant */
+                status: "mock";
+                registry: components["schemas"]["Registry"];
+            } | {
+                /** @constant */
+                status: "ready";
+                network: {
+                    /** @constant */
+                    name: "Curvegrid Testnet";
+                    chainId: number;
+                    nativeCurrency: {
+                        /** @constant */
+                        name: "Ether";
+                        /** @constant */
+                        symbol: "ETH";
+                        /** @constant */
+                        decimals: 18;
+                    };
+                    rpcUrls: string[];
+                };
+                registry: components["schemas"]["Registry"];
+                latestBlock: {
+                    number: number;
+                    hash: components["schemas"]["TransactionHash"];
+                };
+                /** @constant */
+                nicknameMaxUtf8Bytes: 96;
             };
         };
     };
@@ -217,6 +272,17 @@ export interface operations {
             /** @description INVALID_INPUT, INVALID_MOCK_SCENARIO */
             400: {
                 headers: {
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description API response */
+            403: {
+                headers: {
+                    /** @description Responses must not be stored. */
                     "Cache-Control"?: string;
                     [name: string]: unknown;
                 };
@@ -302,6 +368,17 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description API response */
+            403: {
+                headers: {
+                    /** @description Responses must not be stored. */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description CARD_NOT_FOUND */
             404: {
                 headers: {
@@ -342,7 +419,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description CHAIN_MISMATCH, WALLET_NOT_ALLOWED, MOCK_SAMPLE_UNSUPPORTED */
+            /** @description CHAIN_MISMATCH, WALLET_NOT_ALLOWED, MOCK_SAMPLE_UNSUPPORTED, INSUFFICIENT_FUNDS */
             422: {
                 headers: {
                     "Cache-Control"?: string;
@@ -411,6 +488,17 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description API response */
+            403: {
+                headers: {
+                    /** @description Responses must not be stored. */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description CARD_NOT_FOUND */
             404: {
                 headers: {
@@ -434,6 +522,72 @@ export interface operations {
             /** @description UPSTREAM_UNAVAILABLE */
             503: {
                 headers: {
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getConnection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description API response */
+            200: {
+                headers: {
+                    /** @description Responses must not be stored. */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionResponse"];
+                };
+            };
+            /** @description API response */
+            400: {
+                headers: {
+                    /** @description Responses must not be stored. */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description API response */
+            403: {
+                headers: {
+                    /** @description Responses must not be stored. */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description API response */
+            500: {
+                headers: {
+                    /** @description Responses must not be stored. */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description API response */
+            503: {
+                headers: {
+                    /** @description Responses must not be stored. */
                     "Cache-Control"?: string;
                     [name: string]: unknown;
                 };

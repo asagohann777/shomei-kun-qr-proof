@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T21:37:30.783282+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0da77-6a64-7b01-bfd2-324d7b59d75d",
+  "prompt": "<send_user_message_question_reply>\n[{\"answer\":\"試験専用ウォレットを新規作成して使う\",\"question\":\"登録用コントラクトはMultiBaas上に未配置でした。配置・登録試験に使うウォレットはどちらにしますか？\",\"questionItemId\":\"[\\\"request_user_input_async\\\",\\\"call_B33pyQ6bmYcNee6rpnxY1dBn\\\",1]\"}]\n</send_user_message_question_reply>",
+  "model": "gpt-6-astra"
+}

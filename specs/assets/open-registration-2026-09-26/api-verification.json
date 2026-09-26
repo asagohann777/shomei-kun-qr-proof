@@ -1,0 +1,130 @@
+{
+  "observedAt": "2026-09-26T02:01:59.031Z",
+  "origin": "https://shomei-kun-integration.dptr.workers.dev",
+  "results": [
+    {
+      "path": "/connection",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "meta": {
+          "mode": "live"
+        },
+        "data": {
+          "status": "ready",
+          "network": {
+            "name": "Curvegrid Testnet",
+            "chainId": 2017072401,
+            "nativeCurrency": {
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18
+            }
+          },
+          "registry": {
+            "chainId": 2017072401,
+            "contractAddress": "0x0721f6260a83577015f71a50bb46c09b5e15bcaa",
+            "issuer": "0x742685df0832515184334faa2d28931ad2605100"
+          },
+          "latestBlock": {
+            "number": 18780,
+            "hash": "0x9c08fcfb7a722bd4c5423a83fa194be9a16a0d8004ee69d0ed8e4e723cd69d68"
+          },
+          "nicknameMaxUtf8Bytes": 96
+        }
+      }
+    },
+    {
+      "path": "/cards/demo-open-check-2",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "meta": {
+          "mode": "live"
+        },
+        "data": {
+          "cardId": "demo-open-check-2",
+          "playerName": "証明一郎",
+          "registry": {
+            "chainId": 2017072401,
+            "contractAddress": "0x0721f6260a83577015f71a50bb46c09b5e15bcaa",
+            "issuer": "0x742685df0832515184334faa2d28931ad2605100"
+          },
+          "status": "registered",
+          "owner": {
+            "address": "0xf12904ef7abfd79b68dccdc7b30cfde2d6beeeb8",
+            "nickname": "おじいちゃんコンビニ"
+          },
+          "evidence": {
+            "status": "available",
+            "transactionHash": "0xf0b1133e12c01606a52783eb64179d8a2529f8fcd088f43ebd9f8cb3dc2b2362",
+            "blockNumber": 18780
+          }
+        }
+      }
+    },
+    {
+      "path": "/cards/demo-open-check-2",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "meta": {
+          "mode": "live"
+        },
+        "data": {
+          "cardId": "demo-open-check-2",
+          "playerName": "証明一郎",
+          "registry": {
+            "chainId": 2017072401,
+            "contractAddress": "0x0721f6260a83577015f71a50bb46c09b5e15bcaa",
+            "issuer": "0x742685df0832515184334faa2d28931ad2605100"
+          },
+          "status": "registered",
+          "owner": {
+            "address": "0xf12904ef7abfd79b68dccdc7b30cfde2d6beeeb8",
+            "nickname": "おじいちゃんコンビニ"
+          },
+          "evidence": {
+            "status": "available",
+            "transactionHash": "0xf0b1133e12c01606a52783eb64179d8a2529f8fcd088f43ebd9f8cb3dc2b2362",
+            "blockNumber": 18780
+          }
+        }
+      }
+    },
+    {
+      "path": "/cards/demo-open-check-2/transactions/0xf0b1133e12c01606a52783eb64179d8a2529f8fcd088f43ebd9f8cb3dc2b2362",
+      "method": "GET",
+      "status": 200,
+      "body": {
+        "meta": {
+          "mode": "live"
+        },
+        "data": {
+          "cardId": "demo-open-check-2",
+          "transactionHash": "0xf0b1133e12c01606a52783eb64179d8a2529f8fcd088f43ebd9f8cb3dc2b2362",
+          "status": "confirmed",
+          "owner": {
+            "address": "0xf12904ef7abfd79b68dccdc7b30cfde2d6beeeb8",
+            "nickname": "おじいちゃんコンビニ"
+          },
+          "blockNumber": 18780
+        }
+      }
+    },
+    {
+      "path": "/cards/demo-open-check-2/registration/prepare",
+      "method": "POST",
+      "status": 409,
+      "body": {
+        "meta": {
+          "mode": "live"
+        },
+        "error": {
+          "code": "ALREADY_REGISTERED",
+          "message": "Card is already registered."
+        }
+      }
+    }
+  ]
+}

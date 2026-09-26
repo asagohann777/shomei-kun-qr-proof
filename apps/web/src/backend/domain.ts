@@ -9,6 +9,7 @@ export type PrepareInput = components["schemas"]["PrepareRequest"];
 export type PreparedRegistration = components["schemas"]["PreparedRegistration"];
 export type UnsignedTransaction = components["schemas"]["UnsignedTransaction"];
 export type RegistrationTransaction = components["schemas"]["TransactionResponse"]["data"];
+export type Connection = components["schemas"]["ConnectionResponse"]["data"];
 
 export type RegistrationEvent = {
   emitter: Address;
@@ -28,6 +29,8 @@ export type ChainTransaction = {
   chainId: number;
   from: Address;
   to: Address;
+  registration?: { cardId: CardId; nickname: string };
+  pending?: boolean;
 };
 
 export type TransactionReceipt = {
@@ -35,9 +38,13 @@ export type TransactionReceipt = {
   status: "success" | "reverted";
   blockNumber: number;
   events: RegistrationEvent[];
+  blockHash?: string;
+  canonical?: boolean;
 };
 
 export interface RegistrationGateway {
+  readonly mode?: "mock" | "live";
+  checkConnection?(): Promise<Connection>;
   readonly registry: components["schemas"]["Registry"];
   readCard(cardId: CardId): Promise<CardRecord | null>;
   buildRegistrationTransaction(input: {
@@ -64,6 +71,8 @@ export class ApiError extends Error {
     readonly status: number,
     readonly code: ApiErrorCode,
     message: string,
+    readonly details?: { missingSettings: string[] },
+    readonly diagnostics?: { cardId: string; walletAddress: string; allowedWallet: string; chainId: number },
   ) {
     super(message);
     this.name = "ApiError";

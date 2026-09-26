@@ -303,6 +303,64 @@ Node.js 22.22.3でビルド成功。ローカルのChromium 149.0.7827.55とWebK
 ローカルのみで、未コミット・未push・未デプロイ。
 
 2026-09-26の追加指示で、上記のボタン・登録中・スキャン・情報カードの調整と対応する制作記録をまとめてcommit・pushする。各節の未コミットという記述は作業時点の状態を残したもの。最終ビルドは情報カード共通化時の両ブラウザ検証のハッシュと一致することを再確認した。今回の指示はデプロイを含まない。
+## 2026-09-26 JST: Curvegrid連携の計画をPRで管理
+
+ユーザーが、Curvegrid Testnetへの実接続、所有者登録コントラクトの新規作成、自由入力の名前、通常ブラウザからMetaMaskへの接続を選択した。その後、UIを並行実装するため担当を分け、計画保存・詳細設計・ユーザー確認・実装の順に進めるよう指示した。大会期間との対応は未確認。
+
+Codexが専用worktreeと `feat/curvegrid-integration-backend` ブランチを作り、[計画](CURVEGRID_INTEGRATION_PLAN.md) と [会話の選択記録](../docs/prompts/curvegrid-integration-decisions.md)を作成した。対応する3件のhook JSONを元の作業場所から同一内容でコピーした。この段階は計画資料の保存だけで、コード・依存関係・デプロイ設定は変更していない。
+
+計画保存コミット `23bf058` で [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) を作成した。その後Codexが [詳細設計](CURVEGRID_INTEGRATION_DESIGN.md) と [OpenSpec change](../openspec/changes/curvegrid-testnet-integration/proposal.md) の提案・要件・設計・タスクを作成した。MultiBaas公式資料の調査は読取り専用の補助エージェントを使用し、親エージェントがAPI、ABI、CLI再開、UIとの担当境界、試験計画へ反映した。AI使用範囲はこれらの文書と本変更記録である。
+
+`openspec validate curvegrid-testnet-integration --strict` が成功した。新しい計画文書のローカルリンクと空白、3件のプロンプト原本とのバイト一致を確認した。実装タスクは全件未完了。コントラクト・API・CLIのコード変更、実環境への接続、アプリ試験、デプロイは行っていない。ユーザーの詳細設計確認後に実装を開始する。
+
+## 2026-09-26 JST: Curvegrid連携の実装承認とリベース
+
+ユーザーが [同じPRでの実装を承認](../docs/prompts/2026-09-25/210335-646629-78b744b43cdc4d82a0eb1b3135d6a539.json)した。承認対象の詳細設計は `453387e0fac95e097ad85e5ea75e97ffc4395d6f`。続く [最新UIへのリベース指示](../docs/prompts/2026-09-25/210422-768494-7d8a0873b7584160a109075cfd53f25a.json)に従い、`git pull --rebase origin main` で `cdb1ffe` を取り込んだ。変更記録の競合は両方の追記を保持して解消した。設計コミットは `b537e04` に変わったが、設計本文は同一。PR #1へ旧HEADを指定したforce-with-leaseで反映した。
+
+元のUI作業場所は変更せず、専用worktreeで実装する。実環境の設定・配置・UI結合試験はまだ行っていない。大会期間との対応は未確認。
+
+Codexが `contracts/` のSolidity・CLI・試験・ABI、`apps/web/` のlive Gateway・HTTP・接続API・型/validator生成物・試験・専用Worker設定、`specs/openapi.yaml`、OpenAPI検証スクリプト、OpenSpecタスクと設計状態、SPEC・ARCHITECTUREの実装状態、[起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md)、[実装・検証記録](CURVEGRID_INTEGRATION_IMPLEMENTATION.md)を作成・更新した。既存mock 19シナリオを維持した。検証結果と残る依存監査指摘は実装記録を参照。実環境のキーは未設定で、実疎通・公開・スマホ結合試験は未実施。
+
+## 2026-09-26 JST: 実環境疎通の前提を確認
+
+ユーザーの疎通試験・課題整理とリベースの指示を受け、Codexが最新mainを取得し、ローカルlive APIを起動してHTTP応答を確認した。MultiBaas設定は未提供で503 CONFIGURATION_MISSING。外部ネットワーク権限でCloudflareの専用Worker不存在も確認した。結果と対応案は [疎通試験レポート](CURVEGRID_CONNECTIVITY_REPORT.md) に保存した。実環境の認証失敗とは判断していない。
+
+Codexが設定項目名だけの確認、HTTP検証、課題整理・文書作成を担当した。接続情報の場所をユーザーに確認中。チェーン書込み・Worker公開は未実施。大会期間との対応は未確認。
+
+ユーザーの設定提供後、実MultiBaasのチェーン状態・ブロック・Library一覧を読み取った。管理RESTの疎通に成功し、chain ID `2017072401` を確認した。新規の `shomeikuncardregistry` / `1.0.0` をLibraryへ登録したが、チェーンへの配置は行っていない。binの0x接頭辞を除いていたCLIの不具合を実APIの400から特定し、修正と回帰試験を追加した。機密情報を除いた実測JSONと課題の更新は疎通試験レポートを参照。公開RPCと試験ウォレットの指定を確認中。
+
+- 2026-09-26: Curvegrid TestnetにRegistryを配置し、専用カードを発行・本人試験鍵で登録。APIのconfirmedと公開所有者・証跡を実測。bytecode接頭辞、イベント取得件数、開発バンドラー、OpenNextの環境値埋込みを修正。API66件・CLI/contract16件と実応答fixtureで検証。Secret保存は自動承認拒否後にユーザーが明示許可し完了。Workersのredirect指定を修正し、公開Workerで接続・所有者・登録取引・再読込・二重登録拒否に成功。スマホUI結合は未実施。AIが実装・操作・試験・記録、人間が接続設定・Faucet入金・試験鍵作成方針を担当。大会期間との対応は未確認。詳細は `CURVEGRID_CONNECTIVITY_REPORT.md`。
+
+## 2026-09-26 JST: 最新UIと実API・ウォレットの接続
+
+ユーザーの指示で最新main `3598094` の画面にAPI・MetaMask接続を追加した。既定のUIビルドはモックを維持し、専用integrationビルドに実接続を含めた。同じPR #1で進め、UI検討用Workerは変更していない。採用設計は [計画](UI_LIVE_CONNECTION_PLAN.md)、公開URL・実測・残る実機条件は [結果](UI_LIVE_CONNECTION_REPORT.md) に保存した。
+
+Codexが `prototypes/mobile-ui` のlive controller、MetaMask境界、共通テンプレート接続、ビルド切替、試験、`apps/web` のUI同梱・入口遷移と資料を作成した。独立するcontrollerとwallet境界を補助エージェントへ分担し、親担当が統合・実測した。ユーザーは接続方針、mock維持、専用試験ウォレットの作成・公開情報保存を決定した。プロンプトはhookが元の作業場所に保存した3件を `docs/prompts/2026-09-26` へ同一内容でコピーした。大会期間との対応は未確認。
+
+UI境界43件・API66件と型検査、Chromium/WebKitのmock/live画面試験が成功した。公開UIからローカル試験鍵で1回だけ実取引を送り、API confirmed・再読込・別ブラウザでの所有者表示を確認した。スマホ実機のMetaMask遷移・復帰と別物理端末の受入条件は未完了。
+
+公開SDK起動試験でCommonJS動的importの不整合を検出し、ESM参照と小さい変換境界で修正した。修正後の公開URLで、ウォレットを注入しないChromium/WebKitからMetaMaskの起動リンクとrelay接続開始を確認した。スマホ実機への移動は直前で止め、署名試験の代替にはしていない。
+
+## 2026-09-26 JST: 全員登録デモと診断ログ
+
+ユーザーが「デモの所有権登録許可は全員」と訂正したため、Codexがコントラクトのゼロ許可先を全員許可として実装し、CLIの既定値、APIの準備・状態読取り・イベント・取引の照合を更新した。旧記録は変更せず、1.1.0を新しく配置して専用Workerの記録先を変更した。詳細と新しいデモURLは [全員登録記録](OPEN_REGISTRATION_DEMO.md) を参照。登録後の照合漏れを実取引で検出し、共通の許可判定と回帰試験で修正した。
+
+先行するログ追加依頼も反映し、受付ID、構造化エラーログ、画面の診断コピー、ガス不足の案内を実装した。Codexがコード・仕様・試験・デプロイ・資料を担当し、人間が公開デモの操作、エラー報告、全員許可への仕様訂正を行った。大会期間との対応は未確認。旧許可先と別の試験鍵によるブラウザ登録が成功し、API70件・UI43件・contract/CLI17件も成功した。
+
+## 2026-09-26 JST: ガス不足のエラー分類
+
+ユーザーの診断ログから、残高0のウォレットで登録準備がMultiBaasの400となることを再現した。CodexがHTTP503への一律変換を修正し、観測した残高不足だけを422 INSUFFICIENT_FUNDSへ分類した。OpenAPIと生成物、回帰試験、ブラウザ試験を更新。公開Workerでも同じユーザーアドレスで確認し、送金・所有者登録は行っていない。詳細は [全員登録記録](OPEN_REGISTRATION_DEMO.md)。大会期間との対応は未確認。
+
+## 2026-09-26 登録待機と再取得の表示
+
+ユーザーが実機で報告した「登録後の再取得でも登録中と表示される」問題を修正。初回登録は送信後最大60秒、取引と所有者と証跡を確認する。登録後の再取得はカードと所有者を保持し、ステータスだけを「確認中」に変更する。通信失敗でも既知の所有者を消さず、再取得できる。
+
+人間は不適切な表示の発見と、局所更新・最大1分の待機を指定。AIは状態管理、日英表示、CSS、試験、計画と結果の記録を実施。対象ファイルと検証手順は [登録と再取得の表示](REGISTRATION_STATUS_UI.md) を参照。今回の時刻と大会期間との対応は未確認。
+
+### 登録済みカード読込みの追加修正
+
+ユーザーがカード読込みでも「登録中」が表示される残存経路を報告。AIが登録済みカードの読込みと登録履歴の復元を分離し、画面復帰時も登録処理を再開しないよう修正した。UIテスト50件成功。詳細は `REGISTRATION_STATUS_UI.md` に追記。
+
 
 ## 2026-09-26: 背景・ロゴなどの保存と素材整理
 
@@ -319,3 +377,7 @@ Node.js 22.22.3でビルド成功。ローカルのChromium 149.0.7827.55とWebK
 ユーザーの指示で共同制作者付きcommit `112797e` をorigin/mainへpushし、専用UIモックWorker `shomei-kun-ui-mock` にデプロイした。公開URLは https://shomei-kun-ui-mock.dptr.workers.dev 、Version IDは `cdaa816a-7069-4fe6-8d9d-5ebffa5efc1a`。背景・ロゴ・カードと、それまでのボタン・スキャン・登録中アニメーションの調整を含む。
 
 公開URLでChromium 149とWebKit 26.5の日英・登録フロー・画面幅検証が合格。配信される12ファイルについてローカルdistとのバイト一致を確認し、新規画像5点も含めた。アプリのconsole errorは0件。WebKitではPlaywrightのスクリーンショット撮影時に限るCSP警告88件を既存の検証処理で別記録した。実ウォレット・実トランザクションの検証ではない。Codexはcommit・push・デプロイ・公開検証・記録更新を担当した。大会期間との対応は未確認。
+
+## 2026-09-26 最新UIと実接続の合流
+
+ユーザーのPRマージ指示に従い、main `e675119` の提供画像・背景を実接続ブランチに統合。既定mock/mockと環境変数による切替を維持した。Codexが競合解消、両モードのChromium/WebKit試験、50件のUIテスト、画面確認、専用Workerデプロイと実API読込み確認を担当。登録済みカードは保存履歴があっても登録処理を再開しない。検証と公開versionは `REGISTRATION_STATUS_UI.md` に記録した。

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-25T20:19:54.608359+00:00",
+  "session_id": "01a0d87e-0e70-79d0-8caa-7492659ee125",
+  "turn_id": "01a0da39-7751-7260-bcfd-d912df3dd8e7",
+  "prompt": "Curvegrid testnetをまずは利用するので、今のUI検討とは別のURLでmultipassとの疎通が試せるように実装お願いします $Poteto Mode",
+  "model": "gpt-6-astra"
+}

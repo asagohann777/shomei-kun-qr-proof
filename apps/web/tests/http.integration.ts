@@ -107,3 +107,10 @@ test("HTTP parallel scenarios and repeated preparation do not mutate records", a
   await call(preparePath, post(body));
   assert.deepEqual((await call(cardPath, { headers: { "X-Mock-Scenario": "unregistered" } })).value, contract.components.examples.unregistered.value);
 });
+
+test("HTTP connection endpoint stays visibly mock", async () => {
+  const result = await call("/api/v1/connection");
+  assert.equal(result.status, 200);
+  assert.deepEqual(result.value, contract.components.examples["connection-mock"].value);
+  assert.ok(ajv.getSchema("contract#/components/schemas/ConnectionResponse")?.(result.value));
+});

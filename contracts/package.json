@@ -1,0 +1,27 @@
+{
+  "name": "@shomei/ownership-registry",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile && node scripts/export-abi.cjs",
+    "check:abi": "hardhat compile && node scripts/export-abi.cjs --check",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run compile && node --import tsx --test test/*.test.ts",
+    "issuer": "node --import tsx cli/main.ts"
+  },
+  "dependencies": {
+    "ethers": "6.17.0",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.15",
+    "hardhat": "2.29.1",
+    "solc": "0.8.30",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
+  },
+  "overrides": {
+    "undici": "6.28.0",
+    "tmp": "0.2.6"
+  }
+}

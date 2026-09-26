@@ -7,3 +7,5 @@ export async function GET(
   const { cardId, txHash } = await context.params;
   return handleTransactionRequest(request, cardId, txHash);
 }
+
+export const OPTIONS = GET;

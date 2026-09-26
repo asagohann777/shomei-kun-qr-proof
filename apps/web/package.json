@@ -7,19 +7,23 @@
     "node": ">=22.0.0 <23"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "npm run generate:check && next build --webpack",
     "start": "next start",
     "generate": "node scripts/generate-contract.mjs",
     "generate:check": "node scripts/generate-contract.mjs --check",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test --experimental-test-isolation=none --test-reporter=spec tests/*.test.ts",
-    "build:worker": "opennextjs-cloudflare build",
+    "build:worker": "opennextjs-cloudflare build && node scripts/runtime-env-only.mjs",
     "preview": "opennextjs-cloudflare preview",
     "test:http": "node scripts/verify-http.mjs next",
-    "test:worker": "node scripts/verify-http.mjs worker"
+    "test:worker": "node scripts/verify-http.mjs worker",
+    "build:integration": "node scripts/prepare-integration-ui.mjs && opennextjs-cloudflare build --config wrangler.integration.jsonc && node scripts/runtime-env-only.mjs",
+    "test:http:live": "node scripts/verify-http.mjs next-live",
+    "test:worker:live": "node scripts/verify-http.mjs worker-live"
   },
   "dependencies": {
+    "ethers": "6.17.0",
     "next": "16.3.6",
     "react": "19.3.0",
     "react-dom": "19.3.0"

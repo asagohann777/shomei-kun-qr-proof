@@ -23,3 +23,4 @@ export function CardResponse(value: unknown): value is components["schemas"]["Ca
 export function PrepareResponse(value: unknown): value is components["schemas"]["PrepareResponse"];
 export function TransactionResponse(value: unknown): value is components["schemas"]["TransactionResponse"];
 export function ErrorResponse(value: unknown): value is components["schemas"]["ErrorResponse"];
+export function ConnectionResponse(value: unknown): value is components["schemas"]["ConnectionResponse"];

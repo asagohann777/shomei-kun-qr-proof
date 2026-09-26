@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
-if (process.env.BACKEND_MODE !== "mock") {
-  throw new Error("BACKEND_MODE must be explicitly set to mock. Live mode is not implemented.");
+if (process.env.BACKEND_MODE !== "mock" && process.env.BACKEND_MODE !== "live") {
+  throw new Error("BACKEND_MODE must be explicitly set to mock or live.");
 }
 
 const config: NextConfig = {

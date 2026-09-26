@@ -1,0 +1,25 @@
+[
+  {
+    "cardId": "mobile-ui-20260926-manual",
+    "status": 200,
+    "cardStatus": "unregistered",
+    "registry": "0x0721f6260a83577015f71a50bb46c09b5e15bcaa"
+  },
+  {
+    "cardId": "demo-open-001",
+    "status": 200,
+    "cardStatus": "unregistered",
+    "registry": "0x0721f6260a83577015f71a50bb46c09b5e15bcaa"
+  },
+  {
+    "cardId": "demo-open-002",
+    "status": 200,
+    "cardStatus": "unregistered",
+    "registry": "0x0721f6260a83577015f71a50bb46c09b5e15bcaa"
+  },
+  {
+    "diagnosticStatus": 422,
+    "code": "CHAIN_MISMATCH",
+    "requestId": "637d9d0f-acbe-496e-bb62-df302c14357e"
+  }
+]
