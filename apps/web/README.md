@@ -1,6 +1,6 @@
 # 証明くんAPIを動かす
 
-Next.js・TypeScriptによる、カード取得・登録準備・登録確認のAPIです。`mock` は固定応答、`live` はMultiBaas経由でCurvegrid Testnetの記録を扱います。署名・送信は本人のウォレットで行います。以下の起動例はmock用です。相談用の[静的UI](../../prototypes/mobile-ui/README.md)は独立しており、このAPIへ接続していません。
+Next.js・TypeScriptによる、カード取得・登録準備・登録確認のAPIです。`mock` は固定応答、`live` はMultiBaas経由でCurvegrid Testnetの記録を扱います。署名・送信は本人のウォレットで行います。以下の起動例はmock用です。[共通UI](../../prototypes/mobile-ui/README.md)は通常mockで、専用integrationビルドでは実APIとMetaMaskへ接続します。
 
 ## 起動
 
@@ -13,7 +13,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-`BACKEND_MODE=mock` を指定します。未指定・未知の値では起動しません。mockにはAPIキーや秘密鍵は不要です。liveの設定手順は末尾のリンクを参照してください。ルート `/` に画面はありません。
+`BACKEND_MODE=mock` を指定します。未指定・未知の値では起動しません。mockにはAPIキーや秘密鍵は不要です。liveの設定手順は末尾のリンクを参照してください。ルート `/` は `/ui/` に遷移します。画面は専用integrationビルドで同梱します。
 
 ## カード取得
 
@@ -41,7 +41,7 @@ curl -i -H 'X-Mock-Scenario: registered' \
   http://localhost:3000/api/v1/cards/SK-2026-001/transactions/0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 ```
 
-`data: "0x"` は模擬値です。実ウォレットへ送信しないでください。Mock Walletは `src/backend/mock-wallet.ts` にあります。拒否後は確認を呼ばず、結果不明でも再送しません。既存UIへの組込みは別の作業です。
+`data: "0x"` は模擬値です。実ウォレットへ送信しないでください。Mock Walletは `src/backend/mock-wallet.ts` にあります。拒否後は確認を呼ばず、結果不明でも再送しません。実UIはliveの取引だけをウォレットへ渡します。
 
 シナリオは要求ごとに指定します。準備の成功でカード取得結果が変わることはありません。省略時の `default` は各API単体の成功例です。利用できる組合せは[詳細設計のシナリオ表](../../specs/BACKEND_DESIGN.md#固定サンプルとシナリオ)を参照してください。
 

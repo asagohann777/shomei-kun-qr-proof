@@ -1,0 +1,26 @@
+{
+  "type": "Browser with locally signing test provider; not physical MetaMask",
+  "base": "https://shomei-kun-integration.dptr.workers.dev/ui/",
+  "cardId": "mobile-ui-20260926-001",
+  "address": "0x208Fa3cd72959b2562c898B3b7Fc75C0C6fcA99E",
+  "transactionHash": "0x6e28d940225fb8a5ef0efc2020484d08275d87b33fbd8befa71253ccb077b9ee",
+  "walletSends": 1,
+  "reloadVerified": true,
+  "publicReaderVerified": true,
+  "errors": [],
+  "transaction": {
+    "meta": {
+      "mode": "live"
+    },
+    "data": {
+      "cardId": "mobile-ui-20260926-001",
+      "transactionHash": "0x6e28d940225fb8a5ef0efc2020484d08275d87b33fbd8befa71253ccb077b9ee",
+      "status": "confirmed",
+      "owner": {
+        "address": "0x208fa3cd72959b2562c898b3b7fc75c0c6fca99e",
+        "nickname": "おじいちゃんコンビニ"
+      },
+      "blockNumber": 18772
+    }
+  }
+}

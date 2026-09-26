@@ -2,7 +2,7 @@
 
 状態: 2026-09-25の追加指示により、MultiBaas API中心・Polygon Amoyへ改訂した設計。Amoyに先行してCurvegrid Testnet向けのAPI・コントラクト・CLIを実装した。実接続環境の確認は未実施。相談用UIモックの構成は [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) を参照する。
 
-固定モックAPIは [apps/web](../apps/web/README.md) に実装した。mockは固定応答を維持する。追加したlive構成は [Curvegrid詳細設計](CURVEGRID_INTEGRATION_DESIGN.md) と [実装記録](CURVEGRID_INTEGRATION_IMPLEMENTATION.md) を参照。画面・MetaMask接続はUI担当が実装する。検証結果は [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md) を参照する。
+固定モックAPIは [apps/web](../apps/web/README.md) に実装した。mockは固定応答を維持する。追加したlive構成は [Curvegrid詳細設計](CURVEGRID_INTEGRATION_DESIGN.md) と [実装記録](CURVEGRID_INTEGRATION_IMPLEMENTATION.md) を参照。画面・MetaMask接続は最新mainの共通UIへ追加した。環境変数でmock/mock・live/mock・live/metamaskを選ぶ。[接続結果](UI_LIVE_CONNECTION_REPORT.md)を参照。検証結果は [BACKEND_IMPLEMENTATION.md](BACKEND_IMPLEMENTATION.md) を参照する。
 
 ## 構成と責務
 

@@ -1,6 +1,6 @@
 # Curvegrid連携の起動とUI接続
 
-APIは `apps/web`、コントラクトと発行者CLIは [contracts](../contracts/README.md) にある。画面とMetaMaskの接続コードはUI担当が実装する。既存の `prototypes/mobile-ui` はこのAPIへ自動接続しない。
+APIは `apps/web`、コントラクトと発行者CLIは [contracts](../contracts/README.md) にある。画面とMetaMaskの接続コードは `prototypes/mobile-ui` にある。通常buildはmockを維持し、専用integration buildだけ実APIへ接続する。[UI接続の設定・実測](UI_LIVE_CONNECTION_REPORT.md)を参照。
 
 ## ローカルで起動する
 

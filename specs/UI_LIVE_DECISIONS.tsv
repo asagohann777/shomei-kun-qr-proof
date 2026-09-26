@@ -1,0 +1,6 @@
+ts	phase	decision	why	evidence	result
+2026-09-26T00:39:04.951565+00:00	design retrospect	Use shared renderer with live controller and build-time modes	Preserve parallel UI design and prevent mock completion in live mode	UI_LIVE_CONNECTION_PLAN.md	implemented
+2026-09-26T00:39:04.951565+00:00	wallet retrospect	Create separate automated and manual cards for new test wallet	Keep a fresh card for physical phone testing	assets/curvegrid-connectivity/mobile-ui-wallet.json	manual card unregistered
+2026-09-26T00:39:04.951565+00:00	browser verification	Separate fixture browser tests from actual chain signing	Fixture success cannot prove chain or physical MetaMask operation	assets/ui-live-2026-09-26/chain-results.json	one real transaction confirmed
+2026-09-26T00:39:04.951565+00:00	SDK browser startup	Resolve mobile protocol dynamic imports to ESM	Actual browser caught missing named export in bundled CJS dependency	UI_LIVE_CONNECTION_REPORT.md	fix verification pending
+2026-09-26T00:45:34.263195+00:00	SDK verification	Use pinned ESM aliases and small ecies export adapter	Browser bundle must initialize mobile connection without injected provider	assets/ui-live-2026-09-26/sdk-results.json	public Chromium and WebKit passed; device return still open

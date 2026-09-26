@@ -330,3 +330,13 @@ Codexが設定項目名だけの確認、HTTP検証、課題整理・文書作�
 ユーザーの設定提供後、実MultiBaasのチェーン状態・ブロック・Library一覧を読み取った。管理RESTの疎通に成功し、chain ID `2017072401` を確認した。新規の `shomeikuncardregistry` / `1.0.0` をLibraryへ登録したが、チェーンへの配置は行っていない。binの0x接頭辞を除いていたCLIの不具合を実APIの400から特定し、修正と回帰試験を追加した。機密情報を除いた実測JSONと課題の更新は疎通試験レポートを参照。公開RPCと試験ウォレットの指定を確認中。
 
 - 2026-09-26: Curvegrid TestnetにRegistryを配置し、専用カードを発行・本人試験鍵で登録。APIのconfirmedと公開所有者・証跡を実測。bytecode接頭辞、イベント取得件数、開発バンドラー、OpenNextの環境値埋込みを修正。API66件・CLI/contract16件と実応答fixtureで検証。Secret保存は自動承認拒否後にユーザーが明示許可し完了。Workersのredirect指定を修正し、公開Workerで接続・所有者・登録取引・再読込・二重登録拒否に成功。スマホUI結合は未実施。AIが実装・操作・試験・記録、人間が接続設定・Faucet入金・試験鍵作成方針を担当。大会期間との対応は未確認。詳細は `CURVEGRID_CONNECTIVITY_REPORT.md`。
+
+## 2026-09-26 JST: 最新UIと実API・ウォレットの接続
+
+ユーザーの指示で最新main `3598094` の画面にAPI・MetaMask接続を追加した。既定のUIビルドはモックを維持し、専用integrationビルドに実接続を含めた。同じPR #1で進め、UI検討用Workerは変更していない。採用設計は [計画](UI_LIVE_CONNECTION_PLAN.md)、公開URL・実測・残る実機条件は [結果](UI_LIVE_CONNECTION_REPORT.md) に保存した。
+
+Codexが `prototypes/mobile-ui` のlive controller、MetaMask境界、共通テンプレート接続、ビルド切替、試験、`apps/web` のUI同梱・入口遷移と資料を作成した。独立するcontrollerとwallet境界を補助エージェントへ分担し、親担当が統合・実測した。ユーザーは接続方針、mock維持、専用試験ウォレットの作成・公開情報保存を決定した。プロンプトはhookが元の作業場所に保存した3件を `docs/prompts/2026-09-26` へ同一内容でコピーした。大会期間との対応は未確認。
+
+UI境界43件・API66件と型検査、Chromium/WebKitのmock/live画面試験が成功した。公開UIからローカル試験鍵で1回だけ実取引を送り、API confirmed・再読込・別ブラウザでの所有者表示を確認した。スマホ実機のMetaMask遷移・復帰と別物理端末の受入条件は未完了。
+
+公開SDK起動試験でCommonJS動的importの不整合を検出し、ESM参照と小さい変換境界で修正した。修正後の公開URLで、ウォレットを注入しないChromium/WebKitからMetaMaskの起動リンクとrelay接続開始を確認した。スマホ実機への移動は直前で止め、署名試験の代替にはしていない。

@@ -1,0 +1,26 @@
+{
+  "target": "https://shomei-kun-integration.dptr.workers.dev/ui/",
+  "purpose": "SDK mobile launch and relay initiation; wallet navigation suppressed before leaving browser",
+  "results": [
+    {
+      "browser": "chromium",
+      "relayOrigin": "wss://mm-sdk-relay.api.cx.metamask.io",
+      "universalLinkOrigin": "https://metamask.app.link",
+      "universalLinkPath": "/connect/mwp",
+      "registrationRequests": 0,
+      "errors": [],
+      "injectedWallet": false,
+      "deviceReturnTested": false
+    },
+    {
+      "browser": "webkit",
+      "relayOrigin": "wss://mm-sdk-relay.api.cx.metamask.io",
+      "universalLinkOrigin": "https://metamask.app.link",
+      "universalLinkPath": "/connect/mwp",
+      "registrationRequests": 0,
+      "errors": [],
+      "injectedWallet": false,
+      "deviceReturnTested": false
+    }
+  ]
+}

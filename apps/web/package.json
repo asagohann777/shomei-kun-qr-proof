@@ -18,7 +18,7 @@
     "preview": "opennextjs-cloudflare preview",
     "test:http": "node scripts/verify-http.mjs next",
     "test:worker": "node scripts/verify-http.mjs worker",
-    "build:integration": "opennextjs-cloudflare build --config wrangler.integration.jsonc && node scripts/runtime-env-only.mjs",
+    "build:integration": "node scripts/prepare-integration-ui.mjs && opennextjs-cloudflare build --config wrangler.integration.jsonc && node scripts/runtime-env-only.mjs",
     "test:http:live": "node scripts/verify-http.mjs next-live",
     "test:worker:live": "node scripts/verify-http.mjs worker-live"
   },

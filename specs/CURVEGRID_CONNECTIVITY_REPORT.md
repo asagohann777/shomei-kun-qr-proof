@@ -2,6 +2,8 @@
 
 2026-09-26 JST。初回対象はPR #1の `bcfcede`。初回は設定不足で停止した。その後、ユーザーが設定した認証情報でMultiBaasの状態・ブロック・Libraryを実際に読み取り、今回のABI登録に成功した。その後、Testnetへの配置・発行・登録とローカルAPIの証跡読取りに成功した。専用Workerでも接続・所有者・登録取引・再読込み・二重登録拒否を確認した。ローカルAPI起動、管理REST疎通、チェーン書込みを区別する。
 
+最新UIへの接続・署名・公開ブラウザ試験の追加結果は [UI接続結果](UI_LIVE_CONNECTION_REPORT.md) を参照。
+
 ## 最新mainの取込み
 
 ユーザーの指示で `git pull --rebase origin main` を実行した。取得できた `origin/main` は `cdb1ffe`。初回時点は取り込み済みだった。今回の終了前に再取得すると `origin/main` は `3598094` へ進んでいたため、そこへリベースした。`HACKATHON_CHANGES.md` の追記競合はUI・API双方を残して解消した。リベース前後の `apps/web` と `contracts` の差分は0件で、検証済みコードは同一。

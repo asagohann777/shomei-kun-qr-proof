@@ -257,3 +257,8 @@
   .scan-sweep, .scan-corners, .scan-status-ring { animation: none; }
   .scan-sweep { transform: translateY(50%); }
 }
+
+.record-table dd, .data-list dd, .wallet-value, .process-copy {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}

@@ -1,0 +1,12 @@
+{
+  "purpose": "Mobile UI Testnet tests only",
+  "chainId": 2017072401,
+  "address": "0x208Fa3cd72959b2562c898B3b7Fc75C0C6fcA99E",
+  "publicKey": "0x0421d73603f8b30a56e75ec5c2febdcb16fd718533bc427e3aed03f257317ffd67152da0e6400680cb2cc136aaaf3dfebd66abe7b2759b55781a35a3500eb5bfef",
+  "automatedCardId": "mobile-ui-20260926-001",
+  "manualCardId": "mobile-ui-20260926-manual",
+  "keystoreLocalPath": "contracts/.issuer-state/mobile-ui/wallet.keystore.json",
+  "privateMaterialCommitted": false,
+  "fundingTransaction": "0xbbc14c4b7e7219fbc4e8875596977888fae3c0d69ff20f8e3e5d535a9c16054f",
+  "automatedRegistrationTransaction": "0x6e28d940225fb8a5ef0efc2020484d08275d87b33fbd8befa71253ccb077b9ee"
+}

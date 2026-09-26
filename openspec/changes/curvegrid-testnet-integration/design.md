@@ -16,7 +16,7 @@
 
 **Non-Goals:**
 
-- ブラウザ画面、MetaMask接続コード、実カメラの実装。
+- 実カメラの実装。ブラウザのAPI/MetaMask接続は追加指示で対象に変更。
 - 登録の取消し、所有権移転、既存サービスの移行。
 - Curvegrid TestnetでAmoyの公開チェーン検証条件を達成したとすること。
 
@@ -43,3 +43,7 @@
 ユーザーによる詳細設計の確認後、ABI・DTO・fixtureを先に定めてUI担当へ共有する。コントラクト、CLI、Gateway、APIを実装し、既存mockと新しい契約試験を実行する。設定提供後に実応答を確認する。
 
 配置・公開は別途その作業の指示を受けて行う。専用Workerの公開後、実APIとスマホの結合試験を記録する。障害時はWorkerを前バージョンに戻す。チェーン記録は削除しない。Amoy移行は別配置とする。
+
+## UI接続の追加設計
+
+最新の追加指示と状態・モード・作業境界は [UI接続計画](../../../specs/UI_LIVE_CONNECTION_PLAN.md) を正とする。mock/mockを既定とし、live/mockは閲覧のみ、live/metamaskで本人署名を行う。mock/metamaskを拒否する。
