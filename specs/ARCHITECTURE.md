@@ -141,3 +141,11 @@ MultiBaas APIの停止・制限・キー失効、Amoy RPCの障害時は該当�
 - [MultiBaasの取引レシート取得](https://docs.curvegrid.com/multibaas/api/get-transaction-receipt/)
 
 要件と受け入れ条件は [仕様](SPEC.md)、実演は [デモ手順](DEMO.md) を参照する。
+
+## MetaMaskのアプリ間復帰（2026-09-26）
+
+`wallet-preparation.js` が接続準備を管理し、登録取引の状態とは分離する。準備状態はidle、pending、paused、ready、rejected、blocked、failed。pendingにはcheck/connect/add/switchの段階、要求IDと長期待ちの有無を持たせる。非表示中は次の要求を止め、復帰では読取りだけを行う。SDKの接続先チェーン指定を初回から要求せず、既定接続後に公開connection APIの対象チェーンを準備する。
+
+ウォレット境界はrestoreで既存権限を読み、switchChainとaddChainを別々の承認として扱う。4902、4001、-32002はSDKのrpcCodeや入れ子エラーも正規化する。MetaMaskへの移動で停止するブラウザ処理に依存した連続承認は前提にしない。
+
+sessionStorageにはカード/API単位のニックネーム、画面、準備開始マーカーだけを保存する。接続済みの判定には使わず、SDK/providerで再照合する。登録取引の既存の保存・再照会は維持する。公開APIとコントラクトの変更はない。

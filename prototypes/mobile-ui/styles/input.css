@@ -321,3 +321,14 @@
 
 .camera-resume { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 20px; }
 .camera-resume .btn { width: auto; min-height: 48px; height: auto; padding: 12px 18px; font-size: 1rem; }
+.wallet-preparation { border-top: 1px solid #dce4ed; padding-top: 20px; margin-top: 20px; text-align: left; }
+.wallet-network { font-size: 16px; font-weight: 700; color: #080e48; margin: 8px 0; }
+.wallet-status { display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 1.6; }
+.wallet-ready { color: #24734d; font-weight: 700; }
+.wallet-return { margin: 12px 0; font-size: 14px; line-height: 1.7; }
+.wallet-address { overflow-wrap: anywhere; font-size: 14px; margin-top: 8px; }
+.wallet-prepare-button { width: 100%; min-height: 48px; height: auto; padding: 12px; font-size: 16px; white-space: normal; margin-top: 12px; }
+.wallet-help-button { min-height: 44px; height: auto; margin-top: 8px; font-size: 14px; white-space: normal; }
+.network-settings { margin-top: 16px; font-size: 14px; }
+.network-settings summary { min-height: 44px; padding: 12px 0; cursor: pointer; }
+.network-settings p, #network-copy-status, #diagnostic-output { overflow-wrap: anywhere; white-space: pre-wrap; }

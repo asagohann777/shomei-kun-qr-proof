@@ -1,0 +1,28 @@
+[
+  {
+    "browser": "chromium",
+    "passed": true,
+    "actualMetaMask": false,
+    "realDevice": false,
+    "errors": [],
+    "approvalRequests": [
+      "eth_requestAccounts",
+      "wallet_switchEthereumChain",
+      "wallet_addEthereumChain",
+      "wallet_switchEthereumChain"
+    ]
+  },
+  {
+    "browser": "webkit",
+    "passed": true,
+    "actualMetaMask": false,
+    "realDevice": false,
+    "errors": [],
+    "approvalRequests": [
+      "eth_requestAccounts",
+      "wallet_switchEthereumChain",
+      "wallet_addEthereumChain",
+      "wallet_switchEthereumChain"
+    ]
+  }
+]
