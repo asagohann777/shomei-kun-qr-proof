@@ -24,13 +24,14 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     const page = await context.newPage();
     page.setDefaultTimeout(12000);
     const errors = [], screenshotWarnings = [], walletCalls = [], requests = [], assertions = [];
-    let screenshotActive = false, phase = 'unregistered', failRead = false, txReads = 0;
+    let screenshotActive = false, phase = 'unregistered', failRead = false, failPrepare = false, txReads = 0;
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', message => {
       if (message.type() !== 'error') return;
       const text = message.text();
+      if ((failRead || failPrepare) && text.startsWith('shomei_failure')) return;
       if (name === 'webkit' && screenshotActive && /Refused to apply a stylesheet/.test(text)) screenshotWarnings.push(text);
-      else if (!/Failed to load resource.*503|server responded with a status of 503/.test(text)) errors.push(text);
+      else if (!/Failed to load resource.*(503|422)|server responded with a status of (503|422)/.test(text)) errors.push(text);
     });
     page.on('request', request => requests.push({ url: request.url(), method: request.method() }));
     await page.exposeFunction('recordWalletMethod', method => walletCalls.push(method));
@@ -60,6 +61,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
       }
       if (path === '/api/v1/connection') { data = connection; validate = ConnectionResponse; }
       else if (path === `/api/v1/cards/${cardId}/registration/prepare`) {
+        if (failPrepare) return route.fulfill({ status: 422, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'X-Request-ID', 'X-Request-ID': '11111111-1111-4111-8111-111111111111' }, body: JSON.stringify({ meta: { mode: 'live' }, error: { code: 'WALLET_NOT_ALLOWED', message: 'Wallet not allowed' } }) });
         const input = route.request().postDataJSON();
         assert.deepEqual(input, { walletAddress: account, chainId, nickname });
         data = { cardId, nickname, transaction: { chainId, from: account, to: contract, value: '0', data: iface.encodeFunctionData('register', [cardId, nickname]) } };
@@ -151,6 +153,25 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     await action('retry-read').click();
     await page.locator('.result-page').waitFor();
     assertions.push('503 remains unavailable; explicit retry recovers');
+    phase = 'unregistered'; failPrepare = true;
+    await page.evaluate(() => localStorage.clear());
+    await page.goto(`${base}/?cardId=${cardId}`);
+    await action('start-register').click();
+    await page.locator('#nickname').fill(nickname);
+    await action('connect').click(); await action('confirm').click();
+    await page.locator('#consent').check(); await action('register-reviewed').click();
+    await action('copy-diagnostics').waitFor();
+    assert.match(await page.locator('[role="alert"]').innerText(), /登録許可先/);
+    await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async text => { window.copiedDiagnostics = text; } } }));
+    await action('copy-diagnostics').click();
+    await page.waitForFunction(() => Boolean(window.copiedDiagnostics));
+    const report = JSON.parse(await page.evaluate(() => window.copiedDiagnostics));
+    assert.equal(report.code, 'WALLET_NOT_ALLOWED'); assert.equal(report.walletAddress, account);
+    assert(report.errors.some(error => error.requestId === '11111111-1111-4111-8111-111111111111'));
+    assert.equal(walletCalls.filter(method => method === 'eth_sendTransaction').length, 1);
+    for (const width of [390, 320, 1365]) { await page.setViewportSize({ width, height: 844 }); await layout(`${width}-wallet-not-allowed`); }
+    failPrepare = false;
+    assertions.push('wrong wallet stops before signing; diagnostic copy includes code, account and request ID');
     let readonly = 'not run; set LIVE_READONLY_UI_URL to a live/mock build';
     if (readonlyBase) {
       phase = 'unregistered';

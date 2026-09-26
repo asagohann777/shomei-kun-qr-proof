@@ -1,0 +1,9 @@
+{
+  "previousRegistry": "0xE226ABd4e3866568C7bd53a57f2CA4b619EFB47e",
+  "status": "complete",
+  "transactionHash": "0x7e3c2064039ca1225cc729bc92540cba406d6dd0909e71bc4afcde265d51fe9f",
+  "contract": "0x0721F6260a83577015F71a50BB46c09B5e15BcAA",
+  "blockNumber": 18773,
+  "version": "1.1.0",
+  "registrationPermission": "any signed wallet; first registration only"
+}

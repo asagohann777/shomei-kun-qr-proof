@@ -1,5 +1,7 @@
 # Curvegrid Testnet連携の詳細設計
 
+2026-09-26訂正: デモの登録許可は全員。CLI省略時はallowedWallet=0で発行し、任意の本人ウォレットが初回登録できる。以下の指定許可ウォレットに関する記述は、非ゼロを指定した限定カードのみを指す。最新の配置・検証は [全員登録計画](OPEN_REGISTRATION_DEMO.md) を参照。
+
 状態: **実装済み・実環境の接続確認待ち。** 2026-09-26 JST。承認対象は `453387e`。リベース後の同一設計は `b537e04`。承認の出典は [変更記録](HACKATHON_CHANGES.md) を参照。
 
 [計画](CURVEGRID_INTEGRATION_PLAN.md) / [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) / [既存モック設計](BACKEND_DESIGN.md)

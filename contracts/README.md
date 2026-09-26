@@ -80,3 +80,7 @@ CLIは上流の生エラー、キー、署名済み取引を出力しない。�
 ## MultiBaas形式の根拠
 
 [公式SDK](https://github.com/curvegrid/multibaas-sdk-typescript/tree/main/docs) の `ContractOverview`、`ListContractVersions200ResponseAllOfResult`、`Contract`、`Address`、`EventIndexingStatus`、`TransactionToSignTx` に基づく。任意の404を不存在として扱わず、一覧取得が成功した場合にだけ未登録を判定する。既存LibraryのABI・bytecodeが異なる場合や、リンク済みバージョン・索引開始ブロックが異なる場合は停止する。
+
+## デモの全員登録
+
+`issue --card-id ID --state FILE --keystore FILE` のように `--wallet` を省略すると全員許可で発行する。コントラクト1.1.0ではallowedWalletのゼロアドレスが全員許可を示す。任意の本人ウォレットが初回登録でき、所有者は署名した送信者になる。登録済みカードの上書きはできない。従来の `--wallet ADDRESS` は指定先に限定する場合だけ使う。

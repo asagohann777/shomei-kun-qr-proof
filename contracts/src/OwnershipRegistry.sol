@@ -30,7 +30,6 @@ contract OwnershipRegistry {
             if (!((c >= 0x30 && c <= 0x39) || (c >= 0x41 && c <= 0x5a) ||
                 (c >= 0x61 && c <= 0x7a) || c == 0x5f || c == 0x2d)) revert InvalidCardId();
         }
-        if (allowedWallet == address(0)) revert InvalidWallet();
         bytes32 key = keccak256(id);
         if (cards[key].exists) revert CardAlreadyIssued();
         cards[key] = Card(true, allowedWallet, address(0), "");
@@ -41,7 +40,7 @@ contract OwnershipRegistry {
         Card storage card = cards[key];
         if (!card.exists) revert CardNotFound();
         if (card.owner != address(0)) revert AlreadyRegistered();
-        if (msg.sender != card.allowedWallet) revert WalletNotAllowed();
+        if (card.allowedWallet != address(0) && msg.sender != card.allowedWallet) revert WalletNotAllowed();
         if (bytes(nickname).length == 0 || bytes(nickname).length > 96) revert InvalidNicknameLength();
         card.owner = msg.sender;
         card.nickname = nickname;

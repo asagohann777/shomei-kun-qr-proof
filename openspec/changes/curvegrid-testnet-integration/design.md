@@ -1,5 +1,7 @@
 # Design
 
+2026-09-26訂正: デモの登録許可は全員。CLI省略時はallowedWallet=0で発行し、任意の本人ウォレットが初回登録できる。以下の指定許可ウォレットに関する記述は、非ゼロを指定した限定カードのみを指す。最新の配置・検証は [全員登録計画](../../../../specs/OPEN_REGISTRATION_DEMO.md) を参照。
+
 ## Context
 
 背景は [proposal](proposal.md) を参照。現在のAPIはmockのみで、固定のAmoy chain IDを返す。実接続の設定値は未提供。UIは別担当が並行開発する。

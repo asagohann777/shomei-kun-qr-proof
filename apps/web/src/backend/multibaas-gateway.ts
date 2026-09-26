@@ -136,10 +136,10 @@ export class MultiBaasGateway implements RegistrationGateway {
       if (allowedWallet !== zeroAddress || registered || owner !== zeroAddress || nickname !== "") throw unavailable();
       return null;
     }
-    if (allowedWallet === zeroAddress || registered !== (owner !== zeroAddress)) throw unavailable();
+    if (registered !== (owner !== zeroAddress)) throw unavailable();
     const common = { cardId, playerName: "証明一郎", allowedWallet };
     if (!registered) { if (nickname !== "") throw unavailable(); return { ...common, kind: "unregistered" }; }
-    if (!nickname.isWellFormed() || owner !== allowedWallet || new TextEncoder().encode(nickname).length < 1 || new TextEncoder().encode(nickname).length > 96) throw unavailable();
+    if (!nickname.isWellFormed() || (allowedWallet !== zeroAddress && owner !== allowedWallet) || new TextEncoder().encode(nickname).length < 1 || new TextEncoder().encode(nickname).length > 96) throw unavailable();
     return { ...common, kind: "registered", owner: { address: owner, nickname } };
   }
   async buildRegistrationTransaction(input: {cardId: string; walletAddress: string; nickname: string}): Promise<UnsignedTransaction> {

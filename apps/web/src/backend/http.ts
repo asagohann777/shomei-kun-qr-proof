@@ -124,6 +124,7 @@ async function readPrepareInput(request: Request): Promise<PrepareInput> {
 
 async function respond(request: Request, operation: MockOperation | "getConnection", run: (mode: Mode) => Promise<unknown>): Promise<Response> {
   const mode = process.env.BACKEND_MODE === "live" ? "live" : "mock";
+  const requestId = crypto.randomUUID();
   let responseHeaders = new Headers({ ...headers, Vary: "Origin" });
   let response: Response;
   try {
@@ -143,14 +144,18 @@ async function respond(request: Request, operation: MockOperation | "getConnecti
     response = Response.json({ meta: { mode }, data: await run(mode) });
   } catch (error) {
     if (error instanceof ApiError) {
-      if (error.status >= 500) console.error("backend_error", { operation, code: error.code });
+      const log = { requestId, operation, mode, status: error.status, code: error.code, ...error.diagnostics };
+      if (error.status >= 500) console.error("backend_error", log);
+      else console.warn("backend_rejected", log);
       response = errorResponse(error.status, error.code, mode, error.details);
     } else {
       const code = error instanceof GatewayUnavailableError ? "UPSTREAM_UNAVAILABLE" : "INTERNAL_ERROR";
-      console.error("backend_error", { operation, code });
+      console.error("backend_error", { requestId, operation, mode, code });
       response = errorResponse(code === "UPSTREAM_UNAVAILABLE" ? 503 : 500, code, mode);
     }
   }
+  responseHeaders.set("X-Request-ID", requestId);
+  responseHeaders.set("Access-Control-Expose-Headers", "X-Request-ID");
   responseHeaders.forEach((value, key) => response.headers.set(key, value));
   return response;
 }

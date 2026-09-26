@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
-import { JsonRpcProvider, Wallet, keccak256 } from 'ethers';
+import { JsonRpcProvider, Wallet, ZeroAddress, keccak256 } from 'ethers';
 import { z } from 'zod';
 import artifact from '../abi/OwnershipRegistry.json';
 import { execute, resume } from './issuer';
@@ -40,7 +40,7 @@ async function password(): Promise<string> {
 async function main() {
   const { values, positionals } = parseArgs({ allowPositionals: true, options: { state: { type: 'string' }, keystore: { type: 'string' }, 'card-id': { type: 'string' }, wallet: { type: 'string' }, rebroadcast: { type: 'boolean', default: false }, help: { type: 'boolean' } } });
   if (values.help) {
-    process.stdout.write('issuer deploy --state FILE --keystore FILE\nissuer issue --card-id ID --wallet ADDRESS --state FILE --keystore FILE\nissuer show --card-id ID\nissuer resume --state FILE [--rebroadcast]\n'); return;
+    process.stdout.write('issuer deploy --state FILE --keystore FILE\nissuer issue --card-id ID [--wallet ADDRESS] --state FILE --keystore FILE\nissuer show --card-id ID\nissuer resume --state FILE [--rebroadcast]\n'); return;
   }
   const command = z.enum(['deploy', 'issue', 'show', 'resume']).parse(positionals[0]);
   if (positionals.length !== 1 || (values.rebroadcast && command !== 'resume')) throw new Error('Invalid command arguments');
@@ -62,7 +62,7 @@ async function main() {
       else {
         const keyFile = values.keystore ?? setting('ISSUER_KEYSTORE_PATH');
         const signer = await Wallet.fromEncryptedJson(await readFile(keyFile, 'utf8'), await password());
-        const operation = command === 'deploy' ? { kind: 'deploy' as const, bytecodeHash: keccak256(artifact.bytecode) } : { kind: 'issue' as const, contract: address.parse(setting('REGISTRY_ADDRESS')), cardId: cardId.parse(values['card-id']), wallet: address.parse(values.wallet) };
+        const operation = command === 'deploy' ? { kind: 'deploy' as const, bytecodeHash: keccak256(artifact.bytecode) } : { kind: 'issue' as const, contract: address.parse(setting('REGISTRY_ADDRESS')), cardId: cardId.parse(values['card-id']), wallet: address.parse(values.wallet ?? ZeroAddress) };
         result = await execute(context, operation, state, signer);
       }
     }

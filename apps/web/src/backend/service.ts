@@ -21,6 +21,10 @@ async function requireCard(gateway: RegistrationGateway, cardId: CardId): Promis
   return card;
 }
 
+function walletAllowed(card: CardRecord, wallet: string): boolean {
+  return card.allowedWallet === "0x0000000000000000000000000000000000000000" || sameHex(wallet, card.allowedWallet);
+}
+
 function eventMatchesCard(
   event: RegistrationEvent,
   card: Extract<CardRecord, { kind: "registered" }>,
@@ -30,7 +34,7 @@ function eventMatchesCard(
     event.cardId === card.cardId &&
     sameHex(event.emitter, gateway.registry.contractAddress) &&
     sameHex(event.owner, card.owner.address) &&
-    sameHex(event.owner, card.allowedWallet) &&
+    walletAllowed(card, event.owner) &&
     event.nickname === card.owner.nickname
   );
 }
@@ -81,8 +85,10 @@ export async function prepareRegistration({
   if (input.chainId !== gateway.registry.chainId) {
     throw new ApiError(422, "CHAIN_MISMATCH", "Wrong chain");
   }
-  if (!sameHex(input.walletAddress, card.allowedWallet)) {
-    throw new ApiError(422, "WALLET_NOT_ALLOWED", "Wallet not allowed");
+  if (!walletAllowed(card, input.walletAddress)) {
+    throw new ApiError(422, "WALLET_NOT_ALLOWED", "Wallet not allowed", undefined, {
+      cardId, walletAddress: input.walletAddress, allowedWallet: card.allowedWallet, chainId: input.chainId,
+    });
   }
   if (gateway.mode !== "live" && input.nickname !== sample.nickname) {
     throw new ApiError(422, "MOCK_SAMPLE_UNSUPPORTED", "Only the sample nickname is available");
@@ -130,7 +136,8 @@ export async function getRegistrationTransaction({
     !sameHex(transaction.hash, txHash) ||
     transaction.chainId !== gateway.registry.chainId ||
     !sameHex(transaction.to, gateway.registry.contractAddress) ||
-    !sameHex(transaction.from, card.allowedWallet)
+    !walletAllowed(card, transaction.from) ||
+    (card.kind === "registered" && !sameHex(transaction.from, card.owner.address))
   ) {
     return unknown("RECORD_MISMATCH");
   }

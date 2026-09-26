@@ -57,7 +57,7 @@ export class MultiBaas implements RegistryApi {
     if (Array.isArray(output) && output.length !== 5) throw new Error('Invalid card tuple');
     const candidate = Array.isArray(output) ? { exists: output[0], allowedWallet: output[1], registered: output[2], owner: output[3], nickname: output[4] } : output;
     const result = card.parse(candidate);
-    if ((!result.exists && (result.allowedWallet !== ZeroAddress || result.registered || result.nickname !== '')) || (result.exists && result.allowedWallet === ZeroAddress) || (!result.registered && result.nickname !== '') || (result.registered && (result.owner !== result.allowedWallet || Buffer.byteLength(result.nickname) < 1 || Buffer.byteLength(result.nickname) > 96)) || result.registered !== (result.owner !== ZeroAddress)) throw new Error('Inconsistent card state');
+    if ((!result.exists && (result.allowedWallet !== ZeroAddress || result.registered || result.nickname !== '')) || (!result.registered && result.nickname !== '') || (result.registered && ((result.allowedWallet !== ZeroAddress && result.owner !== result.allowedWallet) || Buffer.byteLength(result.nickname) < 1 || Buffer.byteLength(result.nickname) > 96)) || result.registered !== (result.owner !== ZeroAddress)) throw new Error('Inconsistent card state');
     return result;
   }
   async checkRegistry(contract: string, issuer: string) {

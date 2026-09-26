@@ -76,3 +76,23 @@ test("a matching failed transaction is reverted and a missing transaction is unk
   assert.deepEqual(await getRegistrationTransaction({ cardId, txHash, gateway: gateway({ getReceipt: async () => ({ ...receipt, status: "reverted", events: [] }) }) }), { cardId, transactionHash: txHash, status: "reverted" });
   assert.deepEqual(await getRegistrationTransaction({ cardId, txHash, gateway: gateway({ getTransaction: async () => null }) }), { cardId, transactionHash: txHash, status: "unknown", reason: "TRANSACTION_NOT_SEEN" });
 });
+
+test("open cards prepare a transaction for any connected sender", async () => {
+  const port = gateway({ readCard: async () => ({ kind: "unregistered", cardId, playerName: "証明一郎", allowedWallet: "0x0000000000000000000000000000000000000000" }) });
+  for (const walletAddress of [wallet, issuer]) {
+    const result = await prepareRegistration({ cardId, input: { chainId, walletAddress, nickname }, gateway: port });
+    assert.equal(result.transaction.from, walletAddress);
+    assert.equal(result.transaction.value, "0");
+  }
+});
+
+test('open card confirmation checks the actual owner, not the open permission sentinel', async () => {
+  const allowedWallet = '0x0000000000000000000000000000000000000000';
+  const port = gateway({ readCard: async () => ({ ...card, allowedWallet }) });
+  assert.equal((await getCard({ cardId, gateway: port })).evidence.status, 'available');
+  assert.equal((await getRegistrationTransaction({ cardId, txHash, gateway: port })).status, 'confirmed');
+  const wrongSender = gateway({ readCard: port.readCard, getTransaction: async () => ({ ...transaction, from: issuer }) });
+  assert.deepEqual(await getRegistrationTransaction({ cardId, txHash, gateway: wrongSender }), unknown);
+  const pending = gateway({ readCard: async () => ({ kind: 'unregistered', cardId, playerName: '証明一郎', allowedWallet }), getTransaction: async () => ({ ...transaction, pending: true }) });
+  assert.equal((await getRegistrationTransaction({ cardId, txHash, gateway: pending })).status, 'pending');
+});

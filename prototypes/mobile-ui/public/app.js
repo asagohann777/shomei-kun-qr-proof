@@ -129,12 +129,12 @@ function registrationScene() {
 function processView() {
   const view = state.view;
   if (liveEnabled && view === 'approval') return `<section class="page" aria-busy="true"><div class="status-symbol">${icon('wallet')}</div><h1 class="page-title" role="status">${t('approvalTitle')}</h1><p class="process-copy">${t('approvalCopy')}</p><div class="info-panel">${detailTable(false)}</div></section>`;
-  if (liveEnabled && view === 'unknown') return `<section class="page"><div class="status-symbol warning">${icon('info')}</div><h1 class="page-title">${t('unknownTitle')}</h1><p class="process-copy">${t(liveSnapshot?.registration.hash ? 'unknownCopy' : 'unknownNoHash')}</p>${liveSnapshot?.registration.hash ? `<p class="process-copy">${escape(liveSnapshot.registration.hash)}</p>` : `<label class="form-label" for="transaction-hash">${t('hashLabel')}</label><input class="input input-bordered" id="transaction-hash" placeholder="${t('hashPlaceholder')}" autocomplete="off">`}${liveError ? `<p class="alert alert-error">${escape(t(liveError))}</p>` : ''}</section>${footer('recheck', t('recheck'))}`;
+  if (liveEnabled && view === 'unknown') return `<section class="page"><div class="status-symbol warning">${icon('info')}</div><h1 class="page-title">${t('unknownTitle')}</h1><p class="process-copy">${t(liveSnapshot?.registration.hash ? 'unknownCopy' : 'unknownNoHash')}</p>${liveSnapshot?.registration.hash ? `<p class="process-copy">${escape(liveSnapshot.registration.hash)}</p>` : `<label class="form-label" for="transaction-hash">${t('hashLabel')}</label><input class="input input-bordered" id="transaction-hash" placeholder="${t('hashPlaceholder')}" autocomplete="off">`}${liveError ? `<p class="alert alert-error">${escape(t(liveError))}</p>${diagnosticControls()}` : ''}</section>${footer('recheck', t('recheck'))}`;
   if (view === 'success') return registeredView(true);
   const active = ['sent', 'confirming', 'processing-preview'].includes(view);
   if (active) return `<section class="page processing-page" aria-busy="true">${registrationScene()}<h1 class="page-title" role="status">${t('confirmingTitle')}</h1><p class="process-copy">${t(view === 'sent' ? 'sentCopy' : 'confirmingCopy')}</p></section>`;
   const config = { approval: ['wallet', '', 'approvalTitle', 'approvalCopy'], rejected: ['close', '', 'rejectedTitle', 'rejectedCopy'], failed: ['close', 'error', 'failedTitle', 'failedCopy'], unknown: ['info', 'warning', 'unknownTitle', 'unknownCopy'] }[view];
-  return `<section class="page"><div class="status-symbol ${config[1]}">${icon(config[0])}</div><h1 class="page-title">${t(config[2])}</h1><p class="process-copy">${t(config[3])}</p>${liveEnabled && liveError ? `<p class="alert alert-error" role="alert">${escape(t(liveError))}</p>` : ''}${view === 'approval' ? `<div class="info-panel">${detailTable(false)}</div><button class="btn btn-ghost home-link" data-action="reject">${t('reject')}</button>` : ''}</section>${footer(view === 'approval' ? 'approve' : view === 'unknown' ? 'recheck' : 'edit-again', t(view === 'approval' ? 'approve' : view === 'unknown' ? 'recheck' : 'editAgain'))}`;
+  return `<section class="page"><div class="status-symbol ${config[1]}">${icon(config[0])}</div><h1 class="page-title">${t(config[2])}</h1><p class="process-copy">${t(config[3])}</p>${liveEnabled && liveError ? `<p class="alert alert-error" role="alert">${escape(t(liveError))}</p>${diagnosticControls()}` : ''}${view === 'approval' ? `<div class="info-panel">${detailTable(false)}</div><button class="btn btn-ghost home-link" data-action="reject">${t('reject')}</button>` : ''}</section>${footer(view === 'approval' ? 'approve' : view === 'unknown' ? 'recheck' : 'edit-again', t(view === 'approval' ? 'approve' : view === 'unknown' ? 'recheck' : 'editAgain'))}`;
 }
 function dialogs() {
   if (liveEnabled) return liveDialogs();
@@ -233,11 +233,16 @@ function liveDialogs() {
   const evidence = card?.evidence.transactionHash ? `<a class="btn btn-outline w-full mt-5" target="_blank" rel="noopener noreferrer" href="${escape(`${config.apiBaseUrl}/api/v1/cards/${encodeURIComponent(cardLabel())}/transactions/${card.evidence.transactionHash}`)}">${t('recordDetails')}${icon('link')}</a>` : '';
   return `<dialog id="help-dialog" class="modal modal-bottom" aria-labelledby="help-title"><div class="modal-box"><h2 id="help-title">${t('help')}</h2><p id="help-copy" class="process-copy">${t('helpCopy')}</p><form method="dialog"><button class="btn btn-primary w-full mt-5">${t('close')}</button></form></div></dialog><dialog id="details-dialog" class="modal modal-bottom" aria-labelledby="details-title"><div class="modal-box"><h2 id="details-title">${t('detailsTitle')}</h2><p class="process-copy">${t('physicalNote')}</p><dl class="data-list">${details}</dl>${evidence}<form method="dialog"><button class="btn btn-primary w-full mt-5">${t('close')}</button></form></div></dialog><dialog id="scenarios-dialog" class="modal modal-bottom" aria-labelledby="settings-title"><div class="modal-box"><h2 id="settings-title">${t('liveMenu')}</h2><button class="btn btn-outline w-full mt-5" data-action="language">${icon('globe')}${locale === 'ja' ? 'English' : '日本語'}</button>${liveSnapshot?.wallet.kind === 'connected' ? `<button class="btn btn-outline w-full mt-5" data-action="disconnect">${t('disconnect')}</button>` : ''}<button class="btn btn-outline w-full mt-5" data-action="share">${t('shareView')}</button><p id="share-status" aria-live="polite"></p><form method="dialog"><button class="btn btn-primary w-full mt-5">${t('close')}</button></form></div></dialog>`;
 }
+function diagnosticControls() {
+  return `<button class="btn btn-outline w-full mt-5" data-action="copy-diagnostics">${t('copyDiagnostics')}</button><pre id="diagnostic-output" class="process-copy" aria-live="polite"></pre>`;
+}
 function liveNotice(code) {
+  if (code === 'INSUFFICIENT_FUNDS') return 'insufficientFunds';
+  if (code === 'WALLET_4001') return 'rejectedCopy';
   if (code === 'WALLET_CHANGED' || code === 'WALLET_DISCONNECTED') return 'networkChanged';
   if (code === 'LOCKS_UNAVAILABLE') return 'unsupported';
   if (code === 'REGISTRATION_IN_PROGRESS') return 'otherTab';
-  if (code === 'WALLET_NOT_ALLOWED') return 'wrongWalletTitle';
+  if (code === 'WALLET_NOT_ALLOWED') return 'walletNotAllowedHelp';
   if (code === 'CHAIN_MISMATCH') return 'wrongChainTitle';
   if (code === 'INVALID_NICKNAME' || code === 'INVALID_INPUT') return 'nicknameInvalid';
   if (code?.includes('STORAGE')) return 'storageFailed';
@@ -277,6 +282,14 @@ async function openLiveCard(cardId) {
   } else { qrIdentity = null; qrSource = './card-qr.svg'; render(); }
 }
 async function handleLiveAction(action) {
+  if (action === 'copy-diagnostics') {
+    const { diagnostics } = await import('../src/live-api.js');
+    const report = JSON.stringify({ cardId: currentCardId, walletAddress: liveSnapshot?.wallet.address ?? null, chainId: liveSnapshot?.wallet.chainId ?? null, code: liveSnapshot?.registration.errorCode ?? null, errors: diagnostics() }, null, 2);
+    const output = root.querySelector('#diagnostic-output');
+    try { await navigator.clipboard.writeText(report); output.textContent = t('diagnosticsCopied'); }
+    catch { output.textContent = report; }
+    return true;
+  }
   if (['approve', 'reject', 'connect-sample'].includes(action)) return true;
   if (action === 'home' || action === 'scan-again') {
     if (['approval', 'sent', 'confirming', 'unknown'].includes(state.view)) return true;

@@ -1,5 +1,8 @@
 export const liveMessages = {
   ja: {
+    insufficientFunds: 'ガス代が足りません。接続したウォレットにテスト用ETHを補充してください。',
+    walletNotAllowedHelp: 'このカードの登録許可先と、接続中のウォレットが違います。許可されたアカウントに切り替えてください。',
+    copyDiagnostics: 'エラー詳細をコピー', diagnosticsCopied: 'コピーしました。調査する相手に共有してください。',
     title: '証明くん | Testnet', demo: 'Testnet', noTransaction: '実際に登録されます',
     readonly: '閲覧専用', connectingWallet: '接続中', loading: '確認しています', connectDescription: 'MetaMaskで接続します。',
     approvalCopy: 'MetaMaskで内容を確認してください。', switchChain: 'ネットワークを切替',
@@ -14,6 +17,9 @@ export const liveMessages = {
     scanButton: '試験カードを確認', recordedNote: '登録取引と所有者を確認しました。',
   },
   en: {
+    insufficientFunds: 'Not enough gas. Add test ETH to the connected wallet.',
+    walletNotAllowedHelp: 'This wallet is not authorized for this card. Switch to the authorized account.',
+    copyDiagnostics: 'Copy error details', diagnosticsCopied: 'Copied. Share these details for investigation.',
     title: 'Shomei-kun | Testnet', demo: 'Testnet', noTransaction: 'Real registration',
     readonly: 'Read only', connectingWallet: 'Connecting', loading: 'Checking record', connectDescription: 'Connect with MetaMask.',
     approvalCopy: 'Review the transaction in MetaMask.', switchChain: 'Switch network',

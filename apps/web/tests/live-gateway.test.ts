@@ -187,3 +187,12 @@ test("redirect responses are rejected without forwarding credentials", async () 
   assert.equal(calls.length, 1);
   assert.equal(calls[0]?.init?.redirect, "manual");
 });
+
+test("open card decoding preserves issued and registered states with zero permission address", async () => {
+  for (const registered of [false, true]) {
+    const { gateway } = syntheticGateway((path) => path.endsWith('/methods/getCard') ? { output: [true, zero, registered, registered ? wallet : zero, registered ? nickname : ''] } : undefined);
+    const result = await gateway.readCard(cardId);
+    assert.equal(result?.kind, registered ? 'registered' : 'unregistered');
+    assert.equal(result?.allowedWallet, zero);
+  }
+});

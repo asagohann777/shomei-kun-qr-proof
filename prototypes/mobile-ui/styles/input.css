@@ -262,3 +262,5 @@
   overflow-wrap: anywhere;
   min-width: 0;
 }
+
+#diagnostic-output { white-space: pre-wrap; text-align: left; font-size: 12px; }

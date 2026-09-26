@@ -44,7 +44,9 @@ test('issuer authority, zero addresses, card ID boundaries and unissued registra
   const { registry, owner, issuer } = await setup();
   await rejects(() => new ContractFactory(abi, artifact.bytecode, issuer).deploy(ZeroAddress), 'InvalidWallet');
   await rejects(() => registry.connect(owner).getFunction('issue')('ok', owner.address), 'UnauthorizedIssuer');
-  await rejects(() => registry.getFunction('issue')('ok', ZeroAddress), 'InvalidWallet');
+  await (await registry.getFunction('issue')('open', ZeroAddress)).wait();
+  await (await registry.connect(owner).getFunction('register')('open', 'any wallet')).wait();
+  assert.equal((await registry.getFunction('getCard')('open')).owner, owner.address);
   for (const id of ['', 'x'.repeat(65), 'a b', '証明', 'a.b', 'a/b']) await rejects(() => registry.getFunction('issue')(id, owner.address), 'InvalidCardId');
   for (const id of ['a', 'x'.repeat(64), 'AZaz09_-']) await (await registry.getFunction('issue')(id, owner.address)).wait();
   await rejects(() => registry.connect(owner).getFunction('register')('missing', 'name'), 'CardNotFound');
@@ -67,4 +69,15 @@ test('UTF8 nickname limits and concurrent registration preserve first owner', as
     await assert.rejects(() => second.wait());
     assert.equal((await registry.getFunction('getCard')('race')).nickname, 'first');
   } finally { await hre.network.provider.send('evm_setAutomine', [true]); }
+});
+
+test('open card accepts different wallets and the first registration wins', async () => {
+  const { registry, owner, other } = await setup();
+  await (await registry.getFunction('issue')('open-first', ZeroAddress)).wait();
+  await (await registry.connect(other).getFunction('register')('open-first', 'first')).wait();
+  await rejects(() => registry.connect(owner).getFunction('register')('open-first', 'second'), 'AlreadyRegistered');
+  assert.equal((await registry.getFunction('getCard')('open-first')).owner, other.address);
+  await (await registry.getFunction('issue')('open-next', ZeroAddress)).wait();
+  await (await registry.connect(owner).getFunction('register')('open-next', 'next')).wait();
+  assert.equal((await registry.getFunction('getCard')('open-next')).owner, owner.address);
 });

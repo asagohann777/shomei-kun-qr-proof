@@ -72,3 +72,25 @@ test("live rejects mock header with its reserved code even when configuration is
     assert.ok(ErrorResponse(value)); assert.equal(value.error.code, "INVALID_MOCK_SCENARIO");
   });
 });
+
+test('wallet rejection logs correlate with the response without exposing private inputs', async (t) => {
+  const warning = t.mock.method(console, 'warn', () => {});
+  await configured({ BACKEND_MODE: 'mock' }, async () => {
+    const walletAddress = '0x5555555555555555555555555555555555555555';
+    const response = await handlePrepareRequest(new Request(`${base}/api/v1/cards/${sample.cardId}/registration/prepare`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ walletAddress, chainId: sample.chainId, nickname: 'do-not-log-this-name' }),
+    }), sample.cardId);
+    assert.equal(response.status, 422);
+    const requestId = response.headers.get('x-request-id');
+    assert.match(requestId ?? '', /^[a-f0-9-]{36}$/);
+    assert.equal(response.headers.get('access-control-expose-headers'), 'X-Request-ID');
+    const log = JSON.stringify(warning.mock.calls.map(call => call.arguments));
+    assert(log.includes(requestId ?? 'missing'));
+    assert(log.includes(walletAddress)); assert(log.includes(sample.walletAddress));
+    assert(!log.includes('do-not-log-this-name'));
+    const body = await response.json();
+    assert.equal(body.error.code, 'WALLET_NOT_ALLOWED');
+    assert.equal(body.error.diagnostics, undefined);
+  });
+});

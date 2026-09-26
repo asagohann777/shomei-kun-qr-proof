@@ -1,12 +1,12 @@
 import { Interface } from 'ethers';
 import artifact from '../../../contracts/abi/OwnershipRegistry.json' with { type: 'json' };
 import { CardId, Address, TransactionHash } from '../../../apps/web/src/generated/validators.js';
-import { createLiveApi, LiveError } from './live-api.js';
+import { createLiveApi, LiveError, recordFailure } from './live-api.js';
 
 const contract = new Interface(artifact.abi);
 const same = (a, b) => typeof a === 'string' && typeof b === 'string' && a.toLowerCase() === b.toLowerCase();
 const busy = new Set(['preparing', 'approval', 'pending', 'unknown']);
-const code = error => typeof error?.code === 'string' ? error.code : 'UPSTREAM_UNAVAILABLE';
+const code = error => /insufficient funds/i.test(String(error?.message ?? '')) ? 'INSUFFICIENT_FUNDS' : typeof error?.code === 'string' && /^[A-Z0-9_]{1,64}$/.test(error.code) ? error.code : Number.isInteger(error?.code) ? `WALLET_${error.code}` : 'UPSTREAM_UNAVAILABLE';
 const validNickname = value => typeof value === 'string' && value.isWellFormed() && new TextEncoder().encode(value).length > 0 && new TextEncoder().encode(value).length <= 96;
 
 export function createLiveRegistration(config, changed, dependencies = {}) {
@@ -25,7 +25,10 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
     state.canRegister = config.walletMode === 'metamask' && state.read.kind === 'ready' && state.read.card.status === 'unregistered' && state.wallet.kind === 'connected' && state.wallet.chainId === state.read.connection.registry.chainId && !busy.has(state.registration.kind) && !submitting;
     if (!disposed) changed(snapshot());
   }
-  function registration(next) { state.registration = next; emit(); }
+  function registration(next) {
+    if (next.errorCode) recordFailure({ operation: 'registration', code: next.errorCode, state: next.kind, cardId, walletAddress: state.wallet.address ?? null, chainId: state.wallet.chainId ?? null, transactionHash: next.hash ?? null });
+    state.registration = next; emit();
+  }
   function setWallet(value) {
     const next = value ? { kind: 'connected', address: value.address, chainId: value.chainId } : { kind: 'disconnected' };
     if (JSON.stringify(next) !== JSON.stringify(state.wallet)) state.walletRevision++;

@@ -72,6 +72,7 @@ export class ApiError extends Error {
     readonly code: ApiErrorCode,
     message: string,
     readonly details?: { missingSettings: string[] },
+    readonly diagnostics?: { cardId: string; walletAddress: string; allowedWallet: string; chainId: number },
   ) {
     super(message);
     this.name = "ApiError";
