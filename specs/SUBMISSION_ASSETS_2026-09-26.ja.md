@@ -1,4 +1,4 @@
-[English](SUBMISSION_ASSETS_2026-09-26.md) | 日本語
+[English](SUBMISSION_ASSETS_2026-09-26.md) | 日本語（原文保存版）
 
 # 提出用スクリーンショットと画像素材
 

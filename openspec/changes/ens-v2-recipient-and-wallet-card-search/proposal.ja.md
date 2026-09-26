@@ -1,4 +1,4 @@
-[English](proposal.md) | 日本語
+[English](proposal.md) | 日本語（原文保存版）
 
 # Proposal
 

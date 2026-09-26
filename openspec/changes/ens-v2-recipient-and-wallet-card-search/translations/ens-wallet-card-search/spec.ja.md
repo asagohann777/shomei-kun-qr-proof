@@ -1,4 +1,4 @@
-[English](../../specs/ens-wallet-card-search/spec.md) | 日本語
+[English](../../specs/ens-wallet-card-search/spec.md) | 日本語（原文保存版）
 
 # Spec Delta
 

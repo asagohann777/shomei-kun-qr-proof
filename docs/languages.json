@@ -1,0 +1,299 @@
+{
+  "source_commit": "900486440500f614e1c3dcd0c525866dd0864d14",
+  "scope": "English-first reader documentation; captured prompts, supplied text transcripts, sample values, and raw evidence remain unchanged.",
+  "pairs": [
+    {
+      "english": "AGENTS.md",
+      "japanese": "AGENTS.ja.md",
+      "original_sha256": "3244c802cee5ce8ed723fa08cb6cc1d9a209bd3d78bb7e6012ff28a3a90b2158"
+    },
+    {
+      "english": "README.md",
+      "japanese": "README.ja.md"
+    },
+    {
+      "english": "apps/web/README.md",
+      "japanese": "apps/web/README.ja.md",
+      "original_sha256": "4fa691ce7edaf9073aa36cb8d2c42d125ab8b9a15b28353d83ac312fbb5e52ba"
+    },
+    {
+      "english": "contracts/README.md",
+      "japanese": "contracts/README.ja.md",
+      "original_sha256": "0a34a31118a89593cee48c371c1ae3376b01c4ef8c5237694d2eef3fa451c435"
+    },
+    {
+      "english": "docs/LANGUAGES.md",
+      "japanese": "docs/LANGUAGES.ja.md"
+    },
+    {
+      "english": "docs/prompts/2026-09-26/apple-metamask-browser-request.md",
+      "japanese": "docs/prompts/2026-09-26/apple-metamask-browser-request.ja.md",
+      "original_sha256": "3e4dad119582f6070c1e193a7ffddc7f8935c5b3a6ab25cd2dbfc9a1267e60ee"
+    },
+    {
+      "english": "docs/prompts/2026-09-26/camera-integration-request.md",
+      "japanese": "docs/prompts/2026-09-26/camera-integration-request.ja.md",
+      "original_sha256": "961ecf3f1e85ed326ad340524f2cf328c21af2b34080eacbbfeda127fb3277b0"
+    },
+    {
+      "english": "docs/prompts/2026-09-26/metamask-preparation-request.md",
+      "japanese": "docs/prompts/2026-09-26/metamask-preparation-request.ja.md",
+      "original_sha256": "c8299e6aea6c79b92b27e89ca1369312846906518be2955ffb3f7ae0f4f84e44"
+    },
+    {
+      "english": "docs/prompts/2026-09-26/spec-sync-request.md",
+      "japanese": "docs/prompts/2026-09-26/spec-sync-request.ja.md",
+      "original_sha256": "5eea03d8d10fc2a6132b760b882fec4242c85336d024124b638536da046d1a25"
+    },
+    {
+      "english": "docs/prompts/README.md",
+      "japanese": "docs/prompts/README.ja.md",
+      "original_sha256": "f8d716b8f4c4206737e7ee60aec45ef0fad0ffa78f8e4f0efa9bd1496322364f"
+    },
+    {
+      "english": "docs/prompts/asagohann777-design-2026-09-25.md",
+      "japanese": "docs/prompts/asagohann777-design-2026-09-25.ja.md",
+      "original_sha256": "fd9197e0c617c5e9516e1e639addb2b411e058cea8d43a52a7ebf6d1862110fc"
+    },
+    {
+      "english": "docs/prompts/asagohann777-prompt-report-1-2026-09-26.md",
+      "japanese": "docs/prompts/asagohann777-prompt-report-1-2026-09-26.ja.md",
+      "original_sha256": "4f052586e5f3238796daf8a4e8055bc06c8a99388d41bdd904fc94162cbc07d9"
+    },
+    {
+      "english": "docs/prompts/backend-design-decisions.md",
+      "japanese": "docs/prompts/backend-design-decisions.ja.md",
+      "original_sha256": "78a682ec173b2e0fdd41cc0e54ffa8da7a17f3fbd945b9ece54f78ae58190866"
+    },
+    {
+      "english": "docs/prompts/bootstrap-request.md",
+      "japanese": "docs/prompts/bootstrap-request.ja.md",
+      "original_sha256": "2f7a2dba328270d33346869c75679cdc8e8c656e61af0bc03fb18dd8e57cc124"
+    },
+    {
+      "english": "docs/prompts/curvegrid-integration-decisions.md",
+      "japanese": "docs/prompts/curvegrid-integration-decisions.ja.md",
+      "original_sha256": "489873616612281479822122fa2f5134905125d53908f8310250ba523d1ba4e3"
+    },
+    {
+      "english": "docs/prompts/qr-proof-decisions.md",
+      "japanese": "docs/prompts/qr-proof-decisions.ja.md",
+      "original_sha256": "19892f108a0d9fe40248f404583f8ba041f42d7ed657a0653df1fc500c27436f"
+    },
+    {
+      "english": "openspec/changes/curvegrid-testnet-integration/design.md",
+      "japanese": "openspec/changes/curvegrid-testnet-integration/design.ja.md",
+      "original_sha256": "3f340cead40e29bbd96cc903b8b147dbe39b13501256d426a42aafb53ff14b5e",
+      "link_corrections": [
+        {
+          "from": "../../../../specs/OPEN_REGISTRATION_DEMO.md",
+          "to": "../../../specs/OPEN_REGISTRATION_DEMO.md"
+        }
+      ]
+    },
+    {
+      "english": "openspec/changes/curvegrid-testnet-integration/proposal.md",
+      "japanese": "openspec/changes/curvegrid-testnet-integration/proposal.ja.md",
+      "original_sha256": "e8dfa2e7854dcfefde740f0fb2d977aac44c3bd1a4f14a92ca9cc7a07cff95e7"
+    },
+    {
+      "english": "openspec/changes/curvegrid-testnet-integration/specs/curvegrid-registration-backend/spec.md",
+      "japanese": "openspec/changes/curvegrid-testnet-integration/translations/curvegrid-registration-backend/spec.ja.md",
+      "original_sha256": "a815f02065a93a97ed1deff48e00dec5c3c2b99b9782f602f3521560a03e1ff0"
+    },
+    {
+      "english": "openspec/changes/curvegrid-testnet-integration/tasks.md",
+      "japanese": "openspec/changes/curvegrid-testnet-integration/tasks.ja.md",
+      "original_sha256": "8893da4983b64a129b0171d7bbda959290cc73c8a7ed15335938bc28aaffc20b"
+    },
+    {
+      "english": "openspec/changes/ens-v2-recipient-and-wallet-card-search/design.md",
+      "japanese": "openspec/changes/ens-v2-recipient-and-wallet-card-search/design.ja.md",
+      "original_sha256": "d5f57410342f50100d8023a057a8f82f9bdd1a7f82174fcdb8ef5203a4972ae6"
+    },
+    {
+      "english": "openspec/changes/ens-v2-recipient-and-wallet-card-search/proposal.md",
+      "japanese": "openspec/changes/ens-v2-recipient-and-wallet-card-search/proposal.ja.md",
+      "original_sha256": "75bb5e6315688aed6c046668f4a186088540976d808a781917aae5fac0e808b9"
+    },
+    {
+      "english": "openspec/changes/ens-v2-recipient-and-wallet-card-search/specs/ens-wallet-card-search/spec.md",
+      "japanese": "openspec/changes/ens-v2-recipient-and-wallet-card-search/translations/ens-wallet-card-search/spec.ja.md",
+      "original_sha256": "85e401f902199731c1eabb998b4b672bccecb84e5993e51632fca528dc80bb08"
+    },
+    {
+      "english": "openspec/specs/curvegrid-registration-backend/spec.md",
+      "japanese": "openspec/specs/curvegrid-registration-backend/spec.ja.md",
+      "original_sha256": "2771d06633db80146a99829172752948cf68581a785fc5bacd3111bc6a1eebb8"
+    },
+    {
+      "english": "prototypes/mobile-ui/README.md",
+      "japanese": "prototypes/mobile-ui/README.ja.md",
+      "original_sha256": "19531965ceadfeac04749b2e3ee98779060a10817bb945cee78b7dbf73cb977f"
+    },
+    {
+      "english": "specs/APPLE_METAMASK_BROWSER_PLAN.md",
+      "japanese": "specs/APPLE_METAMASK_BROWSER_PLAN.ja.md",
+      "original_sha256": "b051147032aab8dee4973ef37f7adb30c9d42da1c11a1ec3cbcaae07f812beec"
+    },
+    {
+      "english": "specs/ARCHITECTURE.md",
+      "japanese": "specs/ARCHITECTURE.ja.md",
+      "original_sha256": "3335b225e52153209ff25790645586ff7ca53dd6a5b5730ded3629d43a1feaa3"
+    },
+    {
+      "english": "specs/BACKEND_DESIGN.md",
+      "japanese": "specs/BACKEND_DESIGN.ja.md",
+      "original_sha256": "608ed684def87f3f3e2c18660c56bc103ed154e889b85ff0ca328b82ac9823f4"
+    },
+    {
+      "english": "specs/BACKEND_IMPLEMENTATION.md",
+      "japanese": "specs/BACKEND_IMPLEMENTATION.ja.md",
+      "original_sha256": "65c48cbc5b2d81034cf994a335ef77b7e29ea2ce45fa12ae89203d38ed1e5a7a"
+    },
+    {
+      "english": "specs/CAMERA_SCAN.md",
+      "japanese": "specs/CAMERA_SCAN.ja.md",
+      "original_sha256": "a5d6ba5998cd7d147a1a61fea9f4135ce099766ac25caa6e44f8e12832b35ec0"
+    },
+    {
+      "english": "specs/CURVEGRID_CONNECTIVITY_REPORT.md",
+      "japanese": "specs/CURVEGRID_CONNECTIVITY_REPORT.ja.md",
+      "original_sha256": "b61a27a8efa8e6f577177e305d56edb4bc831d1aa5d0e5e3be4605e6e0006e0e"
+    },
+    {
+      "english": "specs/CURVEGRID_INTEGRATION_DESIGN.md",
+      "japanese": "specs/CURVEGRID_INTEGRATION_DESIGN.ja.md",
+      "original_sha256": "25d836421ef7cd5a72953e3318451d1dfa658acf9559205d6d99ebfe40bde7b7"
+    },
+    {
+      "english": "specs/CURVEGRID_INTEGRATION_IMPLEMENTATION.md",
+      "japanese": "specs/CURVEGRID_INTEGRATION_IMPLEMENTATION.ja.md",
+      "original_sha256": "b96ee640192b3c38451192c6c6e7230710219256a65c8aa0b2da08e870292133"
+    },
+    {
+      "english": "specs/CURVEGRID_INTEGRATION_PLAN.md",
+      "japanese": "specs/CURVEGRID_INTEGRATION_PLAN.ja.md",
+      "original_sha256": "418b364d892a93576c53b58e64b79f2b0b468c103d7c8a75030e818c03d43a15"
+    },
+    {
+      "english": "specs/CURVEGRID_INTEGRATION_RUNBOOK.md",
+      "japanese": "specs/CURVEGRID_INTEGRATION_RUNBOOK.ja.md",
+      "original_sha256": "1d72ae18f10aa9a46a2f62338c7428816b9266b8b2e844efccc3ed744da22d64"
+    },
+    {
+      "english": "specs/DEMO.md",
+      "japanese": "specs/DEMO.ja.md",
+      "original_sha256": "451602970797210655711f0d360c7d33583bdc71b4278b7de3c3757dad931fb3"
+    },
+    {
+      "english": "specs/ENS_UI_DESIGN.md",
+      "japanese": "specs/ENS_UI_DESIGN.ja.md"
+    },
+    {
+      "english": "specs/HACKATHON_CHANGES.md",
+      "japanese": "specs/HACKATHON_CHANGES.ja.md",
+      "original_sha256": "133b72a771d604cfd1925b1b960f1ba29f1ae0821b1553e27c220a1c6163e92a"
+    },
+    {
+      "english": "specs/INTEGRATION_CAMERA_PLAN.md",
+      "japanese": "specs/INTEGRATION_CAMERA_PLAN.ja.md",
+      "original_sha256": "7ed1b2330989a01885ddff41891b64f084457fc4355bb7b3afc1e49812c0a4d2"
+    },
+    {
+      "english": "specs/LICENSE_POLICY.md",
+      "japanese": "specs/LICENSE_POLICY.ja.md",
+      "original_sha256": "42066eb512dfc9788ec4a74d6dd910bf5e398138aabdbb6ac02d4b5d214c854a"
+    },
+    {
+      "english": "specs/METAMASK_PREPARATION_PLAN.md",
+      "japanese": "specs/METAMASK_PREPARATION_PLAN.ja.md",
+      "original_sha256": "2a7b21f5e427df072926df5d0ca192d19be5ee55ea2f57863d29629525da41a0"
+    },
+    {
+      "english": "specs/OPEN_REGISTRATION_DEMO.md",
+      "japanese": "specs/OPEN_REGISTRATION_DEMO.ja.md",
+      "original_sha256": "712dacc1809104f441f2753776f1902c20edadbdc989dbe9198d2e5bddda45d0"
+    },
+    {
+      "english": "specs/PLAN.md",
+      "japanese": "specs/PLAN.ja.md",
+      "original_sha256": "dbdb42608ba25b2976655dc3c65f1fc4abd26bf9e0e0e8596626078ffe9fd819"
+    },
+    {
+      "english": "specs/PRE_EXISTING_WORK.md",
+      "japanese": "specs/PRE_EXISTING_WORK.ja.md",
+      "original_sha256": "61bf4eb6e953c9f5da1613ddb0559aa0305ae06aae3439cabf2dea531ea9e001"
+    },
+    {
+      "english": "specs/README.md",
+      "japanese": "specs/README.ja.md",
+      "original_sha256": "2526aadcf381dfedbf393b3cb25f02d08fbd0e8069b66696a0d77f7f46e054e4"
+    },
+    {
+      "english": "specs/README_JA_PLAN.md",
+      "japanese": "specs/README_JA_PLAN.ja.md",
+      "original_sha256": "e7ee03e440e3afd30856a068827aa0b94ad490a9e8a4ac06e4d272405601a6a1"
+    },
+    {
+      "english": "specs/REGISTRATION_STATUS_UI.md",
+      "japanese": "specs/REGISTRATION_STATUS_UI.ja.md",
+      "original_sha256": "b57ad9ea21ba8c3087452377352417c8155c52ca2bb829c1c8afc389d91f8b84"
+    },
+    {
+      "english": "specs/SPEC.md",
+      "japanese": "specs/SPEC.ja.md",
+      "original_sha256": "0e2460eb57eeac277981f230c69519ad7b5f042d16213ecf4f4af2ff1760252b"
+    },
+    {
+      "english": "specs/SPEC_SYNC_PLAN.md",
+      "japanese": "specs/SPEC_SYNC_PLAN.ja.md",
+      "original_sha256": "e72460521fd25c765f6f51f4004aac77f3c8abbe618203e426daac9fe0843106"
+    },
+    {
+      "english": "specs/SUBMISSION_ASSETS_2026-09-26.md",
+      "japanese": "specs/SUBMISSION_ASSETS_2026-09-26.ja.md",
+      "original_sha256": "acb0414b31e7b8c926637a841f953584f84ffa61b7b3dc07a149580261599476"
+    },
+    {
+      "english": "specs/UI_LIVE_CONNECTION_PLAN.md",
+      "japanese": "specs/UI_LIVE_CONNECTION_PLAN.ja.md",
+      "original_sha256": "15925ce845c0904218c26f1a6d9f40f3841c6aa16601880de575fbb38b59406a"
+    },
+    {
+      "english": "specs/UI_LIVE_CONNECTION_REPORT.md",
+      "japanese": "specs/UI_LIVE_CONNECTION_REPORT.ja.md",
+      "original_sha256": "d7b5fb09e613cd17eac9db487428fd4822b1c27d6e08526aeaed3a2d9b92064c"
+    },
+    {
+      "english": "specs/UI_MOCK_PLAN.md",
+      "japanese": "specs/UI_MOCK_PLAN.ja.md",
+      "original_sha256": "4c86a9311e9655ac523fc1dee4f186541af5dbc244e811c8880ff034bc6159a3"
+    },
+    {
+      "english": "specs/UI_WIREFRAME_PLAN.md",
+      "japanese": "specs/UI_WIREFRAME_PLAN.ja.md",
+      "original_sha256": "0cafbe5aba91bcdbf1ca57966d44308704841a12403c77ef298ac32f148b2a7d"
+    },
+    {
+      "english": "specs/assets/asagohann777/2026-09-25/README.md",
+      "japanese": "specs/assets/asagohann777/2026-09-25/README.ja.md",
+      "original_sha256": "d1099e33a932a60cff3899f4ffa2b498a67d7388c7792ed13afddd006ddb13bb"
+    },
+    {
+      "english": "specs/assets/asagohann777/2026-09-26/README.md",
+      "japanese": "specs/assets/asagohann777/2026-09-26/README.ja.md",
+      "original_sha256": "3c7a0b122e186198f1f2158f43318fa0fa94be382ae81817c9aa434364700555"
+    },
+    {
+      "english": "specs/assets/asagohann777/README.md",
+      "japanese": "specs/assets/asagohann777/README.ja.md",
+      "original_sha256": "d7cf9c3ba37fe7db4eadef90c6f12e907458c3b0ba1d195b4801b9da6b125c5f"
+    }
+  ],
+  "excluded_generated_files": [
+    "apps/web/AGENTS.md",
+    "apps/web/CLAUDE.md"
+  ],
+  "japanese_openapi_sha256": "6b0cbdc66e9df230a32c1a6524e27aad1edfa66d8515be930a237b5d0031b0a4"
+}

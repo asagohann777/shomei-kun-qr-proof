@@ -1,4 +1,4 @@
-[English](AGENTS.md) | 日本語
+[English](AGENTS.md) | 日本語（原文保存版）
 
 # このリポジトリでの作業ルール
 

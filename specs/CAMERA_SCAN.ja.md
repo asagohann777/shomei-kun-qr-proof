@@ -1,4 +1,4 @@
-[English](CAMERA_SCAN.md) | 日本語
+[English](CAMERA_SCAN.md) | 日本語（原文保存版）
 
 # カメラ読取り
 
@@ -28,4 +28,4 @@ IDは既存APIの `[A-Za-z0-9_-]{1,64}`。ID単体、外部URL、重複パラメ
 
 `prototypes/mobile-ui` で `npm test` と `npm run verify:camera` を実行する。URL受付、動画・写真のデコード、二重検出、停止・再起動、言語切替、モックの権限要求ゼロを確認する。動画試験にはFFmpegを使う。
 
-公開integrationは `node scripts/verify-camera-public.mjs` で確認する。API応答を試験用に置換し、動画・写真のQRからカードIDがAPIへ渡ることを検証する。試験結果は [INTEGRATION_CAMERA_PLAN.md](INTEGRATION_CAMERA_PLAN.md) と [変更記録](HACKATHON_CHANGES.md) に保存する。
+公開integrationは `node scripts/verify-camera-public.mjs` で確認する。API応答を試験用に置換し、動画・写真のQRからカードIDがAPIへ渡ることを検証する。試験結果は [INTEGRATION_CAMERA_PLAN.ja.md](INTEGRATION_CAMERA_PLAN.md) と [変更記録](HACKATHON_CHANGES.ja.md) に保存する。

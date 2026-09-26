@@ -1,4 +1,4 @@
-[English](spec.md) | 日本語
+[English](spec.md) | 日本語（原文保存版）
 
 # Curvegrid登録バックエンド
 

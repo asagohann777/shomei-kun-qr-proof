@@ -1,4 +1,4 @@
-[English](curvegrid-integration-decisions.md) | 日本語
+[English](curvegrid-integration-decisions.md) | 日本語（原文保存版）
 
 # Curvegrid連携の選択記録
 
@@ -14,6 +14,6 @@
 | 並行開発 | こちらはAPI・コントラクト・CLI。画面とブラウザのMetaMask接続はUI担当 |
 | 進め方 | ブランチとPRを作成。先に計画をMarkdownへ保存し、詳細設計をユーザーが確認してから実装 |
 
-選択結果を反映した [計画](../../specs/CURVEGRID_INTEGRATION_PLAN.md) を保存した。名前の96バイト上限、モジュール構成などはCodexの設計提案であり、個別にユーザーが指定した条件とは扱わない。
+選択結果を反映した [計画](../../specs/CURVEGRID_INTEGRATION_PLAN.ja.md) を保存した。名前の96バイト上限、モジュール構成などはCodexの設計提案であり、個別にユーザーが指定した条件とは扱わない。
 
 対応するhook JSONは2026-09-25 UTCの `201954`、`202746`、`203111`。元のチェックアウトから同一内容で専用worktreeへコピーした。元ファイルを削除・書換えしていない。質問への選択回答とAIの計画はhook記録に含まれると主張しない。

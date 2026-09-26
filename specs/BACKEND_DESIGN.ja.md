@@ -1,14 +1,14 @@
-[English](BACKEND_DESIGN.md) | 日本語
+[English](BACKEND_DESIGN.md) | 日本語（原文保存版）
 
 # 固定モックによるWeb API詳細設計
 
-状態: 2026-09-26 JSTの採用計画を具体化した設計。固定モックAPI・Gateway・Mock Walletの操作ライブラリを `apps/web/` に実装した。実接続は未実装。API契約の正本は [openapi.yaml](openapi.yaml)。既存の静的UIモックはこのAPIを呼んでいない。
+状態: 2026-09-26 JSTの採用計画を具体化した設計。固定モックAPI・Gateway・Mock Walletの操作ライブラリを `apps/web/` に実装した。実接続は未実装。API契約の正本は [openapi.ja.yaml](openapi.ja.yaml)。既存の静的UIモックはこのAPIを呼んでいない。
 
 ## 採用範囲
 
 Next.js・TypeScript・Cloudflare Workersを前提に、カード取得、登録準備、登録確認の3 APIを定義する。MultiBaas接続、ウォレット署名、Amoyへの送信はモックにする。モックは固定サンプルを返し、DB、セッション、登録結果の保存、呼出し回数に応じた状態変更を持たない。発行者CLIは後続とする。
 
-ユーザーが選択した範囲は「署名・送信もモック」「固定サンプルだけ返す」「Web APIを先に設計」「サンプル入力に固定」。初回の成果物はこの文書とOpenAPI。その後の実装指示により、固定モックAPIを追加した。[実装と検証の記録](BACKEND_IMPLEMENTATION.md)を参照する。公開は行っていない。既存PoCには接続しない。
+ユーザーが選択した範囲は「署名・送信もモック」「固定サンプルだけ返す」「Web APIを先に設計」「サンプル入力に固定」。初回の成果物はこの文書とOpenAPI。その後の実装指示により、固定モックAPIを追加した。[実装と検証の記録](BACKEND_IMPLEMENTATION.ja.md)を参照する。公開は行っていない。既存PoCには接続しない。
 
 ## 構成と責務
 
@@ -163,7 +163,7 @@ APIのパスと共通DTOを維持し、GatewayとWalletを実接続へ差し替�
 | B10 | 形式・サイズ・Content-Type、不正シナリオを定義どおり拒否する |
 | B11 | 全応答がOpenAPIに一致し、mockを明示する。liveにモックヘッダーを持ち込めない |
 
-B01〜B11の実装試験と適用範囲は [実装と検証の記録](BACKEND_IMPLEMENTATION.md) に記録する。以下はOpenAPI構文、参照、サンプル、シナリオ表だけを確認する静的検証である。
+B01〜B11の実装試験と適用範囲は [実装と検証の記録](BACKEND_IMPLEMENTATION.ja.md) に記録する。以下はOpenAPI構文、参照、サンプル、シナリオ表だけを確認する静的検証である。
 
 再実行方法:
 
@@ -177,6 +177,6 @@ python3 -m venv /tmp/shomei-openapi-venv
 
 - [探索の依頼](../docs/prompts/2026-09-25/140109-789742-3fa35cc7e2b54786aaaa64a589110919.json)
 - [採用計画の実行指示](../docs/prompts/2026-09-25/151125-676118-d1888c4c54d2401ea99965526e42e9fb.json)
-- [選択回答と採用範囲の手動記録](../docs/prompts/backend-design-decisions.md)
+- [選択回答と採用範囲の手動記録](../docs/prompts/backend-design-decisions.ja.md)
 
 保存日時のJSONはUTCで2026-09-25、実行指示はJSTで2026-09-26となる。OpenSpecの初期化は確認済みだが、現在の仕様は `specs/` にある。初回の承認対象は上記設計成果物。その後の [実装指示](../docs/prompts/2026-09-25/152556-790938-5fdac443e5ab4602b26eb512cec3edb6.json) により固定モックAPIを実装した。OpenSpec changeは作成していない。

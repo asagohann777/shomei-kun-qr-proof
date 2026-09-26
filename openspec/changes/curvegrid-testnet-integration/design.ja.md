@@ -1,14 +1,14 @@
-[English](design.md) | 日本語
+[English](design.md) | 日本語（原文保存版）
 
 # Design
 
-2026-09-26訂正: デモの登録許可は全員。CLI省略時はallowedWallet=0で発行し、任意の本人ウォレットが初回登録できる。以下の指定許可ウォレットに関する記述は、非ゼロを指定した限定カードのみを指す。最新の配置・検証は [全員登録計画](../../../../specs/OPEN_REGISTRATION_DEMO.md) を参照。
+2026-09-26訂正: デモの登録許可は全員。CLI省略時はallowedWallet=0で発行し、任意の本人ウォレットが初回登録できる。以下の指定許可ウォレットに関する記述は、非ゼロを指定した限定カードのみを指す。最新の配置・検証は [全員登録計画](../../../specs/OPEN_REGISTRATION_DEMO.ja.md) を参照。
 
 ## Context
 
-背景は [proposal](proposal.md) を参照。現在のAPIはmockのみで、固定のAmoy chain IDを返す。実接続の設定値は未提供。UIは別担当が並行開発する。
+背景は [proposal](proposal.ja.md) を参照。現在のAPIはmockのみで、固定のAmoy chain IDを返す。実接続の設定値は未提供。UIは別担当が並行開発する。
 
-詳細なAPI形式、ABI、設定、エラー、CLI手順、試験条件は [詳細設計](../../../specs/CURVEGRID_INTEGRATION_DESIGN.md) を正とする。この文書は構成上の判断を記録する。ユーザーは詳細設計 `453387e` と同じPRでの実装を承認した。承認の出典は詳細設計から参照できる。
+詳細なAPI形式、ABI、設定、エラー、CLI手順、試験条件は [詳細設計](../../../specs/CURVEGRID_INTEGRATION_DESIGN.ja.md) を正とする。この文書は構成上の判断を記録する。ユーザーは詳細設計 `453387e` と同じPRでの実装を承認した。承認の出典は詳細設計から参照できる。
 
 ## Goals / Non-Goals
 
@@ -50,4 +50,4 @@
 
 ## UI接続の追加設計
 
-最新の追加指示と状態・モード・作業境界は [UI接続計画](../../../specs/UI_LIVE_CONNECTION_PLAN.md) を正とする。mock/mockを既定とし、live/mockは閲覧のみ、live/metamaskで本人署名を行う。mock/metamaskを拒否する。
+最新の追加指示と状態・モード・作業境界は [UI接続計画](../../../specs/UI_LIVE_CONNECTION_PLAN.ja.md) を正とする。mock/mockを既定とし、live/mockは閲覧のみ、live/metamaskで本人署名を行う。mock/metamaskを拒否する。

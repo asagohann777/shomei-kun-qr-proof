@@ -1,4 +1,4 @@
-[English](LICENSE_POLICY.md) | 日本語
+[English](LICENSE_POLICY.md) | 日本語（原文保存版）
 
 # ソースコードのMITライセンス
 

@@ -1,4 +1,4 @@
-[English](UI_MOCK_PLAN.md) | 日本語
+[English](UI_MOCK_PLAN.md) | 日本語（原文保存版）
 
 # スマホUIモックの採用計画
 
@@ -8,7 +8,7 @@
 
 スマホ縦画面専用の操作可能なモックを `prototypes/mobile-ui/` に作る。所有者の情報を主役とし、カードは補助的に表示する。未登録から模擬接続、登録確認、模擬承認、処理、公開確認まで操作できることを完成条件とする。チームで開けるCloudflareの公開プレビューも今回の承認範囲に含む。
 
-MultiBaas API、Amoy、MetaMask、カメラ、発行者CLIは接続しない。実接続版のNext.js・TypeScript構成は [ARCHITECTURE.md](ARCHITECTURE.md) を維持する。既存PoCのデータとコードを変更しない。
+MultiBaas API、Amoy、MetaMask、カメラ、発行者CLIは接続しない。実接続版のNext.js・TypeScript構成は [ARCHITECTURE.ja.md](ARCHITECTURE.md) を維持する。既存PoCのデータとコードを変更しない。
 
 ## 画面
 
@@ -44,7 +44,7 @@ Tailwind CSS 4とdaisyUI 5を採用する。ボタン、入力、ダイアログ
 
 320・390・430pxの縦画面と、PCでスマホ幅が維持される状態を撮影する。ChromiumとWebKitで操作し、横はみ出し、画像欠落、コンソールエラー、下部操作の重なりを確認する。日英表示、再読込、登録導線、エラー復帰、同じ模擬取引の再確認を検証する。
 
-検証スクリプトは [verify.mjs](../prototypes/mobile-ui/scripts/verify.mjs)、実測結果と制約は [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md) に保存する。ブラウザエミュレーションの合格を、スマホ実機やF01〜F10の実接続試験の合格に置き換えない。
+検証スクリプトは [verify.mjs](../prototypes/mobile-ui/scripts/verify.mjs)、実測結果と制約は [HACKATHON_CHANGES.ja.md](HACKATHON_CHANGES.md) に保存する。ブラウザエミュレーションの合格を、スマホ実機やF01〜F10の実接続試験の合格に置き換えない。
 
 ## 入力の出典
 
@@ -80,7 +80,7 @@ QRの位置             カード画像 / 証明一郎 / ID
 
 ## 2026-09-26の図案反映
 
-現在のローカルUIは [UI_WIREFRAME_PLAN.md](UI_WIREFRAME_PLAN.md)を優先する。中央カード、登録内容の確認画面、パネル内の操作へ変更した。従来の所有者を先に見せる左揃え構成と固定フッターは初版の記録として残す。この段階では公開URLを更新していない。その後の追加指示で2026-09-26に公開した。
+現在のローカルUIは [UI_WIREFRAME_PLAN.ja.md](UI_WIREFRAME_PLAN.md)を優先する。中央カード、登録内容の確認画面、パネル内の操作へ変更した。従来の所有者を先に見せる左揃え構成と固定フッターは初版の記録として残す。この段階では公開URLを更新していない。その後の追加指示で2026-09-26に公開した。
 
 ## 2026-09-26: トップページQRのアニメーション
 

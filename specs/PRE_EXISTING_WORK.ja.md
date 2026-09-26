@@ -1,4 +1,4 @@
-[English](PRE_EXISTING_WORK.md) | 日本語
+[English](PRE_EXISTING_WORK.md) | 日本語（原文保存版）
 
 # 既存成果
 

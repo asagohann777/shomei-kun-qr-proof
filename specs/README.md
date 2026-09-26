@@ -15,3 +15,5 @@ These documents describe the current behavior.
 | [OpenSpec](../openspec/specs/curvegrid-registration-backend/spec.md) | Verification scenarios for each requirement |
 
 See [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md) for development history and test results, and [PRE_EXISTING_WORK.md](PRE_EXISTING_WORK.md) for existing work. `*_PLAN.md`, `*_REPORT.md`, `*_IMPLEMENTATION.md`, and `BACKEND_DESIGN.md` remain as records of the plans, designs, and tests at that time.
+
+See [documentation languages](../docs/LANGUAGES.md) for Japanese versions and the source-record preservation policy.

@@ -1,4 +1,4 @@
-[English](DEMO.md) | 日本語
+[English](DEMO.md) | 日本語（原文保存版）
 
 # デモ手順
 
@@ -63,7 +63,7 @@ MetaMaskを用意し、登録に使うウォレットへCurvegrid Testnetのテ�
 
 ## 発行と照合
 
-カード発行は [CLI手順](../contracts/README.md)、環境設定は [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md) に従う。新規カードは全員許可で発行し、同じIDを再発行しない。現行CLIの `--recipient-ens` と `--wallet` は使わない。ENSの登録・設定は不要。
+カード発行は [CLI手順](../contracts/README.ja.md)、環境設定は [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.ja.md) に従う。新規カードは全員許可で発行し、同じIDを再発行しない。現行CLIの `--recipient-ens` と `--wallet` は使わない。ENSの登録・設定は不要。
 
 公開画面のチェーン・コントラクト・カードID・取引ハッシュを使い、RPCでカード状態と登録レシートを照合できる。MultiBaasの管理キーや発行者の鍵は不要。
 

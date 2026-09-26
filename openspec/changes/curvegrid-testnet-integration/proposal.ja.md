@@ -1,4 +1,4 @@
-[English](proposal.md) | 日本語
+[English](proposal.md) | 日本語（原文保存版）
 
 # Proposal
 
@@ -26,12 +26,12 @@
 
 ## Impact
 
-設計本文は [計画](../../../specs/CURVEGRID_INTEGRATION_PLAN.md) と [詳細設計](../../../specs/CURVEGRID_INTEGRATION_DESIGN.md) に置く。将来のコード変更対象は `apps/web/src/backend`、API Route Handler、OpenAPI、コントラクト・CLI、Workers構成。ブラウザ画面・MetaMask SDKはUI担当。
+設計本文は [計画](../../../specs/CURVEGRID_INTEGRATION_PLAN.ja.md) と [詳細設計](../../../specs/CURVEGRID_INTEGRATION_DESIGN.ja.md) に置く。将来のコード変更対象は `apps/web/src/backend`、API Route Handler、OpenAPI、コントラクト・CLI、Workers構成。ブラウザ画面・MetaMask SDKはUI担当。
 
 Amoyの80002固定をlive配置設定に置き換えるが、mockの既存応答値は変更しない。Curvegrid Testnetは独立した公開RPCによる検証の受け入れ条件を満たしたとは扱わない。実接続値・APIキーは未設定。コード実装は承認済み。マージ・公開は別途の指示に従う。
 
 ## 2026-09-26の追加指示
 
-ユーザーが最新mainのUIへのAPI接続・署名と環境変数によるmock維持を指示した。[UI接続計画](../../../specs/UI_LIVE_CONNECTION_PLAN.md) の範囲でブラウザ実装をこのPRに追加する。UIデザインは並行継続し、既存のmock公開先は維持する。
+ユーザーが最新mainのUIへのAPI接続・署名と環境変数によるmock維持を指示した。[UI接続計画](../../../specs/UI_LIVE_CONNECTION_PLAN.ja.md) の範囲でブラウザ実装をこのPRに追加する。UIデザインは並行継続し、既存のmock公開先は維持する。
 
 2026-09-26訂正: デモは任意の本人ウォレットが初回登録できる全員許可に変更する。エラー受付IDと診断コピーも追加し、既存記録を変更せず新記録先で実測する。

@@ -1,12 +1,12 @@
-[English](CURVEGRID_INTEGRATION_DESIGN.md) | 日本語
+[English](CURVEGRID_INTEGRATION_DESIGN.md) | 日本語（原文保存版）
 
 # Curvegrid Testnet連携の詳細設計
 
-2026-09-26訂正: デモの登録許可は全員。CLI省略時はallowedWallet=0で発行し、任意の本人ウォレットが初回登録できる。以下の指定許可ウォレットに関する記述は、非ゼロを指定した限定カードのみを指す。最新の配置・検証は [全員登録計画](OPEN_REGISTRATION_DEMO.md) を参照。
+2026-09-26訂正: デモの登録許可は全員。CLI省略時はallowedWallet=0で発行し、任意の本人ウォレットが初回登録できる。以下の指定許可ウォレットに関する記述は、非ゼロを指定した限定カードのみを指す。最新の配置・検証は [全員登録計画](OPEN_REGISTRATION_DEMO.ja.md) を参照。
 
-状態: **実装済み・実環境の接続確認待ち。** 2026-09-26 JST。承認対象は `453387e`。リベース後の同一設計は `b537e04`。承認の出典は [変更記録](HACKATHON_CHANGES.md) を参照。
+状態: **実装済み・実環境の接続確認待ち。** 2026-09-26 JST。承認対象は `453387e`。リベース後の同一設計は `b537e04`。承認の出典は [変更記録](HACKATHON_CHANGES.ja.md) を参照。
 
-[計画](CURVEGRID_INTEGRATION_PLAN.md) / [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) / [既存モック設計](BACKEND_DESIGN.md)
+[計画](CURVEGRID_INTEGRATION_PLAN.ja.md) / [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) / [既存モック設計](BACKEND_DESIGN.ja.md)
 
 ## 1. レビュー対象と設計時点の現状
 
@@ -295,10 +295,10 @@ C10/C11の実測記録にはchain ID、contract、cardId、登録hash、block、
 - [イベント一覧](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/EventsApi.md)
 - [Library登録](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/BaseContract.md)
 - [リンクと開始ブロック](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/LinkAddressContractRequest.md)
-- [会話の選択と出典](../docs/prompts/curvegrid-integration-decisions.md)
+- [会話の選択と出典](../docs/prompts/curvegrid-integration-decisions.ja.md)
 
 ## 13. 実装への参照
 
-[起動・UI接続手順](CURVEGRID_INTEGRATION_RUNBOOK.md)、[SolidityとCLI](../contracts/README.md)、[OpenAPI](openapi.yaml) を参照。ABIはコンパイル成果物をAPIとCLIで共有する。MultiBaasのABIリンクはaddress取得のcontractsで確認し、Libraryのラベル・バージョンとABIも照合する。
+[起動・UI接続手順](CURVEGRID_INTEGRATION_RUNBOOK.ja.md)、[SolidityとCLI](../contracts/README.ja.md)、[OpenAPI](openapi.ja.yaml) を参照。ABIはコンパイル成果物をAPIとCLIで共有する。MultiBaasのABIリンクはaddress取得のcontractsで確認し、Libraryのラベル・バージョンとABIも照合する。
 
 本書のC10/C11/C12は実環境・UI担当との結合確認として残る。ローカル試験を実疎通の実績には数えない。

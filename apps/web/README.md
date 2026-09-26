@@ -45,7 +45,7 @@ curl -i -H 'X-Mock-Scenario: registered' \
 
 `data: "0x"` is a mock value. Do not send it to a real wallet. The Mock Wallet is in `src/backend/mock-wallet.ts`. After rejection, do not call confirmation. Do not resend when the outcome is unknown. The real UI passes only live transactions to the wallet.
 
-Specify the scenario for each request. A successful preparation request does not change the card lookup response. The omitted scenario, `default`, is a standalone success example for each API. See the [scenario table in the detailed design](../../specs/BACKEND_DESIGN.md#固定サンプルとシナリオ) for supported combinations.
+Specify the scenario for each request. A successful preparation request does not change the card lookup response. The omitted scenario, `default`, is a standalone success example for each API. See the [scenario table in the detailed design](../../specs/BACKEND_DESIGN.md#fixed-samples-and-scenarios) for supported combinations.
 
 ## Verify the API
 

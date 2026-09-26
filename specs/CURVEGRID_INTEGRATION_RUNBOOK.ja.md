@@ -1,8 +1,8 @@
-[English](CURVEGRID_INTEGRATION_RUNBOOK.md) | 日本語
+[English](CURVEGRID_INTEGRATION_RUNBOOK.md) | 日本語（原文保存版）
 
 # Curvegrid連携の起動とUI接続
 
-APIは `apps/web`、コントラクトと発行者CLIは [contracts](../contracts/README.md) にある。画面とMetaMaskの接続コードは `prototypes/mobile-ui` にある。通常buildはmockを維持し、専用integration buildだけ実APIへ接続する。[UI接続の設定・実測](UI_LIVE_CONNECTION_REPORT.md)を参照。
+APIは `apps/web`、コントラクトと発行者CLIは [contracts](../contracts/README.ja.md) にある。画面とMetaMaskの接続コードは `prototypes/mobile-ui` にある。通常buildはmockを維持し、専用integration buildだけ実APIへ接続する。[UI接続の設定・実測](UI_LIVE_CONNECTION_REPORT.ja.md)を参照。
 
 ## ローカルで起動する
 
@@ -35,7 +35,7 @@ BACKEND_MODE=mock npm run dev
 
 ## UIからAPIを呼ぶ
 
-APIの形式は [OpenAPI](openapi.yaml) が正である。UIのAPI base URLに専用バックエンドのOriginを指定する。クロスOrigin要求はcredentialsなしで送る。未登録でもウォレット接続前にカードを読める。
+APIの形式は [OpenAPI](openapi.ja.yaml) が正である。UIのAPI base URLに専用バックエンドのOriginを指定する。クロスOrigin要求はcredentialsなしで送る。未登録でもウォレット接続前にカードを読める。
 
 1. `GET /api/v1/connection` を呼ぶ。`meta.mode === "live"` と `data.status === "ready"` の場合だけネットワーク設定を使う。
 2. `GET /api/v1/cards/{cardId}` でカードを読む。404は未発行。503を未登録表示に置き換えない。
@@ -91,7 +91,7 @@ UI_CAMERA_MODE=live BACKEND_MODE=live npm run build:integration
 npm run test:worker:live
 ```
 
-`live-gateway.test.ts` は合成応答、`live-recorded.test.ts` は今回のTestnetで取得したMultiBaas応答を使う。RPCのchain/codeは後者でも合成応答。設定提供後の疎通・スマホ署名・別端末確認は [実装タスク](../openspec/changes/curvegrid-testnet-integration/tasks.md) 6章で追跡する。
+`live-gateway.test.ts` は合成応答、`live-recorded.test.ts` は今回のTestnetで取得したMultiBaas応答を使う。RPCのchain/codeは後者でも合成応答。設定提供後の疎通・スマホ署名・別端末確認は [実装タスク](../openspec/changes/curvegrid-testnet-integration/tasks.ja.md) 6章で追跡する。
 
 ## 実接続の設定とビルド
 
@@ -99,7 +99,7 @@ npm run test:worker:live
 
 Workerに設定するのは `MULTIBAAS_BASE_URL`、アプリ用 `MULTIBAAS_API_KEY`、`CHAIN_ID`、`REGISTRY_ADDRESS`、`REGISTRY_CONTRACT_LABEL`、`REGISTRY_CONTRACT_VERSION`、`REGISTRY_DEPLOYMENT_BLOCK`、`REGISTRY_ISSUER`、`CURVEGRID_PUBLIC_WEB3_RPC_URL`、`PUBLIC_API_ORIGIN`、`ALLOWED_UI_ORIGINS`。`.env.local` 全体をbulk登録しない。`MULTIBAAS_ADMIN_API_KEY`、キーストア、パスワードはCLI側だけで使用する。
 
-実測カードと再現コマンド、残る確認は [疎通試験記録](CURVEGRID_CONNECTIVITY_REPORT.md) を参照。
+実測カードと再現コマンド、残る確認は [疎通試験記録](CURVEGRID_CONNECTIVITY_REPORT.ja.md) を参照。
 
 ### integrationでのカメラ試験
 

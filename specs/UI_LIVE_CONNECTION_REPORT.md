@@ -47,7 +47,7 @@ npx wrangler deploy --config wrangler.integration.jsonc
 
 Deploy to the dedicated integration Worker. See the [runbook](CURVEGRID_INTEGRATION_RUNBOOK.md) for required settings. UI builds default to live API and MetaMask; `UI_WALLET_MODE=mock` enables read-only mode. Extract only required public build settings from the API app's `.env.local`. `runtime-env-only.mjs` removes OpenNext's embedded environment values and checks output for known credentials.
 
-Normal UI-design builds remain mock/mock. See the [UI README](../prototypes/mobile-ui/README.md#apiウォレットの切替) for environment variables.
+Normal UI-design builds remain mock/mock. See the [UI README](../prototypes/mobile-ui/README.md#select-api-and-wallet-modes) for environment variables.
 
 ## Verified scope
 

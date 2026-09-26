@@ -1,4 +1,4 @@
-[English](backend-design-decisions.md) | 日本語
+[English](backend-design-decisions.md) | 日本語（原文保存版）
 
 # バックエンド設計の選択記録
 
@@ -15,7 +15,7 @@
 
 - [探索の依頼](2026-09-25/140109-789742-3fa35cc7e2b54786aaaa64a589110919.json)
 - [計画の実行指示](2026-09-25/151125-676118-d1888c4c54d2401ea99965526e42e9fb.json)
-- [採用計画](../../specs/PLAN.md)
-- [詳細設計](../../specs/BACKEND_DESIGN.md)
+- [採用計画](../../specs/PLAN.ja.md)
+- [詳細設計](../../specs/BACKEND_DESIGN.ja.md)
 
 hookのファイル名はUTC。実行指示の保存日時は2026-09-25 UTC、2026-09-26 JSTである。カードIDの文字制約、本文の上限、フィールド名などはCodexが計画を具体化した設計値であり、個別にユーザーが指定した値ではない。

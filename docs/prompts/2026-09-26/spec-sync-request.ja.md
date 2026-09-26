@@ -1,4 +1,4 @@
-[English](spec-sync-request.md) | 日本語
+[English](spec-sync-request.md) | 日本語（原文保存版）
 
 # 仕様整理の指示
 

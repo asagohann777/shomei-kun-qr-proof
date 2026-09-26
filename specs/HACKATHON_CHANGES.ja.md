@@ -1,8 +1,8 @@
-[English](HACKATHON_CHANGES.md) | 日本語
+[English](HACKATHON_CHANGES.md) | 日本語（原文保存版）
 
 # ハッカソンでの変更記録
 
-大会中に作成した成果を、[既存成果](PRE_EXISTING_WORK.md) と区別して記録する。各作業の実施日時と大会開始時刻の対応は確認してから確定する。
+大会中に作成した成果を、[既存成果](PRE_EXISTING_WORK.ja.md) と区別して記録する。各作業の実施日時と大会開始時刻の対応は確認してから確定する。
 
 ## 2026-09-25: 開発記録の初期整備
 
@@ -12,7 +12,7 @@
 - Codexが `AGENTS.md`、`specs/` の初期文書、`docs/prompts/README.md` と導入時のプロンプト記録を作成した。
 - Codexが `.codex/hooks.json`、`.codex/config.toml`、`scripts/save_prompt.py`、`tests/test_save_prompt.py` を作成した。設定・実装・テストはAI支援によるもの。
 - アプリの機能実装と既存コードの移植は行っていない。
-- 対応する依頼は [bootstrap-request.md](../docs/prompts/bootstrap-request.md) に手動保存した。
+- 対応する依頼は [bootstrap-request.md](../docs/prompts/bootstrap-request.ja.md) に手動保存した。
 - `python3 -m unittest discover -s tests -v` の6テストが成功した。設定内のhookコマンドを一時リポジトリで実行し、本文保持、並行保存、入力不正、保存失敗、別リポジトリの拒否、再配信を検証した。
 - Codexの信頼設定後のセッション内自動実行は未確認。CLIの `/hooks` で信頼してから次の入力の保存を確認する。
 
@@ -34,12 +34,12 @@
 
 | ファイル | Codexによる作業 |
 | --- | --- |
-| [SPEC.md](SPEC.md) | 初期文書を具体化。役割、機能要件、画面、状態、日英表示、受け入れ条件を整理 |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | 構成、権限、識別、記録、最小インターフェース、データの流れ、技術選定と未確認事項を記載 |
-| [DEMO.md](DEMO.md) | 事前準備、発行、スマホ登録、別端末での閲覧、RPC照合、検証記録の手順案を作成 |
-| [PRE_EXISTING_WORK.md](PRE_EXISTING_WORK.md) | ユーザーが説明した既存機能と新規範囲を区別し、参照元と流用未実施を記録 |
-| [PLAN.md](PLAN.md) | 採用済みの文書作成計画を会話から手動保存 |
-| [選択回答の手動記録](../docs/prompts/qr-proof-decisions.md) | hookのJSONに含まれない選択質問と回答、スマホへの訂正を出典付きで保存 |
+| [SPEC.ja.md](SPEC.md) | 初期文書を具体化。役割、機能要件、画面、状態、日英表示、受け入れ条件を整理 |
+| [ARCHITECTURE.ja.md](ARCHITECTURE.md) | 構成、権限、識別、記録、最小インターフェース、データの流れ、技術選定と未確認事項を記載 |
+| [DEMO.ja.md](DEMO.md) | 事前準備、発行、スマホ登録、別端末での閲覧、RPC照合、検証記録の手順案を作成 |
+| [PRE_EXISTING_WORK.ja.md](PRE_EXISTING_WORK.md) | ユーザーが説明した既存機能と新規範囲を区別し、参照元と流用未実施を記録 |
+| [PLAN.ja.md](PLAN.md) | 採用済みの文書作成計画を会話から手動保存 |
+| [選択回答の手動記録](../docs/prompts/qr-proof-decisions.ja.md) | hookのJSONに含まれない選択質問と回答、スマホへの訂正を出典付きで保存 |
 | この変更記録 | 人間の判断、AI作業、参照プロンプト、検証範囲を記録 |
 
 Codexが公式サイト・公式技術資料を調査し、既存PoCの実装確認とは区別した。`openspec-explore` で議論し、文章整理に `unslop` と `technical-writing` を使用した。採用計画の範囲で文書を作成し、OpenSpec changeの作成や機能実装は行っていない。
@@ -49,7 +49,7 @@ Codexが公式サイト・公式技術資料を調査し、既存PoCの実装確
 - [最初の機能要件と資料作成依頼](../docs/prompts/2026-09-25/121716-439190-2cd0d9f92aa8468588e7978b39382568.json)
 - [スマホ登録への訂正](../docs/prompts/2026-09-25/122429-037897-c475cb8e8fd244c08302e2043f25f922.json)
 - [計画の実行指示](../docs/prompts/2026-09-25/122651-114438-1fe83e01648547c1a4e98d4f8cc0ec12.json)
-- [選択式の質問と回答](../docs/prompts/qr-proof-decisions.md)
+- [選択式の質問と回答](../docs/prompts/qr-proof-decisions.ja.md)
 
 上記3件のJSONは `source: codex:UserPromptSubmit` と本文を確認した。選択回答と採用計画は手動記録であり、自動保存と扱わない。既存の「開発記録の初期整備」にあるhook未確認の記述は当時の状態を残したもので、今回の3件の保存確認とは区別する。
 
@@ -121,7 +121,7 @@ PY
 
 ### 人間の決定とAIの使用範囲
 
-ユーザーがチーム相談用のUIモック、スマホのみの対応、QRスキャン画面、CSSフレームワークによる制作コスト削減を指定した。計画中に所有者情報を優先する構成、模擬QR読取り、公開URLでの共有を選び、実装を承認した。出典は [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) にまとめた。対応する5件のhook JSONの `source` と本文を確認した。その後、スキャンボタンから模擬カメラへ進む指示と、短い文言・注釈削除・UI調整の指示を反映した。追加3件のhook JSONも採用計画から参照できる。
+ユーザーがチーム相談用のUIモック、スマホのみの対応、QRスキャン画面、CSSフレームワークによる制作コスト削減を指定した。計画中に所有者情報を優先する構成、模擬QR読取り、公開URLでの共有を選び、実装を承認した。出典は [UI_MOCK_PLAN.ja.md](UI_MOCK_PLAN.md) にまとめた。対応する5件のhook JSONの `source` と本文を確認した。その後、スキャンボタンから模擬カメラへ進む指示と、短い文言・注釈削除・UI調整の指示を反映した。追加3件のhook JSONも採用計画から参照できる。
 
 Codexが `prototypes/mobile-ui/` のHTML、JavaScript、翻訳、CSS、SVG、ビルド・ブラウザ検証スクリプト、Cloudflare設定、READMEを作成した。package-lockはnpmが生成した。AIは構成2案を比較し、単一コントローラーとシナリオ状態を採用した。別エージェントによるコメント確認で不要なコメントを1件削除した。
 
@@ -139,7 +139,7 @@ Codexが `SPEC.md`、`ARCHITECTURE.md`、`DEMO.md`、`PLAN.md`、`PRE_EXISTING_W
 
 ### 検証
 
-Node.js 22.23.1、Playwright 1.61.1を使用した。`npm run build` が成功。ローカルでChromium 149.0.7827.55とWebKit 26.5の操作検証が成功した。検証スクリプトと実行方法は [モックのREADME](../prototypes/mobile-ui/README.md) に保存した。
+Node.js 22.23.1、Playwright 1.61.1を使用した。`npm run build` が成功。ローカルでChromium 149.0.7827.55とWebKit 26.5の操作検証が成功した。検証スクリプトと実行方法は [モックのREADME](../prototypes/mobile-ui/README.ja.md) に保存した。
 
 320・390・430px、PCでのスマホ幅表示を撮影し、英語の320・390pxも確認した。横はみ出し、欠落画像、コンソールエラーを自動確認し、画面の画像を目視した。下部操作の上まで最後の内容をスクロールできることも確認するスクリプトにした。
 
@@ -164,8 +164,8 @@ Node.js 22.23.1、Playwright 1.61.1を使用した。`npm run build` が成功�
 
 ユーザーが、おじいちゃんコンビニ、GitHub ID `asagohann777` の制作途中の成果物として画像9点とChatGPT共有会話の保存を指定した。制作日時と大会期間との対応は未確認。
 
-- Codexが [画像9点](assets/asagohann777/2026-09-25/README.md)を元のファイル名・内容のままコピーし、作者情報、出典、SHA-256を記録した。元画像と保存先9点のバイト単位の一致を確認した。
-- Codexが [プロンプトの出典記録](../docs/prompts/asagohann777-design-2026-09-25.md)を手動作成した。共有URLはブラウザでも読み込めず、本文は未取得。保存依頼のhook記録と外部会話の本文を区別した。
+- Codexが [画像9点](assets/asagohann777/2026-09-25/README.ja.md)を元のファイル名・内容のままコピーし、作者情報、出典、SHA-256を記録した。元画像と保存先9点のバイト単位の一致を確認した。
+- Codexが [プロンプトの出典記録](../docs/prompts/asagohann777-design-2026-09-25.ja.md)を手動作成した。共有URLはブラウザでも読み込めず、本文は未取得。保存依頼のhook記録と外部会話の本文を区別した。
 - 画像は制作途中として保存した。採用判断、画像編集、アプリへの反映は行っていない。各画像のAI使用範囲・ライセンスは未確認。
 
 その後、ユーザーが会話本文を貼り付けた。Codexが対応するhook JSONから [会話抜粋の原文](../docs/prompts/asagohann777-design-2026-09-25-transcript.txt)を抽出して保存した。ユーザー指示とChatGPT回答が混在する本文を編集せず、hook記録の該当部分と完全一致することを確認した。共有URL自体の取得失敗は解消していない。
@@ -174,7 +174,7 @@ Node.js 22.23.1、Playwright 1.61.1を使用した。`npm run build` が成功�
 
 ユーザーが、MultiBaas・ウォレット署名・送信のモック化、固定サンプル応答、Web API優先、サンプル入力への限定を選択し、設計成果物の作成計画を承認した。大会期間との対応は未確認。
 
-Codexが [詳細設計](BACKEND_DESIGN.md)、[OpenAPI定義](openapi.yaml)、[静的検証スクリプト](../scripts/verify_backend_spec.py)、[検証用依存定義](../scripts/requirements-backend-spec.txt)、[会話の選択記録](../docs/prompts/backend-design-decisions.md)を作成した。`SPEC.md`、`ARCHITECTURE.md`、`PLAN.md`、この変更記録も更新した。APIのフィールド、状態、照合条件、エラーと試験計画の具体化にAIを使用した。
+Codexが [詳細設計](BACKEND_DESIGN.ja.md)、[OpenAPI定義](openapi.ja.yaml)、[静的検証スクリプト](../scripts/verify_backend_spec.py)、[検証用依存定義](../scripts/requirements-backend-spec.txt)、[会話の選択記録](../docs/prompts/backend-design-decisions.ja.md)を作成した。`SPEC.md`、`ARCHITECTURE.md`、`PLAN.md`、この変更記録も更新した。APIのフィールド、状態、照合条件、エラーと試験計画の具体化にAIを使用した。
 
 Python 3.11でOpenAPI 3.1の構文・参照を検証した。3 APIの応答例30件、シナリオ19件、固定値の対応が検証に合格した。不正な入力・応答10件がJSON Schemaで拒否されることを確認した。最初の検証でサンプルアドレスが42桁の16進数になっていたため40桁へ修正し、再検証した。再実行手順は詳細設計書に記載した。文書のローカル参照先、要件ID、空白も確認した。
 
@@ -182,7 +182,7 @@ B01〜B11はAPI実装後の試験計画で、実行していない。APIサー�
 
 ## 2026-09-26 JST: 固定モックのWeb APIを実装
 
-[詳細設計に沿った実装指示](../docs/prompts/2026-09-25/152556-790938-5fdac443e5ab4602b26eb512cec3edb6.json)を受け、カード取得・登録準備・登録確認の3 APIを [apps/web](../apps/web/README.md) に追加した。大会期間との対応は未確認。
+[詳細設計に沿った実装指示](../docs/prompts/2026-09-25/152556-790938-5fdac443e5ab4602b26eb512cec3edb6.json)を受け、カード取得・登録準備・登録確認の3 APIを [apps/web](../apps/web/README.ja.md) に追加した。大会期間との対応は未確認。
 
 CodexがNext.js・TypeScriptの構成、Route Handler、Registration Service、Mock Gateway、Mock Walletの操作ライブラリ、OpenAPIからの型・検証関数・固定サンプル生成、試験と起動手順を作成した。実装担当エージェントが `src/backend` と `src/app` を担当し、親エージェントが構成・生成・試験・文書を担当した。既存PoCのコードやデータは流用していない。
 
@@ -190,7 +190,7 @@ CodexがNext.js・TypeScriptの構成、Route Handler、Registration Service、M
 
 OpenAPIの型定義に合わせた判別可能な型を使用した。Workersでは動的コード生成を使わず、Ajvの検証コードを事前生成する。TypeScriptはOpenAPI型生成の互換条件に合わせ5.9.3とした。依存バージョンとlockfileを保存した。
 
-36件のサービス・境界・設定・Wallet試験、Next.jsとローカルWorkersそれぞれ24件のHTTP試験が成功した。OpenAPIの静的検証、生成物一致、型チェック、Next.jsとWorkers向けビルドも成功した。Workersの404には追加のキャッシュ制御指定が付くため、保存禁止を維持したままAPI定義と試験を調整した。初回の失敗と実行環境上の対応は [実装・検証記録](BACKEND_IMPLEMENTATION.md) に記載した。
+36件のサービス・境界・設定・Wallet試験、Next.jsとローカルWorkersそれぞれ24件のHTTP試験が成功した。OpenAPIの静的検証、生成物一致、型チェック、Next.jsとWorkers向けビルドも成功した。Workersの404には追加のキャッシュ制御指定が付くため、保存禁止を維持したままAPI定義と試験を調整した。初回の失敗と実行環境上の対応は [実装・検証記録](BACKEND_IMPLEMENTATION.ja.md) に記載した。
 
 AIで作成・変更したファイルは `apps/web/` の実装・構成・試験・README・生成物、`scripts/verify_backend_spec.py`、`specs/openapi.yaml`、`BACKEND_IMPLEMENTATION.md`、`BACKEND_DESIGN.md`、`SPEC.md`、`ARCHITECTURE.md`、`PLAN.md`、この変更記録、[HTTP試験結果](assets/backend/http-next.txt)と [Workers試験結果](assets/backend/http-worker.txt)。生成物はOpenAPIと生成スクリプトから再現できる。
 
@@ -198,13 +198,13 @@ AIで作成・変更したファイルは `apps/web/` の実装・構成・試�
 
 ## 2026-09-26: おじいちゃんコンビニの追加図案を保存
 
-ユーザー指定の `origin/main` をfast-forwardで取り込んだ後、[追加図案12点の一覧](assets/asagohann777/2026-09-26/README.md)を作成した。新規8点を保存し、既存4点は内容が一致する保存済みファイルを参照した。12点すべてを元画像とバイト単位で照合した。制作プロンプトは未受領。大会期間との対応は未確認。
+ユーザー指定の `origin/main` をfast-forwardで取り込んだ後、[追加図案12点の一覧](assets/asagohann777/2026-09-26/README.ja.md)を作成した。新規8点を保存し、既存4点は内容が一致する保存済みファイルを参照した。12点すべてを元画像とバイト単位で照合した。制作プロンプトは未受領。大会期間との対応は未確認。
 
 ユーザーが作者を指定し、共同著者付きコミットを指示した。Codexがコピー、照合、一覧とハッシュの記録を担当した。UI変更はこの画像保存コミットの後に行う。
 
 ## 2026-09-26: 図案に合わせたUIワイヤー
 
-[採用計画](UI_WIREFRAME_PLAN.md)に従って `prototypes/mobile-ui` を更新した。大会期間との対応は未確認。画像保存コミット `164a180` とは別の変更で、UI変更は未コミット・未push・未デプロイ。
+[採用計画](UI_WIREFRAME_PLAN.ja.md)に従って `prototypes/mobile-ui` を更新した。大会期間との対応は未確認。画像保存コミット `164a180` とは別の変更で、UI変更は未コミット・未push・未デプロイ。
 
 ユーザーがおじいちゃんコンビニの図案を参照し、先にワイヤーレベルを合わせるよう指示した。背景・カード素材はユーザー側で制作する。Codexが `public/app.js`、`public/messages.js`、`styles/input.css`、`scripts/verify.mjs`、README、計画・変更記録を作成・更新した。既存の仮カードSVGを使用し、新規画像の生成・編集は行っていない。
 
@@ -238,7 +238,7 @@ Chromeでも公開ページを開き、日英切替と「カード右下のQRを
 
 ユーザーの依頼でCodexが `prototypes/mobile-ui/styles/input.css` を変更した。主操作には青の縦グラデーション、上辺のハイライト、細い光の縁と淡い外側の光を付けた。副操作と円形ツールは白い面に薄い縁と小さな影を付けた。次へ・登録の矢印を右端に配置した。無効時は光沢を外し、押下時の沈みとキーボードのフォーカスを設定した。小さい主操作ボタンは文字が読める暗めの青にした。
 
-[方針](UI_WIREFRAME_PLAN.md)を先に記録し、既存図案と撮影画像を見比べた。画像素材は追加していない。大会期間との対応は未確認。
+[方針](UI_WIREFRAME_PLAN.ja.md)を先に記録し、既存図案と撮影画像を見比べた。画像素材は追加していない。大会期間との対応は未確認。
 
 Node.js 22.22.3でビルド成功。ローカルのChromium 149.0.7827.55とWebKit 26.5で既存の画面幅・日英・登録フロー検証が成功した。コンソールエラー0件、配信7アセットとビルドの一致を確認した。`git diff --check` も成功した。
 
@@ -290,7 +290,7 @@ Node.js 22.22.3でビルド成功。ローカルのChromium 149.0.7827.55とWebK
 
 ユーザーの追加指示でCodexが `styles/input.css` を変更した。読取結果のチェックだけに青い球面状グラデーション、白い縁、淡い発光を追加し、チェックの線を太くした。「証明一郎」の情報パネルは白・淡青の半透明面と内側ハイライト、白い縁に変更した。未登録ラベルは白地と青文字を維持し、薄い陰影を付けた。登録完了の緑のチェックは変更していない。
 
-方針は [UI_WIREFRAME_PLAN.md](UI_WIREFRAME_PLAN.md) に記録。ビルドと `git diff --check` が成功し、Chromeの読取結果画面でチェック、情報パネル、未登録ラベルと文言の表示を目視した。画像素材の変更はない。ローカルのみで、未コミット・未push・未デプロイ。大会期間との対応は未確認。
+方針は [UI_WIREFRAME_PLAN.ja.md](UI_WIREFRAME_PLAN.md) に記録。ビルドと `git diff --check` が成功し、Chromeの読取結果画面でチェック、情報パネル、未登録ラベルと文言の表示を目視した。画像素材の変更はない。ローカルのみで、未コミット・未push・未デプロイ。大会期間との対応は未確認。
 
 ## 2026-09-26: 情報カードの質感を共通化
 
@@ -309,9 +309,9 @@ Node.js 22.22.3でビルド成功。ローカルのChromium 149.0.7827.55とWebK
 
 ユーザーが、Curvegrid Testnetへの実接続、所有者登録コントラクトの新規作成、自由入力の名前、通常ブラウザからMetaMaskへの接続を選択した。その後、UIを並行実装するため担当を分け、計画保存・詳細設計・ユーザー確認・実装の順に進めるよう指示した。大会期間との対応は未確認。
 
-Codexが専用worktreeと `feat/curvegrid-integration-backend` ブランチを作り、[計画](CURVEGRID_INTEGRATION_PLAN.md) と [会話の選択記録](../docs/prompts/curvegrid-integration-decisions.md)を作成した。対応する3件のhook JSONを元の作業場所から同一内容でコピーした。この段階は計画資料の保存だけで、コード・依存関係・デプロイ設定は変更していない。
+Codexが専用worktreeと `feat/curvegrid-integration-backend` ブランチを作り、[計画](CURVEGRID_INTEGRATION_PLAN.ja.md) と [会話の選択記録](../docs/prompts/curvegrid-integration-decisions.ja.md)を作成した。対応する3件のhook JSONを元の作業場所から同一内容でコピーした。この段階は計画資料の保存だけで、コード・依存関係・デプロイ設定は変更していない。
 
-計画保存コミット `23bf058` で [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) を作成した。その後Codexが [詳細設計](CURVEGRID_INTEGRATION_DESIGN.md) と [OpenSpec change](../openspec/changes/curvegrid-testnet-integration/proposal.md) の提案・要件・設計・タスクを作成した。MultiBaas公式資料の調査は読取り専用の補助エージェントを使用し、親エージェントがAPI、ABI、CLI再開、UIとの担当境界、試験計画へ反映した。AI使用範囲はこれらの文書と本変更記録である。
+計画保存コミット `23bf058` で [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) を作成した。その後Codexが [詳細設計](CURVEGRID_INTEGRATION_DESIGN.ja.md) と [OpenSpec change](../openspec/changes/curvegrid-testnet-integration/proposal.ja.md) の提案・要件・設計・タスクを作成した。MultiBaas公式資料の調査は読取り専用の補助エージェントを使用し、親エージェントがAPI、ABI、CLI再開、UIとの担当境界、試験計画へ反映した。AI使用範囲はこれらの文書と本変更記録である。
 
 `openspec validate curvegrid-testnet-integration --strict` が成功した。新しい計画文書のローカルリンクと空白、3件のプロンプト原本とのバイト一致を確認した。実装タスクは全件未完了。コントラクト・API・CLIのコード変更、実環境への接続、アプリ試験、デプロイは行っていない。ユーザーの詳細設計確認後に実装を開始する。
 
@@ -321,11 +321,11 @@ Codexが専用worktreeと `feat/curvegrid-integration-backend` ブランチを�
 
 元のUI作業場所は変更せず、専用worktreeで実装する。実環境の設定・配置・UI結合試験はまだ行っていない。大会期間との対応は未確認。
 
-Codexが `contracts/` のSolidity・CLI・試験・ABI、`apps/web/` のlive Gateway・HTTP・接続API・型/validator生成物・試験・専用Worker設定、`specs/openapi.yaml`、OpenAPI検証スクリプト、OpenSpecタスクと設計状態、SPEC・ARCHITECTUREの実装状態、[起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md)、[実装・検証記録](CURVEGRID_INTEGRATION_IMPLEMENTATION.md)を作成・更新した。既存mock 19シナリオを維持した。検証結果と残る依存監査指摘は実装記録を参照。実環境のキーは未設定で、実疎通・公開・スマホ結合試験は未実施。
+Codexが `contracts/` のSolidity・CLI・試験・ABI、`apps/web/` のlive Gateway・HTTP・接続API・型/validator生成物・試験・専用Worker設定、`specs/openapi.yaml`、OpenAPI検証スクリプト、OpenSpecタスクと設計状態、SPEC・ARCHITECTUREの実装状態、[起動手順](CURVEGRID_INTEGRATION_RUNBOOK.ja.md)、[実装・検証記録](CURVEGRID_INTEGRATION_IMPLEMENTATION.ja.md)を作成・更新した。既存mock 19シナリオを維持した。検証結果と残る依存監査指摘は実装記録を参照。実環境のキーは未設定で、実疎通・公開・スマホ結合試験は未実施。
 
 ## 2026-09-26 JST: 実環境疎通の前提を確認
 
-ユーザーの疎通試験・課題整理とリベースの指示を受け、Codexが最新mainを取得し、ローカルlive APIを起動してHTTP応答を確認した。MultiBaas設定は未提供で503 CONFIGURATION_MISSING。外部ネットワーク権限でCloudflareの専用Worker不存在も確認した。結果と対応案は [疎通試験レポート](CURVEGRID_CONNECTIVITY_REPORT.md) に保存した。実環境の認証失敗とは判断していない。
+ユーザーの疎通試験・課題整理とリベースの指示を受け、Codexが最新mainを取得し、ローカルlive APIを起動してHTTP応答を確認した。MultiBaas設定は未提供で503 CONFIGURATION_MISSING。外部ネットワーク権限でCloudflareの専用Worker不存在も確認した。結果と対応案は [疎通試験レポート](CURVEGRID_CONNECTIVITY_REPORT.ja.md) に保存した。実環境の認証失敗とは判断していない。
 
 Codexが設定項目名だけの確認、HTTP検証、課題整理・文書作成を担当した。接続情報の場所をユーザーに確認中。チェーン書込み・Worker公開は未実施。大会期間との対応は未確認。
 
@@ -335,7 +335,7 @@ Codexが設定項目名だけの確認、HTTP検証、課題整理・文書作�
 
 ## 2026-09-26 JST: 最新UIと実API・ウォレットの接続
 
-ユーザーの指示で最新main `3598094` の画面にAPI・MetaMask接続を追加した。既定のUIビルドはモックを維持し、専用integrationビルドに実接続を含めた。同じPR #1で進め、UI検討用Workerは変更していない。採用設計は [計画](UI_LIVE_CONNECTION_PLAN.md)、公開URL・実測・残る実機条件は [結果](UI_LIVE_CONNECTION_REPORT.md) に保存した。
+ユーザーの指示で最新main `3598094` の画面にAPI・MetaMask接続を追加した。既定のUIビルドはモックを維持し、専用integrationビルドに実接続を含めた。同じPR #1で進め、UI検討用Workerは変更していない。採用設計は [計画](UI_LIVE_CONNECTION_PLAN.ja.md)、公開URL・実測・残る実機条件は [結果](UI_LIVE_CONNECTION_REPORT.ja.md) に保存した。
 
 Codexが `prototypes/mobile-ui` のlive controller、MetaMask境界、共通テンプレート接続、ビルド切替、試験、`apps/web` のUI同梱・入口遷移と資料を作成した。独立するcontrollerとwallet境界を補助エージェントへ分担し、親担当が統合・実測した。ユーザーは接続方針、mock維持、専用試験ウォレットの作成・公開情報保存を決定した。プロンプトはhookが元の作業場所に保存した3件を `docs/prompts/2026-09-26` へ同一内容でコピーした。大会期間との対応は未確認。
 
@@ -345,19 +345,19 @@ UI境界43件・API66件と型検査、Chromium/WebKitのmock/live画面試験�
 
 ## 2026-09-26 JST: 全員登録デモと診断ログ
 
-ユーザーが「デモの所有権登録許可は全員」と訂正したため、Codexがコントラクトのゼロ許可先を全員許可として実装し、CLIの既定値、APIの準備・状態読取り・イベント・取引の照合を更新した。旧記録は変更せず、1.1.0を新しく配置して専用Workerの記録先を変更した。詳細と新しいデモURLは [全員登録記録](OPEN_REGISTRATION_DEMO.md) を参照。登録後の照合漏れを実取引で検出し、共通の許可判定と回帰試験で修正した。
+ユーザーが「デモの所有権登録許可は全員」と訂正したため、Codexがコントラクトのゼロ許可先を全員許可として実装し、CLIの既定値、APIの準備・状態読取り・イベント・取引の照合を更新した。旧記録は変更せず、1.1.0を新しく配置して専用Workerの記録先を変更した。詳細と新しいデモURLは [全員登録記録](OPEN_REGISTRATION_DEMO.ja.md) を参照。登録後の照合漏れを実取引で検出し、共通の許可判定と回帰試験で修正した。
 
 先行するログ追加依頼も反映し、受付ID、構造化エラーログ、画面の診断コピー、ガス不足の案内を実装した。Codexがコード・仕様・試験・デプロイ・資料を担当し、人間が公開デモの操作、エラー報告、全員許可への仕様訂正を行った。大会期間との対応は未確認。旧許可先と別の試験鍵によるブラウザ登録が成功し、API70件・UI43件・contract/CLI17件も成功した。
 
 ## 2026-09-26 JST: ガス不足のエラー分類
 
-ユーザーの診断ログから、残高0のウォレットで登録準備がMultiBaasの400となることを再現した。CodexがHTTP503への一律変換を修正し、観測した残高不足だけを422 INSUFFICIENT_FUNDSへ分類した。OpenAPIと生成物、回帰試験、ブラウザ試験を更新。公開Workerでも同じユーザーアドレスで確認し、送金・所有者登録は行っていない。詳細は [全員登録記録](OPEN_REGISTRATION_DEMO.md)。大会期間との対応は未確認。
+ユーザーの診断ログから、残高0のウォレットで登録準備がMultiBaasの400となることを再現した。CodexがHTTP503への一律変換を修正し、観測した残高不足だけを422 INSUFFICIENT_FUNDSへ分類した。OpenAPIと生成物、回帰試験、ブラウザ試験を更新。公開Workerでも同じユーザーアドレスで確認し、送金・所有者登録は行っていない。詳細は [全員登録記録](OPEN_REGISTRATION_DEMO.ja.md)。大会期間との対応は未確認。
 
 ## 2026-09-26 登録待機と再取得の表示
 
 ユーザーが実機で報告した「登録後の再取得でも登録中と表示される」問題を修正。初回登録は送信後最大60秒、取引と所有者と証跡を確認する。登録後の再取得はカードと所有者を保持し、ステータスだけを「確認中」に変更する。通信失敗でも既知の所有者を消さず、再取得できる。
 
-人間は不適切な表示の発見と、局所更新・最大1分の待機を指定。AIは状態管理、日英表示、CSS、試験、計画と結果の記録を実施。対象ファイルと検証手順は [登録と再取得の表示](REGISTRATION_STATUS_UI.md) を参照。今回の時刻と大会期間との対応は未確認。
+人間は不適切な表示の発見と、局所更新・最大1分の待機を指定。AIは状態管理、日英表示、CSS、試験、計画と結果の記録を実施。対象ファイルと検証手順は [登録と再取得の表示](REGISTRATION_STATUS_UI.ja.md) を参照。今回の時刻と大会期間との対応は未確認。
 
 ### 登録済みカード読込みの追加修正
 
@@ -366,7 +366,7 @@ UI境界43件・API66件と型検査、Chromium/WebKitのmock/live画面試験�
 
 ## 2026-09-26: 背景・ロゴなどの保存と素材整理
 
-ユーザーが提供したおじいちゃんコンビニの素材14点を保存した。背景11点、ロゴ・QRイラスト・カード各1点。既存の画面図案17点を含む31点を内容別に分類・改名し、[素材一覧](assets/asagohann777/README.md)と旧名・新名・SHA-256の対応を記録した。Codexがコピー、目視分類、改名、既存資料のリンク更新と照合を担当した。画像自体の生成・編集は行っていない。全31点のハッシュ一致と保存先リンクを確認した。素材の制作プロンプトは未受領。制作日時、大会期間との対応、素材制作でのAI使用範囲とライセンスは未確認。
+ユーザーが提供したおじいちゃんコンビニの素材14点を保存した。背景11点、ロゴ・QRイラスト・カード各1点。既存の画面図案17点を含む31点を内容別に分類・改名し、[素材一覧](assets/asagohann777/README.ja.md)と旧名・新名・SHA-256の対応を記録した。Codexがコピー、目視分類、改名、既存資料のリンク更新と照合を担当した。画像自体の生成・編集は行っていない。全31点のハッシュ一致と保存先リンクを確認した。素材の制作プロンプトは未受領。制作日時、大会期間との対応、素材制作でのAI使用範囲とライセンスは未確認。
 
 ## 2026-09-26: 受領背景・ロゴ・カードのUI反映
 
@@ -415,7 +415,7 @@ Codexがユーザーの指示に従い `public/app.js` の結果画面からホ�
 
 - 人間の指示で専用worktree `shomei-kun-qr-proof-camera-scan` とブランチ `feat/camera-scan` を使用。元の作業フォルダを変更しない。
 - AIが `UI_CAMERA_MODE`、カメラ管理、ローカル写真デコード、ライト、QR受付制限、関連テストを実装。デザイン素材や作者帰属は変更していない。
-- `qr-scanner` 1.4.2と同梱workerを使用。設定・停止条件・受け付けるQR・実機未検証の範囲は [カメラ仕様](CAMERA_SCAN.md) に記録。
+- `qr-scanner` 1.4.2と同梱workerを使用。設定・停止条件・受け付けるQR・実機未検証の範囲は [カメラ仕様](CAMERA_SCAN.ja.md) に記録。
 - ユーザー入力は元チェックアウトのhookが保存した [実装依頼](../docs/prompts/2026-09-26/032930-685335-75407fed05314b13aceddf690f21b8df.json) と [計画実行指示](../docs/prompts/2026-09-26/033424-981583-b71e1b9dc3de4761b5d83c3dffea3cd6.json) を同じ相対パスへコピーした。コピーを新たな自動収集とは扱わない。
 - 大会期間との対応は未確認。実カメラを使った実登録、main統合、デプロイはこの変更の検証に含まれない。
 
@@ -467,22 +467,22 @@ Chromium/WebKitの日英320px・390pxで表示と操作を確認し、カメラ�
 
 ## 2026-09-26: 画像生成の「プロンプト報告1」を受領
 
-ユーザーから、おじいちゃんコンビニの画像生成・UI設計・素材分離に関する[報告1の前編と続編（1〜28項）](../docs/prompts/asagohann777-prompt-report-1-2026-09-26.md)を受領した。人間がQR読取りを起点とする流れ、文言、視覚的優先順位、世界観、縦横比、QR後付け領域を判断し、AIへ修正指示を出した経緯を記録している。Codexが提供本文を抽出・結合し、出典、受領素材との区別、関連リンクを保存。本文と入力の一致、リンク、差分を確認した。画像生成・UI実装は今回行っていない。制作日時と大会期間との対応、各素材と個別プロンプトの対応は未確認。
+ユーザーから、おじいちゃんコンビニの画像生成・UI設計・素材分離に関する[報告1の前編と続編（1〜28項）](../docs/prompts/asagohann777-prompt-report-1-2026-09-26.ja.md)を受領した。人間がQR読取りを起点とする流れ、文言、視覚的優先順位、世界観、縦横比、QR後付け領域を判断し、AIへ修正指示を出した経緯を記録している。Codexが提供本文を抽出・結合し、出典、受領素材との区別、関連リンクを保存。本文と入力の一致、リンク、差分を確認した。画像生成・UI実装は今回行っていない。制作日時と大会期間との対応、各素材と個別プロンプトの対応は未確認。
 
 ## 2026-09-26: 英語の提出用スクリーンショットとブランド画像を保存
 
-ユーザー指定により、統合済みmain `5d3e676` のUIデモから英語スクショ9枚を撮影し、指定画像2点をアイコン・カバーとして原寸保存した。Codexが撮影・目視確認・原本照合・保存記録を担当。READMEにはスクショのリンクだけを追加した。実取引の証跡ではない。詳細は[保存記録](SUBMISSION_ASSETS_2026-09-26.md)。大会期間との対応は未確認。ユーザーのcommit・push指示により、素材・撮影スクリプト・保存記録・対応プロンプトを本変更に含める。
+ユーザー指定により、統合済みmain `5d3e676` のUIデモから英語スクショ9枚を撮影し、指定画像2点をアイコン・カバーとして原寸保存した。Codexが撮影・目視確認・原本照合・保存記録を担当。READMEにはスクショのリンクだけを追加した。実取引の証跡ではない。詳細は[保存記録](SUBMISSION_ASSETS_2026-09-26.ja.md)。大会期間との対応は未確認。ユーザーのcommit・push指示により、素材・撮影スクリプト・保存記録・対応プロンプトを本変更に含める。
 
 ## 2026-09-26: 現行仕様の同期と文章整理
 
 ユーザーがOpenSpec同期、簡潔な文章、古い未確定事項の削除を指定した。Codexが仕様・構成・デモ手順とカメラ仕様を整理し、`curvegrid-testnet-integration` に実装済みの画面動作を反映して現行仕様へ同期した。要件から設計承認待ちの作業手続きを外し、資料の入口を追加した。OpenSpecの現行仕様と変更の検証、相対リンク、同期内容の一致を確認した。実装コードは変更していない。大会期間との対応は未確認。
 ## 2026-09-26: 提出用READMEの日本語草稿
 
-ユーザーの指定で最新mainをpullし、ロゴ・カバー・スクショリンク・概要・既存成果と今回の追加機能を日本語で整理した。Continuityトラック向けの提出方針を記録。Codexがunslopを使って執筆し、公式サイト・大会ルールと既存資料を照合した。実装コードと別セッションで修正中の仕様本文は変更していない。採用内容は[README作成記録](README_JA_PLAN.md)。大会期間との対応は未確認。
+ユーザーの指定で最新mainをpullし、ロゴ・カバー・スクショリンク・概要・既存成果と今回の追加機能を日本語で整理した。Continuityトラック向けの提出方針を記録。Codexがunslopを使って執筆し、公式サイト・大会ルールと既存資料を照合した。実装コードと別セッションで修正中の仕様本文は変更していない。採用内容は[README作成記録](README_JA_PLAN.ja.md)。大会期間との対応は未確認。
 
 ## 2026-09-26: MITライセンスとREADMEの調整
 
-ユーザーの指示でソースコードにMITを採用し、LICENSE、SPDX識別子、生成コードのヘッダー、パッケージ情報を揃えた。提供素材の権利は別扱いとした。READMEの指定文と出典リンクを削除し、素材提供者のGitHubリンクを追加。Codexが整備と検証を担当。詳細は[ライセンス方針](LICENSE_POLICY.md)。大会期間との対応は未確認。
+ユーザーの指示でソースコードにMITを採用し、LICENSE、SPDX識別子、生成コードのヘッダー、パッケージ情報を揃えた。提供素材の権利は別扱いとした。READMEの指定文と出典リンクを削除し、素材提供者のGitHubリンクを追加。Codexが整備と検証を担当。詳細は[ライセンス方針](LICENSE_POLICY.ja.md)。大会期間との対応は未確認。
 
 ## 2026-09-26: Optional ENS recipient and wallet registration search
 

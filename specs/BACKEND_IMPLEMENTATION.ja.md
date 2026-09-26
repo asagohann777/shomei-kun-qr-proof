@@ -1,8 +1,8 @@
-[English](BACKEND_IMPLEMENTATION.md) | 日本語
+[English](BACKEND_IMPLEMENTATION.md) | 日本語（原文保存版）
 
 # 固定モックAPIの実装計画と検証
 
-2026-09-26 JST。[詳細設計](BACKEND_DESIGN.md)に沿って実装する。既存の静的UIモックと既存PoCには接続しない。
+2026-09-26 JST。[詳細設計](BACKEND_DESIGN.ja.md)に沿って実装する。既存の静的UIモックと既存PoCには接続しない。
 
 ## 実装手順
 
@@ -24,7 +24,7 @@ APIアプリは `apps/web/` に配置する。OpenAPIからDTO、サンプル、
 
 Next.jsのRoute HandlerはHTTP境界を担当し、ServiceがGatewayの取引・レシート・イベント・カードを照合する。Mock Walletのライブラリは承認・拒否と確認を模擬し、既存画面への組込みは行わない。
 
-Cloudflare構成は[既存アーキテクチャ](ARCHITECTURE.md)のOpenNext案を具体化する。[OpenNext公式の設定手順](https://opennext.js.org/cloudflare/get-started)とnpmのpeerDependenciesを確認し、互換範囲内のバージョンを固定する。デプロイは行わない。
+Cloudflare構成は[既存アーキテクチャ](ARCHITECTURE.ja.md)のOpenNext案を具体化する。[OpenNext公式の設定手順](https://opennext.js.org/cloudflare/get-started)とnpmのpeerDependenciesを確認し、互換範囲内のバージョンを固定する。デプロイは行わない。
 
 ## 検証記録
 
@@ -41,7 +41,7 @@ Node.js 22.23.1、Next.js 16.3.6、TypeScript 5.9.3、OpenNext Cloudflare 1.20.6
 | B10 | boundary、HTTP試験 | JSON・型・形式、シナリオ、UTF-8、Content-Type、本文16 KiBの境界。Content-Lengthの偽装に依存しない |
 | B11 | HTTP試験、config、生成チェック | 全19シナリオの応答がOpenAPI例・スキーマと一致。mock明示、未設定・liveの起動拒否、liveへのモックヘッダー拒否 |
 
-試験コードは [apps/web/tests](../apps/web/tests/)、再実行手順は [README](../apps/web/README.md) にある。サービス・入力境界・設定・Mock Walletの36試験が成功した。Next.js上で24件、ローカルWorkers上で同じ24件のHTTP試験が成功した。[Next.jsの実行結果](assets/backend/http-next.txt)と [Workersの実行結果](assets/backend/http-worker.txt)を保存した。
+試験コードは [apps/web/tests](../apps/web/tests/)、再実行手順は [README](../apps/web/README.ja.md) にある。サービス・入力境界・設定・Mock Walletの36試験が成功した。Next.js上で24件、ローカルWorkers上で同じ24件のHTTP試験が成功した。[Next.jsの実行結果](assets/backend/http-next.txt)と [Workersの実行結果](assets/backend/http-worker.txt)を保存した。
 
 Workersの404ではOpenNextが `private, no-cache, no-store, max-age=0, must-revalidate` を付ける。初回試験は文字列の完全一致で4件失敗した。保存禁止の意味を保ったまま、OpenAPIと試験を `no-store` 指定必須・追加指定許容に修正した。
 

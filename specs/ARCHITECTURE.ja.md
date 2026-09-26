@@ -1,4 +1,4 @@
-[English](ARCHITECTURE.md) | 日本語
+[English](ARCHITECTURE.md) | 日本語（原文保存版）
 
 # 構成とデータの流れ
 
@@ -43,7 +43,7 @@
 | Primary name表示 | `GET /api/v1/ens/primary-name?address={address}` |
 | 登録取引の照合 | `GET /api/v1/cards/{cardId}/transactions/{hash}` |
 
-本文・応答・エラーの定義は [openapi.yaml](openapi.yaml)。未発行は404、入力不正は400/413/422、設定・上流障害は503。残高不足が確認できた場合は422 `INSUFFICIENT_FUNDS` を返す。
+本文・応答・エラーの定義は [openapi.ja.yaml](openapi.ja.yaml)。未発行は404、入力不正は400/413/422、設定・上流障害は503。残高不足が確認できた場合は422 `INSUFFICIENT_FUNDS` を返す。
 
 ## 登録の流れ
 
@@ -66,7 +66,7 @@ iPhone/iPadの外部ブラウザからは `metamask://dapp/<公開URL>?cardId=..
 
 ## カメラ
 
-`qr-scanner` が端末内で動画・写真を解析する。デコーダーworkerは同一配信元にバンドルする。実カメラ時だけカメラ権限と必要なblobを許可する。画面離脱・ページ非表示・読取り完了でストリームを停止する。[カメラ仕様](CAMERA_SCAN.md)。
+`qr-scanner` が端末内で動画・写真を解析する。デコーダーworkerは同一配信元にバンドルする。実カメラ時だけカメラ権限と必要なblobを許可する。画面離脱・ページ非表示・読取り完了でストリームを停止する。[カメラ仕様](CAMERA_SCAN.ja.md)。
 
 ## モードと秘密情報
 
@@ -76,7 +76,7 @@ MultiBaasのアプリ用キーはCloudflare Secretへ保存する。管理キー
 
 CORSは許可したOriginだけに付与する。上流のエラー本文や認証値を公開せず、エラーコードと受付IDで診断する。
 
-設定・ビルド・運用は [CURVEGRID_INTEGRATION_RUNBOOK.md](CURVEGRID_INTEGRATION_RUNBOOK.md)、コントラクトとCLIは [contracts/README.md](../contracts/README.md) を参照する。
+設定・ビルド・運用は [CURVEGRID_INTEGRATION_RUNBOOK.ja.md](CURVEGRID_INTEGRATION_RUNBOOK.md)、コントラクトとCLIは [contracts/README.md](../contracts/README.ja.md) を参照する。
 
 ## ENSの読み取りとカード検索
 

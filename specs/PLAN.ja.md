@@ -1,14 +1,14 @@
-[English](PLAN.md) | 日本語
+[English](PLAN.md) | 日本語（原文保存版）
 
 # 採用計画: QR起点・現在登録所有者確認の仕様文書作成
 
 状態: 2026-09-25の採用計画と、その後の改訂を手動保存した記録。hookによる回答の自動収集ではない。初版のCurvegrid Testnet・RPC中心の設計は、同日の追加指示でMultiBaas API中心・Polygon Amoyに変更した。
 
-この初版計画の承認は文書作成を対象とする。アプリ実装、コミット、push、提出、デプロイはこの作業に含めない。現行の仕様は [SPEC.md](SPEC.md)、設計は [ARCHITECTURE.md](ARCHITECTURE.md)、実施結果は [HACKATHON_CHANGES.md](HACKATHON_CHANGES.md) に記録する。
+この初版計画の承認は文書作成を対象とする。アプリ実装、コミット、push、提出、デプロイはこの作業に含めない。現行の仕様は [SPEC.ja.md](SPEC.md)、設計は [ARCHITECTURE.ja.md](ARCHITECTURE.md)、実施結果は [HACKATHON_CHANGES.ja.md](HACKATHON_CHANGES.md) に記録する。
 
 ## 追加の採用計画: スマホUIモック
 
-その後のUI作成依頼と実行指示により、スマホ縦画面だけの操作可能なモックを作る。QRスキャンを含む4画面、daisyUIとTailwind CSS、公開プレビューを採用した。範囲・判断・検証手順は [UI_MOCK_PLAN.md](UI_MOCK_PLAN.md) に保存する。以下の「文書だけ」という記録は当時の作業範囲を示す。
+その後のUI作成依頼と実行指示により、スマホ縦画面だけの操作可能なモックを作る。QRスキャンを含む4画面、daisyUIとTailwind CSS、公開プレビューを採用した。範囲・判断・検証手順は [UI_MOCK_PLAN.ja.md](UI_MOCK_PLAN.md) に保存する。以下の「文書だけ」という記録は当時の作業範囲を示す。
 
 ## 現行の変更点: MultiBaas API中心・Polygon Amoy
 
@@ -70,17 +70,17 @@
 
 採用範囲はMultiBaas・署名・送信の固定モック。状態を保存せず、登録入力はサンプルに限定する。発行者CLIは後続とする。
 
-成果物は [BACKEND_DESIGN.md](BACKEND_DESIGN.md) と [openapi.yaml](openapi.yaml)。カード取得、登録準備、登録確認の3 APIについて、入出力、エラー、シナリオ、照合条件と実接続への移行条件を定義する。静的検証スクリプトでOpenAPIと応答例を照合する。APIサーバーや既存UIへの接続は今回の対象に含めない。
+成果物は [BACKEND_DESIGN.ja.md](BACKEND_DESIGN.md) と [openapi.ja.yaml](openapi.ja.yaml)。カード取得、登録準備、登録確認の3 APIについて、入出力、エラー、シナリオ、照合条件と実接続への移行条件を定義する。静的検証スクリプトでOpenAPIと応答例を照合する。APIサーバーや既存UIへの接続は今回の対象に含めない。
 
-実装後の試験B01〜B11は詳細設計書に保存する。今回の静的検証を実接続試験の合格として扱わない。[選択結果と出典](../docs/prompts/backend-design-decisions.md)も保存する。
+実装後の試験B01〜B11は詳細設計書に保存する。今回の静的検証を実接続試験の合格として扱わない。[選択結果と出典](../docs/prompts/backend-design-decisions.ja.md)も保存する。
 
 ### 初版の参照
 
 - [最初の依頼](../docs/prompts/2026-09-25/121716-439190-2cd0d9f92aa8468588e7978b39382568.json)
 - [スマホ登録への訂正](../docs/prompts/2026-09-25/122429-037897-c475cb8e8fd244c08302e2043f25f922.json)
 - [計画の実行指示](../docs/prompts/2026-09-25/122651-114438-1fe83e01648547c1a4e98d4f8cc0ec12.json)
-- [選択式の質問と回答の手動記録](../docs/prompts/qr-proof-decisions.md)
+- [選択式の質問と回答の手動記録](../docs/prompts/qr-proof-decisions.ja.md)
 
 ## 2026-09-26 JST: 詳細設計に沿った実装
 
-[ユーザーの実装指示](../docs/prompts/2026-09-25/152556-790938-5fdac443e5ab4602b26eb512cec3edb6.json)により、固定モックのWeb APIを `apps/web/` に実装する。[実装計画と検証](BACKEND_IMPLEMENTATION.md)に担当範囲、手順、結果を保存する。既存UIとの接続、実ウォレット、MultiBaas・Amoy実接続、公開は含めない。
+[ユーザーの実装指示](../docs/prompts/2026-09-25/152556-790938-5fdac443e5ab4602b26eb512cec3edb6.json)により、固定モックのWeb APIを `apps/web/` に実装する。[実装計画と検証](BACKEND_IMPLEMENTATION.ja.md)に担当範囲、手順、結果を保存する。既存UIとの接続、実ウォレット、MultiBaas・Amoy実接続、公開は含めない。

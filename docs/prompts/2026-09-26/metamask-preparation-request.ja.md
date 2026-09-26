@@ -1,4 +1,4 @@
-[English](metamask-preparation-request.md) | 日本語
+[English](metamask-preparation-request.md) | 日本語（原文保存版）
 
 # MetaMaskの接続準備に関する依頼
 

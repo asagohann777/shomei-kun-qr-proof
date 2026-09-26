@@ -63,7 +63,7 @@ iPhone・iPadではMetaMask内ブラウザから登録してください。ニ�
 | 既存成果 | 証明くんの構想、写真・動画登録、アルバム管理、公開範囲の設定、URLによる共有、外部証跡としてのブロックチェーン利用 |
 | 本リポジトリでの開発 | カードID発行、QR読取、ウォレットによる所有者登録、ニックネーム記録、公開記録閲覧、日本語・英語UI、カメラ・写真からのQR読取、登録先を限定しない発行、ENS・アドレス検索、正引き確認済みPrimary nameの表示 |
 
-既存機能の説明はプロジェクトから提供された資料に基づきます。出典と流用範囲は[既存成果](specs/PRE_EXISTING_WORK.md)、実装と検証の記録は[開発記録](specs/HACKATHON_CHANGES.md)を参照してください。
+既存機能の説明はプロジェクトから提供された資料に基づきます。出典と流用範囲は[既存成果](specs/PRE_EXISTING_WORK.ja.md)、実装と検証の記録は[開発記録](specs/HACKATHON_CHANGES.ja.md)を参照してください。
 
 ## ETHGlobal Tokyo 2026
 
@@ -73,16 +73,16 @@ Continuityには「Extend Open Source」と「Ship a Feature」があります�
 
 ## 実装と開発記録
 
-UIはJavaScript、Tailwind CSS、daisyUI、APIはNext.jsとCloudflare Workersを使用しています。登録にはSolidity、Curvegrid MultiBaas、MetaMaskを使用します。ENSはSepolia上でethers 6.17.0により解決します。実接続デモはCurvegrid Testnetで検証しました。環境と検証結果は[登録デモ記録](specs/OPEN_REGISTRATION_DEMO.md)を参照してください。
+UIはJavaScript、Tailwind CSS、daisyUI、APIはNext.jsとCloudflare Workersを使用しています。登録にはSolidity、Curvegrid MultiBaas、MetaMaskを使用します。ENSはSepolia上でethers 6.17.0により解決します。実接続デモはCurvegrid Testnetで検証しました。環境と検証結果は[登録デモ記録](specs/OPEN_REGISTRATION_DEMO.ja.md)を参照してください。
 
-- [仕様書](specs/SPEC.md)、[アーキテクチャ](specs/ARCHITECTURE.md)、[デモ手順](specs/DEMO.md)
-- [UIのローカル起動](prototypes/mobile-ui/README.md)、[API](apps/web/README.md)、[コントラクト](contracts/README.md)
-- [仕様駆動開発の資料](openspec/)、[プロンプト記録](docs/prompts/README.md)
+- [仕様書](specs/SPEC.ja.md)、[アーキテクチャ](specs/ARCHITECTURE.ja.md)、[デモ手順](specs/DEMO.ja.md)
+- [UIのローカル起動](prototypes/mobile-ui/README.ja.md)、[API](apps/web/README.ja.md)、[コントラクト](contracts/README.ja.md)
+- [仕様駆動開発の資料](openspec/)、[プロンプト記録](docs/prompts/README.ja.md)
 
-チームメンバーが要件を定義し、画面配置、文言、素材を確認しました。AIは画像生成、実装、テスト、文書作成を補助しました。[プロンプト報告1](docs/prompts/asagohann777-prompt-report-1-2026-09-26.md)には、人間がAIの提案を評価し修正した過程を記録しています。[開発記録](specs/HACKATHON_CHANGES.md)にはファイルごとの作業と検証を記録しています。
+チームメンバーが要件を定義し、画面配置、文言、素材を確認しました。AIは画像生成、実装、テスト、文書作成を補助しました。[プロンプト報告1](docs/prompts/asagohann777-prompt-report-1-2026-09-26.ja.md)には、人間がAIの提案を評価し修正した過程を記録しています。[開発記録](specs/HACKATHON_CHANGES.ja.md)にはファイルごとの作業と検証を記録しています。
 
 ## 素材とライセンス
 
-UIの背景、ロゴ、カード画像は[おじいちゃんコンビニ（GitHub: @asagohann777）](https://github.com/asagohann777)から提供されました。[素材一覧](specs/assets/asagohann777/README.md)と[提出用アイコン・カバーのmanifest](docs/submission/2026-09-26/branding/manifest.json)を参照してください。
+UIの背景、ロゴ、カード画像は[おじいちゃんコンビニ（GitHub: @asagohann777）](https://github.com/asagohann777)から提供されました。[素材一覧](specs/assets/asagohann777/README.ja.md)と[提出用アイコン・カバーのmanifest](docs/submission/2026-09-26/branding/manifest.json)を参照してください。
 
 本リポジトリのソースコードは[MIT License](LICENSE)で公開しています。このライセンスは提供された画像・ロゴや既存の証明くんプロジェクトには適用しません。依存関係はそれぞれのライセンスに従います。

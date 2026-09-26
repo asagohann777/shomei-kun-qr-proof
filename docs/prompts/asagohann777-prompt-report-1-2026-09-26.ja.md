@@ -1,4 +1,4 @@
-[English](asagohann777-prompt-report-1-2026-09-26.md) | 日本語
+[English](asagohann777-prompt-report-1-2026-09-26.md) | 日本語（原文保存版）
 
 # おじいちゃんコンビニ「プロンプト報告1」の保存記録
 
@@ -13,7 +13,7 @@
 
 上記JSONは今回の入力をUserPromptSubmit hookが保存したもの。報告本文はCodexがそこから抽出して結合した。前編の保存依頼文と続編末尾の「続編もありました」を除き、提供された本文の文言・改行を保持した。画像生成時の外部会話を自動取得したものではなく、会話全文や個別の生成プロンプト原文を保証するものでもない。報告文自体の執筆でAIを使用したかは未確認。
 
-[先に受領した制作会話の記録](asagohann777-design-2026-09-25.md)と[受領画像・素材一覧](../../specs/assets/asagohann777/README.md)も参照。
+[先に受領した制作会話の記録](asagohann777-design-2026-09-25.ja.md)と[受領画像・素材一覧](../../specs/assets/asagohann777/README.ja.md)も参照。
 
 ## 報告内容と検証済み事項の区別
 

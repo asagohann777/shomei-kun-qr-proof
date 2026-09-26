@@ -55,7 +55,7 @@ After explicit approval, the actual CLI issued `ens-shomeikun-20260926-01` with 
 
 Test card: https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=ens-shomeikun-20260926-01
 
-The user subsequently reported that the iPhone app crashed during the test and displayed "結果を確認できません" after reopening. The public card API still returned `unregistered` with no registration evidence when checked after the report. This does not rule out a pending transaction. The user later reported approving with a different wallet and seeing no transaction in MetaMask activity. The crash cause is not established. Recovery of this saved unknown attempt remains unresolved. PC Chrome + MetaMask was confirmed by the user. Prize eligibility is not established solely by these checks.
+The user subsequently reported that the iPhone app crashed during the test and displayed "Unable to confirm the result" after reopening. The public card API still returned `unregistered` with no registration evidence when checked after the report. This does not rule out a pending transaction. The user later reported approving with a different wallet and seeing no transaction in MetaMask activity. The crash cause is not established. Recovery of this saved unknown attempt remains unresolved. PC Chrome + MetaMask was confirmed by the user. Prize eligibility is not established solely by these checks.
 
 
 ## Successful unrestricted demo registration

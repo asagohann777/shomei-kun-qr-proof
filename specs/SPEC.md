@@ -113,4 +113,4 @@ Acceptance covers matching ENS/address results, continued conventional operation
 
 ENS-restricted recipient issuance is removed from the requirements. New cards allow everyone, and ENS only assists search and display. The current CLI still has the old `--recipient-ens` and `--wallet` options. Their removal is unfinished. Existing contracts and previously restricted cards are unchanged.
 
-The user reported successful registration of unrestricted card `demo-open-20260926-02`. The public API also confirmed registration with evidence. The old card's "結果を確認できません" message after app termination remains unresolved. Successful registration of another card does not establish that recovery is fixed.
+The user reported successful registration of unrestricted card `demo-open-20260926-02`. The public API also confirmed registration with evidence. The old card's "Unable to confirm the result" message after app termination remains unresolved. Successful registration of another card does not establish that recovery is fixed.

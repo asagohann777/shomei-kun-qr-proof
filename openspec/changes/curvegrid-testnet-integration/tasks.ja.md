@@ -1,4 +1,4 @@
-[English](tasks.md) | 日本語
+[English](tasks.md) | 日本語（原文保存版）
 
 # Tasks
 

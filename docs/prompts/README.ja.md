@@ -1,4 +1,4 @@
-[English](README.md) | 日本語
+[English](README.md) | 日本語（原文保存版）
 
 # プロンプトの保存
 
@@ -51,4 +51,4 @@ python3 -m unittest discover -s tests -v
 
 ## 画像生成の提供記録
 
-- [おじいちゃんコンビニ「プロンプト報告1」（1〜28項）](asagohann777-prompt-report-1-2026-09-26.md)。2026-09-26受領。UI案の検討と実装素材への分離をまとめた提供報告。
+- [おじいちゃんコンビニ「プロンプト報告1」（1〜28項）](asagohann777-prompt-report-1-2026-09-26.ja.md)。2026-09-26受領。UI案の検討と実装素材への分離をまとめた提供報告。

@@ -1,4 +1,4 @@
-[English](REGISTRATION_STATUS_UI.md) | 日本語
+[English](REGISTRATION_STATUS_UI.md) | 日本語（原文保存版）
 
 # 登録と再取得の表示
 

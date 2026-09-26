@@ -1,4 +1,4 @@
-[English](UI_LIVE_CONNECTION_PLAN.md) | 日本語
+[English](UI_LIVE_CONNECTION_PLAN.md) | 日本語（原文保存版）
 
 # 最新UIへのAPI・ウォレット接続
 

@@ -75,6 +75,7 @@ Continuity includes "Extend Open Source" and "Ship a Feature." The specific cate
 
 The UI uses JavaScript, Tailwind CSS, and daisyUI. The API uses Next.js and Cloudflare Workers. Registration uses Solidity, Curvegrid MultiBaas, and MetaMask. ENS resolution uses ethers 6.17.0 on Sepolia. The connected demo has been tested on Curvegrid Testnet. See the [registration demo record](specs/OPEN_REGISTRATION_DEMO.md) for environment details and verification results.
 
+- [Documentation languages](docs/LANGUAGES.md) and Japanese source versions
 - [Specification](specs/SPEC.md), [architecture](specs/ARCHITECTURE.md), and [demo guide](specs/DEMO.md)
 - [Run the UI locally](prototypes/mobile-ui/README.md), [API](apps/web/README.md), and [contracts](contracts/README.md)
 - [Spec-driven development artifacts](openspec/) and [prompt records](docs/prompts/README.md)

@@ -1,4 +1,4 @@
-[English](README_JA_PLAN.md) | 日本語
+[English](README_JA_PLAN.md) | 日本語（原文保存版）
 
 # 日本語READMEの作成
 

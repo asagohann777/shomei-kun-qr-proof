@@ -1,4 +1,4 @@
-[English](qr-proof-decisions.md) | 日本語
+[English](qr-proof-decisions.md) | 日本語（原文保存版）
 
 # QR登録機能の探索で確認した選択回答
 
@@ -59,4 +59,4 @@
 
 上記を反映した計画を提示した後、ユーザーは「Implement the plan.」と指示した。[hook記録](2026-09-25/122651-114438-1fe83e01648547c1a4e98d4f8cc0ec12.json) を参照する。
 
-採用計画は [specs/PLAN.md](../../specs/PLAN.md) に保存した。今回の実行対象は仕様・設計・デモ手順などの文書作成であり、アプリ実装ではない。
+採用計画は [specs/PLAN.md](../../specs/PLAN.ja.md) に保存した。今回の実行対象は仕様・設計・デモ手順などの文書作成であり、アプリ実装ではない。

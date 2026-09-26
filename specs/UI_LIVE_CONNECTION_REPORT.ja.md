@@ -1,8 +1,8 @@
-[English](UI_LIVE_CONNECTION_REPORT.md) | 日本語
+[English](UI_LIVE_CONNECTION_REPORT.md) | 日本語（原文保存版）
 
 # 最新UIと実APIの接続結果
 
-更新: デモの登録許可は全員へ変更した。[最新の記録先・デモカード・検証結果](OPEN_REGISTRATION_DEMO.md)を参照。以下は指定ウォレット方式での過去の実測記録。旧チェーン記録は保存されているが、公開APIの既定記録先は新しいコントラクトである。
+更新: デモの登録許可は全員へ変更した。[最新の記録先・デモカード・検証結果](OPEN_REGISTRATION_DEMO.ja.md)を参照。以下は指定ウォレット方式での過去の実測記録。旧チェーン記録は保存されているが、公開APIの既定記録先は新しいコントラクトである。
 
 2026-09-26 JST。PR #1の専用worktreeで、`origin/main` の `3598094` を基準に実装した。終了前にも同じSHAを確認した。既存UIモックのWorkerは更新していない。大会期間との対応は未確認。
 
@@ -45,9 +45,9 @@ BACKEND_MODE=live npm run build:integration
 npx wrangler deploy --config wrangler.integration.jsonc
 ```
 
-デプロイ先は専用integration Worker。必要設定は既存の [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md) を参照。UIビルドはAPIモードlive・MetaMask接続を既定にし、`UI_WALLET_MODE=mock` で閲覧専用にできる。APIアプリの `.env.local` からはビルドに必要な公開設定だけを抽出する。`runtime-env-only.mjs` がOpenNextの環境値埋込みを消去し、成果物内の既知の認証情報を検査する。
+デプロイ先は専用integration Worker。必要設定は既存の [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.ja.md) を参照。UIビルドはAPIモードlive・MetaMask接続を既定にし、`UI_WALLET_MODE=mock` で閲覧専用にできる。APIアプリの `.env.local` からはビルドに必要な公開設定だけを抽出する。`runtime-env-only.mjs` がOpenNextの環境値埋込みを消去し、成果物内の既知の認証情報を検査する。
 
-通常のUIデザイン用ビルドは引き続きmock/mock。環境変数の一覧は [UI README](../prototypes/mobile-ui/README.md#apiウォレットの切替) を参照。
+通常のUIデザイン用ビルドは引き続きmock/mock。環境変数の一覧は [UI README](../prototypes/mobile-ui/README.ja.md#apiウォレットの切替) を参照。
 
 ## 検証した範囲
 

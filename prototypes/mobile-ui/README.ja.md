@@ -1,4 +1,4 @@
-[English](README.md) | 日本語
+[English](README.md) | 日本語（原文保存版）
 
 # 証明くん スマホUIモック
 
@@ -43,15 +43,15 @@ Cloudflare認証を設定して `npm run deploy` を実行する。専用Worker 
 
 アイコンはCodexが作成したSVG。背景・ロゴ・QRイラスト・カードはおじいちゃんコンビニから受領したJPEG。依存関係のライセンスは各パッケージに従う。ソースコードは[MIT License](../../LICENSE)。提供画像・ロゴなどの素材はこのライセンス付与の対象外。
 
-採用計画は [UI_MOCK_PLAN.md](../../specs/UI_MOCK_PLAN.md)、実測記録は [HACKATHON_CHANGES.md](../../specs/HACKATHON_CHANGES.md) を参照。
+採用計画は [UI_MOCK_PLAN.md](../../specs/UI_MOCK_PLAN.ja.md)、実測記録は [HACKATHON_CHANGES.md](../../specs/HACKATHON_CHANGES.ja.md) を参照。
 
 ## 2026-09-26の図案ワイヤー
 
-[UI_WIREFRAME_PLAN.md](../../specs/UI_WIREFRAME_PLAN.md)に図案との対応を記録した。ローカル版は中央カード、入力、登録確認、模擬承認、処理、完了の順に操作できる。2026-09-26に今回のワイヤーを上記の公開URLへデプロイした。
+[UI_WIREFRAME_PLAN.md](../../specs/UI_WIREFRAME_PLAN.ja.md)に図案との対応を記録した。ローカル版は中央カード、入力、登録確認、模擬承認、処理、完了の順に操作できる。2026-09-26に今回のワイヤーを上記の公開URLへデプロイした。
 
 ## 受領素材の組み込み
 
-2026-09-26にローカルUIへ組み込んだ。原本と旧名の対応は[素材一覧](../../specs/assets/asagohann777/README.md)に保存。
+2026-09-26にローカルUIへ組み込んだ。原本と旧名の対応は[素材一覧](../../specs/assets/asagohann777/README.ja.md)に保存。
 
 | 表示 | 配布用素材 | 原本 |
 | --- | --- | --- |
@@ -101,7 +101,7 @@ npm run build:integration
 
 `live/mock` は閲覧専用。`mock/metamask` はビルドエラー。実接続ではシナリオ切替・模擬承認を表示しない。カメラ画面への遷移は従来どおり模擬。
 
-UIソースはこのディレクトリを共有する。専用Workerのビルドは `apps/web/scripts/prepare-integration-ui.mjs` が同じソースを `dist-integration` へビルドし、生成物をAPIアプリの `public/ui` に同梱する。管理キーをUIへ渡さない。[手順と実測](../../specs/UI_LIVE_CONNECTION_REPORT.md)を参照。
+UIソースはこのディレクトリを共有する。専用Workerのビルドは `apps/web/scripts/prepare-integration-ui.mjs` が同じソースを `dist-integration` へビルドし、生成物をAPIアプリの `public/ui` に同梱する。管理キーをUIへ渡さない。[手順と実測](../../specs/UI_LIVE_CONNECTION_REPORT.ja.md)を参照。
 
 ```sh
 npm test
@@ -129,7 +129,7 @@ UI_CAMERA_MODE=live npm run dev
 
 カメラはHTTPSまたはlocalhostで使用する。スマートフォンからLANのHTTPアドレスを開いても起動できない場合がある。カメラを許可できない場合は「写真から」を使う。画像はアップロードしない。ライトは対応端末のみ表示し、タブを隠した後は「再開」で起動する。
 
-受け付けるQRは `UI_PUBLIC_URL` の `?cardId=...` と、設定済みAPIの `/api/v1/cards/{id}`。公開URLにパスがある場合も一致が必要。APIモック時のみ従来の `?scenario=registered` も利用できる。詳細は [カメラ仕様](../../specs/CAMERA_SCAN.md)。
+受け付けるQRは `UI_PUBLIC_URL` の `?cardId=...` と、設定済みAPIの `/api/v1/cards/{id}`。公開URLにパスがある場合も一致が必要。APIモック時のみ従来の `?scenario=registered` も利用できる。詳細は [カメラ仕様](../../specs/CAMERA_SCAN.ja.md)。
 
 ```sh
 npm test
@@ -140,11 +140,11 @@ npm run verify:camera
 ブラウザ検証では実QR画像・仮想カメラ映像を使う。iPhone/Androidの実カメラとライトは実機で別途確認する。
 ## MetaMaskの接続準備
 
-iPhone・iPadの外部ブラウザでは「MetaMaskで開く」から同じカードをアプリ内ブラウザで開く。開かなければカードURLをコピーして貼り付ける。MetaMask内では「MetaMaskで準備する」から接続・ネットワーク追加・切替へ進む。ほかの外部ブラウザではSDKを使い、復帰後に接続状況を確認する。[デモ手順](../../specs/DEMO.md)。
+iPhone・iPadの外部ブラウザでは「MetaMaskで開く」から同じカードをアプリ内ブラウザで開く。開かなければカードURLをコピーして貼り付ける。MetaMask内では「MetaMaskで準備する」から接続・ネットワーク追加・切替へ進む。ほかの外部ブラウザではSDKを使い、復帰後に接続状況を確認する。[デモ手順](../../specs/DEMO.ja.md)。
 
 通常のmock/mockで `?scenario=wallet-connect`、`wallet-add`、`wallet-switch`、`wallet-paused`、`wallet-rejected`、`wallet-ready` を確認できる。準備処理は実行しない。live/mockは閲覧専用のまま。
 
-`node scripts/verify-wallet-preparation.mjs` は4273のmock、4274のlive UIを合成ウォレット/APIで操作する。URLは `MOCK_BASE_URL` と `LIVE_UI_URL` で変更できる。アプリ移動を模擬した試験であり、iPhone実機のMetaMask往復を検証したものではない。詳しくは [接続準備計画](../../specs/METAMASK_PREPARATION_PLAN.md)。
+`node scripts/verify-wallet-preparation.mjs` は4273のmock、4274のlive UIを合成ウォレット/APIで操作する。URLは `MOCK_BASE_URL` と `LIVE_UI_URL` で変更できる。アプリ移動を模擬した試験であり、iPhone実機のMetaMask往復を検証したものではない。詳しくは [接続準備計画](../../specs/METAMASK_PREPARATION_PLAN.ja.md)。
 
 ## ENS search
 

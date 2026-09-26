@@ -1,4 +1,4 @@
-[English](INTEGRATION_CAMERA_PLAN.md) | 日本語
+[English](INTEGRATION_CAMERA_PLAN.md) | 日本語（原文保存版）
 
 # integrationで実カメラを有効にする
 

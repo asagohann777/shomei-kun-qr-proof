@@ -1,4 +1,4 @@
-[English](CURVEGRID_INTEGRATION_IMPLEMENTATION.md) | 日本語
+[English](CURVEGRID_INTEGRATION_IMPLEMENTATION.md) | 日本語（原文保存版）
 
 # Curvegrid連携の実装・検証記録
 
@@ -16,7 +16,7 @@ Solidityから生成するABIをCLIとAPIで共有する。OpenAPIから公開�
 
 ## 検証結果
 
-Node.js 22.23.1で実行。再実行するコマンドは [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md) と [CLI手順](../contracts/README.md) に記載した。
+Node.js 22.23.1で実行。再実行するコマンドは [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.ja.md) と [CLI手順](../contracts/README.ja.md) に記載した。
 
 | 検証 | 結果 |
 | --- | --- |
@@ -40,7 +40,7 @@ MultiBaasのAPI形式は公式SDK資料を参照し、合成応答でテスト�
 
 Web APIのnpm監査は0件。CLIの実行時依存も0件。Hardhatなどの開発依存には18件の監査指摘が残る。内訳はhigh 5、moderate 2、low 11。互換範囲の修正版を適用し、追加のmajor更新は行っていない。公開WorkerにHardhatを含めない。
 
-実際のMultiBaas接続、コントラクト配置、専用URLへの公開、スマホのMetaMask復帰・別端末確認は未実施。[OpenSpec tasks](../openspec/changes/curvegrid-testnet-integration/tasks.md) 6章に残している。公開チェーンで独立に照合するA07は達成扱いにしない。
+実際のMultiBaas接続、コントラクト配置、専用URLへの公開、スマホのMetaMask復帰・別端末確認は未実施。[OpenSpec tasks](../openspec/changes/curvegrid-testnet-integration/tasks.ja.md) 6章に残している。公開チェーンで独立に照合するA07は達成扱いにしない。
 
 ## AIと人間の担当
 

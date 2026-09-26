@@ -1,4 +1,4 @@
-[English](SPEC_SYNC_PLAN.md) | 日本語
+[English](SPEC_SYNC_PLAN.md) | 日本語（原文保存版）
 
 # 現行仕様の整理
 

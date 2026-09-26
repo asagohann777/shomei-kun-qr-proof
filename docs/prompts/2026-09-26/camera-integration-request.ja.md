@@ -1,4 +1,4 @@
-[English](camera-integration-request.md) | 日本語
+[English](camera-integration-request.md) | 日本語（原文保存版）
 
 # 手動保存したユーザー指示
 

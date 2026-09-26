@@ -1,10 +1,10 @@
-[English](CURVEGRID_INTEGRATION_PLAN.md) | 日本語
+[English](CURVEGRID_INTEGRATION_PLAN.md) | 日本語（原文保存版）
 
 # Curvegrid連携の計画
 
-状態: 2026-09-26 JST、詳細設計と同じPRでの実装を承認済み。計画保存→設計確認の履歴は [変更記録](HACKATHON_CHANGES.md) を参照。
+状態: 2026-09-26 JST、詳細設計と同じPRでの実装を承認済み。計画保存→設計確認の履歴は [変更記録](HACKATHON_CHANGES.ja.md) を参照。
 
-[詳細設計](CURVEGRID_INTEGRATION_DESIGN.md) / [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1)
+[詳細設計](CURVEGRID_INTEGRATION_DESIGN.ja.md) / [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1)
 
 ## 目的
 
@@ -69,4 +69,4 @@ OpenSpecの初期化は済んでいるが、この計画保存時点でchangeは
 - [Curvegrid Testnetと別URLの依頼](../docs/prompts/2026-09-25/201954-608359-10ee560f85bf438a9719f628ceadc4b0.json)
 - [ブランチ・PR・設計レビューの指示](../docs/prompts/2026-09-25/202746-820949-ef57f69d6cb24768bc80b6fecc3446ef.json)
 - [この手順の実行指示](../docs/prompts/2026-09-25/203111-203270-0c1f2dbe99cc4e19af3fb1ab5528d7b4.json)
-- [選択結果の手動記録](../docs/prompts/curvegrid-integration-decisions.md)
+- [選択結果の手動記録](../docs/prompts/curvegrid-integration-decisions.ja.md)

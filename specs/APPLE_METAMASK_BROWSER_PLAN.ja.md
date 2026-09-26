@@ -1,4 +1,4 @@
-[English](APPLE_METAMASK_BROWSER_PLAN.md) | 日本語
+[English](APPLE_METAMASK_BROWSER_PLAN.md) | 日本語（原文保存版）
 
 # iPhone・iPadはMetaMask内で登録する
 

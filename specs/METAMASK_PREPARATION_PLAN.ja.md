@@ -1,4 +1,4 @@
-[English](METAMASK_PREPARATION_PLAN.md) | 日本語
+[English](METAMASK_PREPARATION_PLAN.md) | 日本語（原文保存版）
 
 # MetaMaskの接続準備とアプリ間の復帰
 

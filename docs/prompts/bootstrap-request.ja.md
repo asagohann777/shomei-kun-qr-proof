@@ -1,4 +1,4 @@
-[English](bootstrap-request.md) | 日本語
+[English](bootstrap-request.md) | 日本語（原文保存版）
 
 # 導入時の依頼
 

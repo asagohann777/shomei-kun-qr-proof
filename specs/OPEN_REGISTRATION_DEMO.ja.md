@@ -1,4 +1,4 @@
-[English](OPEN_REGISTRATION_DEMO.md) | 日本語
+[English](OPEN_REGISTRATION_DEMO.md) | 日本語（原文保存版）
 
 # デモの登録許可を全員へ変更
 
