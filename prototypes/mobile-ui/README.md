@@ -138,7 +138,7 @@ npm run verify:camera
 ブラウザ検証では実QR画像・仮想カメラ映像を使う。iPhone/Androidの実カメラとライトは実機で別途確認する。
 ## MetaMaskの接続準備
 
-実接続では「MetaMaskで準備する」から接続、必要なネットワーク追加・切替へ進む。外部アプリに移動した後はこの画面に戻り、「MetaMaskで続ける」で次の承認へ進む。保留中の要求は重ねず「接続状況を確認」で読み直す。日英の手動設定案内も用意している。
+iPhone・iPadの外部ブラウザでは「MetaMaskで開く」から同じカードをアプリ内ブラウザで開く。開かなければカードURLをコピーして貼り付ける。MetaMask内では「MetaMaskで準備する」から接続・ネットワーク追加・切替へ進む。ほかの外部ブラウザではSDKを使い、復帰後に接続状況を確認する。[デモ手順](../../specs/DEMO.md)。
 
 通常のmock/mockで `?scenario=wallet-connect`、`wallet-add`、`wallet-switch`、`wallet-paused`、`wallet-rejected`、`wallet-ready` を確認できる。準備処理は実行しない。live/mockは閲覧専用のまま。
 

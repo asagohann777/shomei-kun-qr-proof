@@ -4,7 +4,7 @@
 
 Curvegrid TestnetとMultiBaasを使い、本人ウォレットによるカード所有者登録と公開確認を提供する。UIモックを維持し、接続準備・登録取引・証跡再取得を分けて扱う。
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 明示的な接続先とモード
 システムはmock/liveを明示しなければならない（MUST）。liveは配置設定で指定したCurvegrid Testnetとコントラクトだけを扱い、障害時にmockへ切り替えてはならない（MUST NOT）。
