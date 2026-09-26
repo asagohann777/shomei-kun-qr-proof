@@ -46,3 +46,7 @@ python3 -m unittest discover -s tests -v
 - [Codex hooks公式仕様](https://learn.chatgpt.com/docs/hooks): プロジェクトhooks、`UserPromptSubmit` の入力とブロック、`/hooks` の信頼設定。
 
 確認日: 2026-09-25。ローカルCLI: `codex-cli 0.156.1`。
+
+## 画像生成の提供記録
+
+- [おじいちゃんコンビニ「プロンプト報告1」（1〜28項）](asagohann777-prompt-report-1-2026-09-26.md)。2026-09-26受領。UI案の検討と実装素材への分離をまとめた提供報告。
