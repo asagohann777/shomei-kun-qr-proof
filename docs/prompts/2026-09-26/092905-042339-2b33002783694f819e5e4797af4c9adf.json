@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T09:29:05.042339+00:00",
+  "session_id": "01a0dd09-bbc9-7bb3-b3b3-f305b9687b35",
+  "turn_id": "01a0dd0b-f8ca-7811-8469-7c0da5a66389",
+  "prompt": "画面が小さくて決済ボタンが表示されてないが正しいかな",
+  "model": "gpt-6-astra"
+}

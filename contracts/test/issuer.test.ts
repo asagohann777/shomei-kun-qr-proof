@@ -116,3 +116,21 @@ test('resume rejects wrong chain, consumed nonce and network failure without bro
     assert.equal(await s.context.provider.getTransactionCount(s.wallet.address), 1);
   } finally { await rm(s.directory, { recursive: true }); }
 });
+test('ENS recipient is frozen before signing and resume does not resolve it again', async () => {
+  const s = await setup();
+  try {
+    const deployment = await execute(s.context, {kind:'deploy',bytecodeHash:keccak256(artifact.bytecode)},s.file,s.wallet);
+    assert.ok(deployment.contract);
+    const operation = {kind:'issue' as const,contract:deployment.contract,cardId:'ens-card',wallet:s.owner};
+    const file=join(s.directory,'ens.json');
+    const recipient={name:'shomeikun.eth',address:s.owner,chainId:11155111 as const};
+    await assert.rejects(execute(s.context,operation,file,s.wallet,{recipient,recheck:async()=>{throw new Error('ENS_ADDRESS_CHANGED');}}),/ENS_ADDRESS_CHANGED/);
+    assert.equal(await s.context.provider.getTransactionCount(s.wallet.address),1);
+    let checked=0;
+    const result=await execute(s.context,operation,file,s.wallet,{recipient,recheck:async()=>{checked++;}});
+    assert.equal(result.status,'complete');assert.equal(checked,1);
+    assert.deepEqual((await loadState(file))?.ensRecipient,recipient);
+    assert.equal((await resume(s.context,file)).status,'complete');
+    assert.equal(await s.context.provider.getTransactionCount(s.wallet.address),2);
+  } finally {await rm(s.directory,{recursive:true});}
+});

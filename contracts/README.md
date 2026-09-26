@@ -84,3 +84,7 @@ CLIは上流の生エラー、キー、署名済み取引を出力しない。�
 ## デモの全員登録
 
 `issue --card-id ID --state FILE --keystore FILE` のように `--wallet` を省略すると全員許可で発行する。コントラクト1.1.0ではallowedWalletのゼロアドレスが全員許可を示す。任意の本人ウォレットが初回登録でき、所有者は署名した送信者になる。登録済みカードの上書きはできない。従来の `--wallet ADDRESS` は指定先に限定する場合だけ使う。
+
+## Optional ENS recipient
+
+Use `--recipient-ens NAME` instead of `--wallet ADDRESS` when issuing a card. Set `ENS_SEPOLIA_RPC_URL` for Sepolia resolution. The CLI requires address confirmation and resolves again before signing. Omit both flags for unrestricted issuance. Resume uses the saved recipient without a new ENS lookup. See [ENS integration](../specs/ENS_INTEGRATION.md) for configuration and the PC demo procedure.

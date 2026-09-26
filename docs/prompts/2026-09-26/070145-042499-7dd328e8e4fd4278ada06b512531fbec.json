@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T07:01:45.042499+00:00",
+  "session_id": "01a0dc17-6562-7900-9202-41fa136ce12f",
+  "turn_id": "01a0dc85-0e64-7002-8cf8-6e9254a415a5",
+  "prompt": "Are there any other specific technologies, libraries, frameworks, or tools you're making heavy usage of don't fit into the categories above?\nType and hit enter to add new values into the multiselect box.",
+  "model": "gpt-6-astra"
+}

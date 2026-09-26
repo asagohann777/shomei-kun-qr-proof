@@ -13,6 +13,12 @@ export const sample = {
 } as const;
 
 export const scenarios = {
+  "getEnsPrimaryName": {
+    "default": {}
+  },
+  "getEnsCards": {
+    "default": {}
+  },
   "getCard": {
     "default": {
       "status": 200,

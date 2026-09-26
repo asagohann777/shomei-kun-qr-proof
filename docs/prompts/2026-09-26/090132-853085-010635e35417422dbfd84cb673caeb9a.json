@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T09:01:32.853085+00:00",
+  "session_id": "01a0dc17-6562-7900-9202-41fa136ce12f",
+  "turn_id": "01a0dcec-c009-7e82-85b2-769cd4cf4bbd",
+  "prompt": "名前なしの表示を確認 削除で　$unslop",
+  "model": "gpt-6-astra"
+}

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-import { Fragment, Interface, id } from "ethers";
+import { Fragment, Interface, id, zeroPadValue } from "ethers";
 import registryArtifact from "../../../../contracts/abi/OwnershipRegistry.json";
 import { ApiError, sameHex, type Connection, type CardRecord, type ChainTransaction, type RegistrationEvent, type RegistrationGateway, type TransactionReceipt, type UnsignedTransaction } from "./domain";
 import { parseLiveConfig, type LiveConfig } from "./live-config";
@@ -45,6 +45,8 @@ function registration(data: string): { cardId: string; nickname: string } | unde
   } catch { return undefined; }
 }
 
+export type RegistrationLog = { cardId: string; owner: string; nickname: string; blockNumber: number; logIndex: number; transactionHash: string; blockHash: string };
+class LogRangeError extends Error {}
 export class MultiBaasGateway implements RegistrationGateway {
   readonly mode = "live";
   readonly registry;
@@ -94,6 +96,7 @@ export class MultiBaasGateway implements RegistrationGateway {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
     }));
+    if (method === "eth_getLogs" && response.error && typeof response.error === "object" && "message" in response.error && typeof response.error.message === "string" && /block range|too many (results|logs)|response (size|too large)|query returned more/i.test(response.error.message)) throw new LogRangeError();
     if (response.jsonrpc !== "2.0" || response.id !== 1 || "error" in response || !("result" in response)) throw unavailable();
     return response.result;
   }
@@ -148,6 +151,38 @@ export class MultiBaasGateway implements RegistrationGateway {
     if (!registered) { if (nickname !== "") throw unavailable(); return { ...common, kind: "unregistered" }; }
     if (!nickname.isWellFormed() || (allowedWallet !== zeroAddress && owner !== allowedWallet) || new TextEncoder().encode(nickname).length < 1 || new TextEncoder().encode(nickname).length > 96) throw unavailable();
     return { ...common, kind: "registered", owner: { address: owner, nickname } };
+  }
+  get deploymentBlock(): number { return this.config.deploymentBlock; }
+  async searchBlock(number?: number): Promise<{ number: number; hash: string }> {
+    const block = object(await this.rpc("eth_getBlockByNumber", [number === undefined ? "latest" : `0x${number.toString(16)}`, false]));
+    const actual = quantity(block.number);
+    if (number !== undefined && actual !== number) throw unavailable();
+    return { number: actual, hash: hex(block.hash, 32) };
+  }
+  async registrationLogs(owner: string, from: number, to: number): Promise<RegistrationLog[]> {
+    let raw: unknown;
+    try {
+      raw = await this.rpc("eth_getLogs", [{ address: this.config.address,
+        fromBlock: `0x${from.toString(16)}`, toBlock: `0x${to.toString(16)}`,
+        topics: [id(eventSignature), null, zeroPadValue(owner, 32)],
+      }]);
+    } catch (error) {
+      if (!(error instanceof LogRangeError) || from === to) throw error;
+      const middle = Math.floor((from + to) / 2);
+      return [...await this.registrationLogs(owner, middle + 1, to), ...await this.registrationLogs(owner, from, middle)];
+    }
+    if (!Array.isArray(raw)) throw unavailable();
+    return raw.map(entry => {
+      const log = object(entry);
+      if (hex(log.address, 20) !== this.config.address || log.removed !== false || !Array.isArray(log.topics)) throw unavailable();
+      const decoded = registryInterface.parseLog({ topics: log.topics.map(t => hex(t, 32)), data: hex(log.data) });
+      const blockNumber = quantity(log.blockNumber);
+      if (!decoded || decoded.name !== "CardRegistered" || blockNumber < from || blockNumber > to) throw unavailable();
+      const cardId = string(decoded.args[1]);
+      if (!/^[A-Za-z0-9_-]{1,64}$/.test(cardId) || hex(decoded.args[0], 32) !== id(cardId) || !sameHex(hex(decoded.args[2], 20), owner)) throw unavailable();
+      return { cardId, owner: hex(decoded.args[2], 20), nickname: string(decoded.args[3]),
+        blockNumber, logIndex: quantity(log.logIndex), transactionHash: hex(log.transactionHash, 32), blockHash: hex(log.blockHash, 32) };
+    });
   }
   async buildRegistrationTransaction(input: {cardId: string; walletAddress: string; nickname: string}): Promise<UnsignedTransaction> {
     await this.checkConnection();

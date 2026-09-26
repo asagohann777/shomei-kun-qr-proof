@@ -17,6 +17,7 @@
 | コントラクト | `contracts/src/OwnershipRegistry.sol`。発行権限、初回登録、所有者・ニックネームの保存 |
 | 発行者CLI | `contracts`。配置、MultiBaasへの紐付け、カード発行、記録の確認 |
 | MultiBaas | 状態読取り、未署名取引作成、レシート・イベント取得 |
+| ENS | ethers 6.17.0でSepoliaのENSv2を正引き・逆引き。登録チェーンと分離し、登録先はアドレスを正本にする |
 | MetaMask | 登録者の鍵を保持し、取引を署名・送信 |
 
 既存PoCのコード・データ・保存先には接続しない。現在のintegrationはCurvegrid Testnet、チェーンID `2017072401` を使う。配置先はAPI設定で指定し、MultiBaas・RPC・ウォレットのチェーンを照合する。
@@ -36,6 +37,8 @@
 | 接続設定と状態 | `GET /api/v1/connection` |
 | カードの公開情報 | `GET /api/v1/cards/{cardId}` |
 | 登録用の未署名取引 | `POST /api/v1/cards/{cardId}/registration/prepare` |
+| カード一覧検索 | `GET /api/v1/ens/cards?name={ENS名またはアドレス}` |
+| Primary name表示 | `GET /api/v1/ens/primary-name?address={address}` |
 | 登録取引の照合 | `GET /api/v1/cards/{cardId}/transactions/{hash}` |
 
 本文・応答・エラーの定義は [openapi.yaml](openapi.yaml)。未発行は404、入力不正は400/413/422、設定・上流障害は503。残高不足が確認できた場合は422 `INSUFFICIENT_FUNDS` を返す。
@@ -72,3 +75,11 @@ MultiBaasのアプリ用キーはCloudflare Secretへ保存する。管理キー
 CORSは許可したOriginだけに付与する。上流のエラー本文や認証値を公開せず、エラーコードと受付IDで診断する。
 
 設定・ビルド・運用は [CURVEGRID_INTEGRATION_RUNBOOK.md](CURVEGRID_INTEGRATION_RUNBOOK.md)、コントラクトとCLIは [contracts/README.md](../contracts/README.md) を参照する。
+
+## ENSの読み取りとカード検索
+
+ENS名はSepoliaで解決し、Curvegrid Testnetの`CardRegistered`イベントをownerで絞る。1範囲は最大2,000ブロック、1回は最大4範囲・20件。取引・レシート・現在のカード状態を照合して一覧を返す。カーソルは検索名・アドレス・レジストリ・基準ブロックhashを保持し、参照先や基準hashが変わった場合は再検索させる。アドレス入力はENS解決を省略する。
+
+登録画面の逆引きは任意の表示補助。正引き一致時だけ表示し、失敗時はnullで返す。アカウント変更時は前の表示を即座に消し、古いリクエストの応答を破棄する。APIキーとENS RPC設定はWorkerの実行時Secretに置き、ブラウザへ渡さない。CCIP/RPCのHTTPリダイレクトはmanualで受けて3xxを拒否する。
+
+CLIはENS指定時にアドレスを確認し、署名前に再解決する。署名済み再開は保存済み取引を使用する。カード別サブネーム、新規Registry/Resolver、永続検索インデックスは追加しない。[詳細](ENS_INTEGRATION.md)。

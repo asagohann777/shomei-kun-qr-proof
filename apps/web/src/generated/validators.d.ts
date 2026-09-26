@@ -2,6 +2,10 @@
 // Generated from specs/openapi.yaml. Run npm run generate.
 import type { components } from "./api";
 
+export function PrimaryNameResponse(value: unknown): value is components["schemas"]["PrimaryNameResponse"];
+export function EnsCardItem(value: unknown): value is components["schemas"]["EnsCardItem"];
+export function EnsCardsResponse(value: unknown): value is components["schemas"]["EnsCardsResponse"];
+export function EnsSearchCursor(value: unknown): value is components["schemas"]["EnsSearchCursor"];
 export function Address(value: unknown): value is components["schemas"]["Address"];
 export function TransactionHash(value: unknown): value is components["schemas"]["TransactionHash"];
 export function CardId(value: unknown): value is components["schemas"]["CardId"];

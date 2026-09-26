@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: MIT
+import { liveEnsSearch, ensApiError, normalizeCardSearch } from "./ens-search";
+import { createEnsResolver } from "../../../../contracts/cli/ens";
 import contract from "../generated/contract.json";
 import * as validate from "../generated/validators.js";
 import { ApiError, GatewayUnavailableError, type ApiErrorCode, type PrepareInput, type RegistrationGateway } from "./domain";
@@ -194,5 +196,33 @@ export async function handleConnectionRequest(request: Request): Promise<Respons
       return { status: "mock", registry: createMockGateway({ operation: "getCard", scenario: "default" }).registry };
     }
     return createLiveGateway(process.env).checkConnection();
+  });
+}
+
+export async function handleEnsCardsRequest(request: Request): Promise<Response> {
+  return respond(request, "getEnsCards", async mode => {
+    const params = new URL(request.url).searchParams;
+    if ([...params.keys()].some(key => key !== "name" && key !== "cursor") || params.getAll("name").length !== 1 || params.getAll("cursor").length > 1) throw new ApiError(400, "INVALID_INPUT", "Invalid ENS query");
+    try {
+      const name = normalizeCardSearch(params.get("name") ?? "");
+      if (mode !== "live") throw new ApiError(503, "ENS_NOT_CONFIGURED", "ENS requires live mode");
+      return await liveEnsSearch(name, params.get("cursor") ?? undefined);
+    } catch (error) { throw ensApiError(error); }
+  });
+}
+
+export async function handleEnsPrimaryNameRequest(request: Request): Promise<Response> {
+  return respond(request, "getEnsPrimaryName", async mode => {
+    const params = new URL(request.url).searchParams;
+    const address = params.get("address") ?? "";
+    if (params.getAll("address").length !== 1 || [...params.keys()].some(key => key !== "address") || !/^0x[0-9a-fA-F]{40}$/.test(address)) throw new ApiError(400, "INVALID_INPUT", "Invalid address");
+    let name: string | null = null;
+    if (mode === "live") {
+      try {
+        const resolver = createEnsResolver(process.env.ENS_SEPOLIA_RPC_URL);
+        try { name = await resolver.primaryName(address); } finally { resolver.destroy(); }
+      } catch { /* Optional display enrichment must not prevent registration. */ }
+    }
+    return { address, name, ensChainId: 11155111 };
   });
 }

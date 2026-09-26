@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T07:34:15.865167+00:00",
+  "session_id": "01a0dc17-6562-7900-9202-41fa136ce12f",
+  "turn_id": "01a0dca2-d8d4-7e22-ad39-59072ce9f318",
+  "prompt": "提出したデモ手順にCurvegrid Testnet gas is required みたいな記述あったっけ？出し直した方がいいかも",
+  "model": "gpt-6-astra"
+}

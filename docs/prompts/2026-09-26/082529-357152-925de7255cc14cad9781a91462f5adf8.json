@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T08:25:29.357152+00:00",
+  "session_id": "01a0dc17-6562-7900-9202-41fa136ce12f",
+  "turn_id": "01a0dcc3-beb8-7242-a374-35d8c168b901",
+  "prompt": "<send_user_message_question_reply>\n[{\"answer\":\"別のアドレスです\",\"question\":\"shomeikun.eth の解決先は 0xc22D961e56b70a73f6dCB1EC0a47b7Da1Fe38FDd でした。このアドレスは、デモに使うiPhoneのMetaMaskで操作できますか？\",\"questionItemId\":\"[\\\"request_user_input_async\\\",\\\"call_GHqbWYzTuKFkg7Wq0BWGi4Oj\\\",0]\"}]\n</send_user_message_question_reply>",
+  "model": "gpt-6-astra"
+}

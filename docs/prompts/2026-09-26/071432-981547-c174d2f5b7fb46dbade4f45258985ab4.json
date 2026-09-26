@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T07:14:32.981547+00:00",
+  "session_id": "01a0dc17-6562-7900-9202-41fa136ce12f",
+  "turn_id": "01a0dc90-c96a-73b3-9325-6dbc106713ec",
+  "prompt": "README追加しよう\n利用箇所はブロックチェーンやスマートコントラクトの操作だよね？　使ってよかった点としては実装がAPI呼び出しだけですごくスマートだしドキュメントやダッシュボードもわかりやすい　実装で困った点は特になかったように思った\nチーム紹介 takagi x.com fly1tkg github id fly1tkg\n\nasagohann777 github id asagohann777\n\nこれでまとまる？",
+  "model": "gpt-6-astra"
+}

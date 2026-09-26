@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: MIT
 import { hasMetaMaskProvider, useMetaMaskBrowser, metaMaskBrowserLink, cardPageUrl } from '../src/wallet-navigation.js';
+import { createLiveApi } from '../src/live-api.js';
+import { createWalletPrimaryName } from '../src/wallet-primary-name.js';
+import { mockEnsApi } from '../src/ens-mock.js';
+import { createEnsSearch } from '../src/ens-search.js';
+import { ensMessages } from './ens-messages.js';
 import { messages } from './messages.js';
 import { walletMessages } from './wallet-messages.js';
 import { liveMessages } from './live-messages.js';
@@ -51,12 +56,28 @@ const read = (storage, key) => { try { return window[storage].getItem(key); } ca
 const write = (storage, key, value) => { try { window[storage].setItem(key, value); } catch { return; } };
 const savedLocale = read('localStorage', localeKey);
 let locale = ['ja', 'en'].includes(savedLocale) ? savedLocale : navigator.languages.map((item) => item.split('-')[0]).find((item) => ['ja', 'en'].includes(item)) || 'en';
-const t = (key) => walletMessages[locale][key] ?? cameraMessages[locale][key] ?? (liveEnabled ? liveMessages[locale][key] : undefined) ?? messages[locale][key];
+const t = (key) => ensMessages[locale][key] ?? walletMessages[locale][key] ?? cameraMessages[locale][key] ?? (liveEnabled ? liveMessages[locale][key] : undefined) ?? messages[locale][key];
 const lines = (key) => escape(t(key)).replace(/\n/g, '<br>');
 let timer;
 let scanning = false;
 let cameraOpen = false;
 let state = liveEnabled ? { ...fixture('unregistered'), nickname: '', view: currentCardId ? 'card' : 'scan' } : restore();
+
+let ensOpen = !liveEnabled && new URL(location.href).searchParams.get('preview') === 'ens';
+let ensInput = liveEnabled ? '' : 'shomeikun.eth';
+const ens = createEnsSearch(liveEnabled ? createLiveApi(config.apiBaseUrl ?? '', (...args) => fetch(...args)) : mockEnsApi, () => { if (ensOpen) render(); });
+
+const primaryName = createWalletPrimaryName(createLiveApi(config.apiBaseUrl ?? '', (...args) => fetch(...args)), () => {
+  const element = root.querySelector('#wallet-identity');
+  if (element) element.outerHTML = walletIdentity();
+});
+const mockPrimaryName = new URL(location.href).searchParams.get('primary') !== 'unset';
+function walletIdentity() {
+  const address = walletLabel();
+  const resolved = primaryName.snapshot();
+  const name = liveEnabled ? (resolved.address === address.toLowerCase() ? resolved.name : null) : mockPrimaryName ? 'shomeikun.eth' : null;
+  return `<div id="wallet-identity" class="wallet-identity" aria-live="polite">${name ? `<strong class="wallet-primary-name">${escape(name)}</strong>` : ''}<p class="wallet-address">${escape(address)}</p></div>`;
+}
 
 let cameraState = { kind: 'stopped' };
 function createCameraVideo() {
@@ -171,10 +192,24 @@ function footer(action, label, extra = '', disabled = false, secondary = false) 
   return `<footer class="bottom-actions"><button type="button" class="btn ${secondary ? 'btn-outline' : 'btn-primary'}" data-action="${action}" ${disabled ? 'disabled' : ''}>${label}</button>${extra}</footer>`;
 }
 function scanView() {
-  if (!cameraOpen) return `<section class="page entry-page"><h1 class="page-title">${lines('scanTitle')}</h1><div class="scan-intro"><img class="intro-qr" src="./assets/qr-scan.jpg" alt="${t('qrAlt')}" width="1241" height="1268"></div></section>${footer('open-camera', `${icon('qr')}${t('openCamera')}`)}`;
+  if (!cameraOpen) return `<section class="page entry-page"><h1 class="page-title">${lines('scanTitle')}</h1><div class="scan-intro"><img class="intro-qr" src="./assets/qr-scan.jpg" alt="${t('qrAlt')}" width="1241" height="1268"></div></section>${footer('open-camera', `${icon('qr')}${t('openCamera')}`, `<button class="btn ens-home-button" data-action="ens-open">${t('ensOpen')}</button>`)}`;
   if (cameraEnabled) return liveCameraView();
   return `<section class="page camera-page"><button class="flash-button" data-action="flash">${icon('flash')}<span>${t('flash')}</span></button><div class="scanner" aria-label="${t('scanHint')}"><div class="scan-corners" aria-hidden="true"><span></span><span></span><span></span><span></span></div><img class="scan-center" src="${liveEnabled || state.scannedCardId ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"><div class="scan-light-track" aria-hidden="true"><div class="scan-sweep"></div></div></div><h1 class="scan-status"><span class="scan-status-ring" aria-hidden="true"></span>${t('cameraTitle')}</h1><div class="scan-tools"><button class="round-tool" data-action="photos">${icon('photo')}<span>${t('fromPhotos')}</span></button><button class="round-tool" data-action="help">${icon('info')}<span>${t('help')}</span></button></div></section>${footer('scan', `${scanning ? '<span class="loading loading-spinner loading-xs"></span>' : ''}${t(scanning ? 'scanLoading' : 'scanButton')}`, '', scanning)}`;
 }
+function ensView() {
+  const { result, busy, error } = ens.snapshot();
+  const shortAddress = result ? `${result.address.slice(0, 6)}…${result.address.slice(-4)}` : '';
+  return `<section class="page ens-page"><h1 class="page-title">${t('ensOpen')}</h1><p class="ens-intro">${t('ensIntro')}</p>
+    <form id="ens-form" class="ens-form"><label for="ens-name">${t('ensName')}</label><input id="ens-name" class="input input-bordered" value="${escape(ensInput)}" placeholder="shomeikun.eth" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="255" required><button class="btn btn-primary" ${busy ? 'disabled' : ''}>${busy ? '<span class="loading loading-spinner loading-sm" aria-hidden="true"></span>' : ''}${t(busy ? 'ensSearching' : 'ensSearch')}</button></form>
+    ${!liveEnabled ? `<p class="ens-sample-label">${t('ensSample')}</p>` : ''}
+    <div class="ens-results" aria-live="polite" aria-busy="${busy}">${error ? `<p class="ens-feedback" role="alert">${escape(ensMessages[locale][error] ?? t('ensFailed'))}</p>` : ''}
+    ${result ? `<div class="ens-wallet"><span class="ens-wallet-icon">${icon('wallet')}</span><div><strong>${escape(result.ensChainId === null ? t('wallet') : result.name)}</strong><details><summary>${escape(shortAddress)}</summary><p>${escape(result.address)}</p></details></div></div>
+    <h2 class="ens-list-title">${t('ensTitle')}<span>${result.cards.length}${!result.complete ? '+' : ''}</span></h2>
+    <ul class="ens-cards">${result.cards.map(card => `<li><button class="ens-card-row" data-action="ens-card" data-card-id="${escape(card.cardId)}"><span class="ens-card-art card-art"><img src="./assets/trading-card.jpg" alt="" width="1180" height="1333"></span><span class="ens-card-copy"><strong>${t('player')}</strong><span class="ens-card-id">${escape(card.cardId)}</span><span class="ens-card-owner">${escape(card.owner.nickname)}</span><span class="ens-card-link">${t('ensViewRecord')}${icon('arrow')}</span></span></button></li>`).join('')}</ul>
+    ${result.complete && !result.cards.length ? `<div class="ens-feedback">${icon('card')}<p>${t('ensEmpty')}</p></div>` : ''}${!result.complete ? `<p class="ens-partial">${t('ensPartial')}</p><button class="btn btn-outline ens-more" data-action="ens-more" ${busy ? 'disabled' : ''}>${t(busy ? 'ensSearching' : 'ensMore')}</button>` : ''}` : ''}</div>
+    <details class="ens-help"><summary>${t(liveEnabled ? 'ensAbout' : 'ensMockHelp')}</summary><p>${t(liveEnabled ? 'ensNote' : 'ensMockNote')}</p></details></section>`;
+}
+
 function detailTable(includeOwner = true, showIcons = false) {
   const rows = liveEnabled
     ? includeOwner ? [['cardName', `${t('player')} / ${t('cardType')}`], ['cardId', cardLabel()], ['ownerLabel', liveSnapshot?.read.card?.owner?.nickname ?? ''], ['wallet', liveSnapshot?.read.card?.owner?.address ?? '']]
@@ -220,7 +255,7 @@ function walletPreparationView() {
   const pending = setup.kind === 'pending';
   const status = setup.kind === 'ready' ? 'walletReady' : setup.kind === 'idle' ? 'preparationCopy' : pending ? setup.slow ? 'setupSlow' : { check: 'setupCheck', connect: 'setupConnect', add: 'setupAdd', switch: 'setupSwitch' }[setup.step] : { paused: 'setupPaused', rejected: 'setupRejected', failed: 'setupFailed', blocked: 'setupBlocked' }[setup.kind];
   const action = pending || setup.kind === 'blocked' ? 'check-wallet' : 'prepare-wallet';
-  return `<div class="wallet-preparation" id="wallet-preparation"><p class="form-label">${t('walletPreparationTitle')}</p><p class="wallet-network">${escape(name)}</p><div class="wallet-status ${setup.kind === 'ready' ? 'wallet-ready' : ''}" role="status" aria-live="polite">${pending && !setup.slow ? '<span class="loading loading-spinner loading-xs" aria-hidden="true"></span>' : setup.kind === 'ready' ? icon('check') : ''}<span>${t(status)}</span></div>${state.wallet !== 'disconnected' ? `<p class="wallet-address">${escape(walletLabel())}</p>` : ''}${setup.kind !== 'ready' ? `<p class="wallet-return">${t(hasMetaMaskProvider() ? 'approveInApp' : 'returnToBrowser')}</p><button class="btn btn-primary wallet-prepare-button" data-action="${action}">${t(pending || setup.kind === 'blocked' ? 'checkWallet' : setup.kind === 'idle' ? 'prepareWallet' : 'continueWallet')}</button>` : ''}<button class="btn btn-ghost wallet-help-button" data-action="wallet-help">${t('walletHelp')}</button>${['failed', 'blocked'].includes(setup.kind) || setup.slow ? diagnosticControls() : ''}</div>`;
+  return `<div class="wallet-preparation" id="wallet-preparation"><p class="form-label">${t('walletPreparationTitle')}</p><p class="wallet-network">${escape(name)}</p><div class="wallet-status ${setup.kind === 'ready' ? 'wallet-ready' : ''}" role="status" aria-live="polite">${pending && !setup.slow ? '<span class="loading loading-spinner loading-xs" aria-hidden="true"></span>' : setup.kind === 'ready' ? icon('check') : ''}<span>${t(status)}</span></div>${state.wallet !== 'disconnected' ? walletIdentity() : ''}${setup.kind !== 'ready' ? `<p class="wallet-return">${t(hasMetaMaskProvider() ? 'approveInApp' : 'returnToBrowser')}</p><button class="btn btn-primary wallet-prepare-button" data-action="${action}">${t(pending || setup.kind === 'blocked' ? 'checkWallet' : setup.kind === 'idle' ? 'prepareWallet' : 'continueWallet')}</button>` : ''}<button class="btn btn-ghost wallet-help-button" data-action="wallet-help">${t('walletHelp')}</button>${['failed', 'blocked'].includes(setup.kind) || setup.slow ? diagnosticControls() : ''}</div>`;
 }
 function registerView() {
   if (useMetaMaskBrowser(config)) return `<section class="page register-page">${tradingCard()}<div class="info-panel"><h1 class="page-title">${t('registerTitle')}</h1>${metaMaskHandoff()}</div></section>`;
@@ -261,8 +296,8 @@ function render(preserveDialog = false) {
   const openDialog = preserveDialog && root.querySelector('dialog[open]')?.id;
   document.documentElement.lang = locale;
   document.title = t('title');
-  const content = state.view === 'scan' ? scanView() : state.view === 'card' ? cardView() : state.view === 'register' ? registerView() : state.view === 'review' ? reviewView() : processView();
-  root.innerHTML = walletHelpDialog() + `<div class="phone ${state.view === 'scan' && !cameraOpen ? 'home-scene' : 'flow-scene'}"><header class="app-header"><button class="round-button" data-action="${state.view === 'scan' && cameraOpen ? 'close-camera' : 'back-screen'}" aria-label="${t('backScreen')}" ${(['sent', 'confirming', 'unknown'].includes(state.view) || (liveEnabled && state.view === 'approval')) ? 'disabled' : ''}>${icon('back')}</button><a class="brand" href="./" data-action="home"><span class="brand-art"><img src="./assets/logo-ja.jpg" alt="${t('brand')} QR Proof" width="1236" height="1272"></span></a><button class="round-button" data-action="scenarios" aria-label="${t('menu')}"><span aria-hidden="true">•••</span></button></header><p class="demo-label">${liveEnabled ? t(config.walletMode === 'mock' ? 'readonly' : 'demo') : `${t('demo')} · ${t('noTransaction')}`}</p><main>${content}</main></div>${dialogs()}`;
+  const content = ensOpen ? ensView() : state.view === 'scan' ? scanView() : state.view === 'card' ? cardView() : state.view === 'register' ? registerView() : state.view === 'review' ? reviewView() : processView();
+  root.innerHTML = walletHelpDialog() + `<div class="phone ${ensOpen ? 'flow-scene ens-scene' : state.view === 'scan' && !cameraOpen ? 'home-scene' : 'flow-scene'}"><header class="app-header"><button class="round-button" data-action="${state.view === 'scan' && cameraOpen ? 'close-camera' : 'back-screen'}" aria-label="${t('backScreen')}" ${(['sent', 'confirming', 'unknown'].includes(state.view) || (liveEnabled && state.view === 'approval')) ? 'disabled' : ''}>${icon('back')}</button><a class="brand" href="./" data-action="home"><span class="brand-art"><img src="./assets/logo-ja.jpg" alt="${t('brand')} QR Proof" width="1236" height="1272"></span></a><button class="round-button" data-action="scenarios" aria-label="${t('menu')}"><span aria-hidden="true">•••</span></button></header><p class="demo-label">${liveEnabled ? t(config.walletMode === 'mock' ? 'readonly' : 'demo') : `${t('demo')} · ${t('noTransaction')}`}</p><main>${content}</main></div>${dialogs()}`;
   if (cameraEnabled && cameraOpen && state.view === 'scan') root.querySelector('#camera-slot').replaceWith(camera.getVideo());
   if (openDialog) document.getElementById(openDialog)?.showModal();
   if (!liveEnabled && ['sent', 'confirming'].includes(state.view)) {
@@ -276,7 +311,9 @@ function render(preserveDialog = false) {
   }
 }
 
+root.addEventListener('submit', event => { if (event.target.id === 'ens-form') { event.preventDefault(); void ens.search(ensInput); } });
 root.addEventListener('input', (event) => {
+  if (event.target.id === 'ens-name') ensInput = event.target.value;
   if (event.target.id === 'nickname') { state.nickname = event.target.value; persist(); }
   if (event.target.id === 'consent') { state.consent = event.target.checked; persist(); }
   const confirm = root.querySelector('[data-action="confirm"]');
@@ -291,6 +328,20 @@ root.addEventListener('click', async (event) => {
   if (!button || button.disabled) return;
   event.preventDefault();
   const action = button.dataset.action;
+  if (action === 'ens-open') { ensOpen = true; render(); root.querySelector('#ens-name').focus(); return; }
+  if (ensOpen && action === 'ens-more') { await ens.search(ens.snapshot().name, true); return; }
+  if (ensOpen && action === 'ens-card') {
+    ensOpen = false; ens.cancel();
+    const cardId = button.dataset.cardId;
+    if (liveEnabled) { history.replaceState(null, '', `?cardId=${encodeURIComponent(cardId)}`); await openLiveCard(cardId); }
+    else {
+      history.replaceState(null, '', `?cardId=${encodeURIComponent(cardId)}`);
+      state = { ...fixture('registered'), scannedCardId: cardId };
+      cameraOpen = false; setCardQr(cardId); persist(); render();
+    }
+    return;
+  }
+  if (ensOpen && ['home', 'back-screen'].includes(action)) { ensOpen = false; ens.cancel(); render(); return; }
   if (cameraEnabled && await handleCameraAction(action)) return;
   if (action === 'copy-card-url') {
     try { await navigator.clipboard.writeText(cardPageUrl(config.publicUrl, currentCardId)); root.querySelector('#card-url-copy-status').textContent = t('copied'); }
@@ -380,6 +431,7 @@ function receiveLive(snapshot) {
   const walletOnly = state.view === 'register' && liveSnapshot && snapshot.registration.kind === 'idle' && liveSnapshot.registration.kind === 'idle' && JSON.stringify(snapshot.read) === JSON.stringify(liveSnapshot.read) && root.querySelector('#wallet-preparation');
   const changedWallet = liveSnapshot && snapshot.walletRevision !== liveSnapshot.walletRevision;
   liveSnapshot = snapshot;
+  void primaryName.setAddress(snapshot.wallet.kind === 'connected' ? snapshot.wallet.address : null);
   if (changedWallet) { state.consent = false; if (state.view === 'review') state.view = 'register'; }
   const readState = snapshot.read;
   if (readState.kind === 'ready') {

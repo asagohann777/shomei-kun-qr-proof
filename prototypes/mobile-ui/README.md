@@ -143,3 +143,9 @@ iPhone・iPadの外部ブラウザでは「MetaMaskで開く」から同じカ�
 通常のmock/mockで `?scenario=wallet-connect`、`wallet-add`、`wallet-switch`、`wallet-paused`、`wallet-rejected`、`wallet-ready` を確認できる。準備処理は実行しない。live/mockは閲覧専用のまま。
 
 `node scripts/verify-wallet-preparation.mjs` は4273のmock、4274のlive UIを合成ウォレット/APIで操作する。URLは `MOCK_BASE_URL` と `LIVE_UI_URL` で変更できる。アプリ移動を模擬した試験であり、iPhone実機のMetaMask往復を検証したものではない。詳しくは [接続準備計画](../../specs/METAMASK_PREPARATION_PLAN.md)。
+
+## ENS search
+
+Live mode adds an optional `Find cards by ENS name` action below QR scanning. It resolves Sepolia names and searches cards registered to that wallet on Curvegrid Testnet. See [ENS integration](../../specs/ENS_INTEGRATION.md) for API setup, pagination, error behavior and browser checks.
+
+Mock mode also exposes the ENS search UI. Open `/?preview=ens` directly or use the secondary action on the home screen. `shomeikun.eth` returns sample cards with pagination, `empty.eth` returns no cards, and `error.eth` shows an upstream error. Other valid names show the unresolved-name state. All results are fixtures; no API, ENS or wallet requests are made. Selecting a sample card opens the existing registered-card view.

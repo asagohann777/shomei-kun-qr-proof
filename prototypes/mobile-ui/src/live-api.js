@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-import { CardResponse, ConnectionResponse, PrepareResponse, TransactionResponse, ErrorResponse } from '../../../apps/web/src/generated/validators.js';
+import { PrimaryNameResponse, EnsCardsResponse, CardResponse, ConnectionResponse, PrepareResponse, TransactionResponse, ErrorResponse } from '../../../apps/web/src/generated/validators.js';
 
 const failures = [];
 export function diagnostics() { return structuredClone(failures); }
@@ -25,7 +25,7 @@ export function createLiveApi(baseUrl, fetcher) {
     const fail = code => {
       const rawId = response?.headers?.get('X-Request-ID');
       const requestId = /^[a-f0-9-]{36}$/i.test(rawId ?? '') ? rawId : null;
-      recordFailure({ operation: path.endsWith('/prepare') ? 'prepareRegistration' : path.includes('/transactions/') ? 'getRegistrationTransaction' : path === '/connection' ? 'getConnection' : 'getCard', code, status: response?.status ?? null, requestId });
+      recordFailure({ operation: path.endsWith('/prepare') ? 'prepareRegistration' : path.includes('/transactions/') ? 'getRegistrationTransaction' : path.startsWith('/ens/primary-name?') ? 'getEnsPrimaryName' : path.startsWith('/ens/cards?') ? 'getEnsCards' : path === '/connection' ? 'getConnection' : 'getCard', code, status: response?.status ?? null, requestId });
       return new LiveError(code);
     };
     try {
@@ -45,6 +45,8 @@ export function createLiveApi(baseUrl, fetcher) {
   }
   const path = id => `/cards/${encodeURIComponent(id)}`;
   return {
+    primaryName: address => request(`/ens/primary-name?${new URLSearchParams({ address })}`, PrimaryNameResponse, undefined, 12000),
+    ensCards: (name, cursor) => request(`/ens/cards?${new URLSearchParams({ name, ...(cursor ? { cursor } : {}) })}`, EnsCardsResponse, undefined, 60000),
     connection: () => request('/connection', ConnectionResponse),
     card: (id, timeout) => request(path(id), CardResponse, undefined, timeout),
     prepare: (id, input) => request(`${path(id)}/registration/prepare`, PrepareResponse, input),

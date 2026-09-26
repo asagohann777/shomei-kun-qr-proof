@@ -16,6 +16,7 @@ export const stateSchema = z.object({
   version: z.literal(1), chainId: z.number().int().positive().safe(), issuer: address,
   label: z.string().min(1), contractVersion: z.string().min(1), operation: operationSchema,
   nonce: z.number().int().nonnegative(), rawTransaction: z.string().regex(/^0x[0-9a-fA-F]+$/), transactionHash: hash,
+  ensRecipient: z.object({ name: z.string(), address, chainId: z.literal(11155111) }).strict().optional(),
 }).strict();
 export type State = z.infer<typeof stateSchema>;
 export type Operation = State['operation'];
@@ -35,6 +36,7 @@ export async function loadState(file: string): Promise<State | null> {
     const state = result.data;
     const tx = Transaction.from(state.rawTransaction);
     if (keccak256(state.rawTransaction) !== state.transactionHash || tx.from !== state.issuer || tx.chainId !== BigInt(state.chainId) || tx.nonce !== state.nonce) throw new Error('State transaction mismatch');
+    if (state.ensRecipient && (state.operation.kind !== 'issue' || state.ensRecipient.address !== state.operation.wallet)) throw new Error('ENS recipient does not match operation');
     return state;
   } finally { await handle.close(); }
 }

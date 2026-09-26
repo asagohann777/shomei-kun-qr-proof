@@ -4,7 +4,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright';
 
-const base = 'http://127.0.0.1:4189';
+const base = process.env.SCREENSHOT_BASE_URL ?? 'http://127.0.0.1:4173';
 const output = '../../docs/submission/2026-09-26/screenshots';
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({ headless: true });
@@ -55,7 +55,7 @@ try {
   await capture('07-registration-progress-en', 'Stable processing preview, not a pending transaction');
   assert.deepEqual(errors, []);
   captures.sort((a, b) => a.file.localeCompare(b.file));
-  await writeFile(`${output}/capture.json`, JSON.stringify({ capturedAt: new Date().toISOString(), commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), base, browser: `Chromium ${browser.version()}`, viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, fullPage: true, locale: 'en-US', errors, captures }, null, 2) + '\n');
+  await writeFile(`${output}/capture.json`, JSON.stringify({ capturedAt: new Date().toISOString(), workingTreeDirty: Boolean(execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim()), commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), base, browser: `Chromium ${browser.version()}`, viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, fullPage: true, locale: 'en-US', errors, captures }, null, 2) + '\n');
   console.log(JSON.stringify({ output, screenshots: captures.length, errors }));
 } finally {
   await browser.close();

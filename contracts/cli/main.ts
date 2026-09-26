@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: MIT
+import { createInterface } from 'node:readline/promises';
+import { createEnsResolver, confirmEnsRecipient, recheckEnsRecipient, EnsError } from './ens';
 import { readFile } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
 import { JsonRpcProvider, Wallet, ZeroAddress, keccak256 } from 'ethers';
@@ -39,12 +41,13 @@ async function password(): Promise<string> {
   });
 }
 async function main() {
-  const { values, positionals } = parseArgs({ allowPositionals: true, options: { state: { type: 'string' }, keystore: { type: 'string' }, 'card-id': { type: 'string' }, wallet: { type: 'string' }, rebroadcast: { type: 'boolean', default: false }, help: { type: 'boolean' } } });
+  const { values, positionals } = parseArgs({ allowPositionals: true, options: { state: { type: 'string' }, keystore: { type: 'string' }, 'card-id': { type: 'string' }, wallet: { type: 'string' }, 'recipient-ens': { type: 'string' }, rebroadcast: { type: 'boolean', default: false }, help: { type: 'boolean' } } });
   if (values.help) {
-    process.stdout.write('issuer deploy --state FILE --keystore FILE\nissuer issue --card-id ID [--wallet ADDRESS] --state FILE --keystore FILE\nissuer show --card-id ID\nissuer resume --state FILE [--rebroadcast]\n'); return;
+    process.stdout.write('issuer deploy --state FILE --keystore FILE\nissuer issue --card-id ID [--wallet ADDRESS | --recipient-ens NAME] --state FILE --keystore FILE\nissuer show --card-id ID\nissuer resume --state FILE [--rebroadcast]\n'); return;
   }
   const command = z.enum(['deploy', 'issue', 'show', 'resume']).parse(positionals[0]);
   if (positionals.length !== 1 || (values.rebroadcast && command !== 'resume')) throw new Error('Invalid command arguments');
+  if (values['recipient-ens'] !== undefined && (values.wallet !== undefined || command !== 'issue')) throw new Error('ENS and wallet are mutually exclusive and only valid for issue');
   const config = { baseUrl: url('MULTIBAAS_BASE_URL'), apiKey: setting('MULTIBAAS_ADMIN_API_KEY'), label: setting('REGISTRY_CONTRACT_LABEL'), version: setting('REGISTRY_CONTRACT_VERSION') };
   if (!config.baseUrl.endsWith('/api/v0')) throw new Error('MULTIBAAS_BASE_URL must end in /api/v0');
   const api = new MultiBaas(config);
@@ -61,13 +64,26 @@ async function main() {
       const state = z.string().min(1).parse(values.state);
       if (command === 'resume') result = await resume(context, state, values.rebroadcast);
       else {
-        const keyFile = values.keystore ?? setting('ISSUER_KEYSTORE_PATH');
-        const signer = await Wallet.fromEncryptedJson(await readFile(keyFile, 'utf8'), await password());
-        const operation = command === 'deploy' ? { kind: 'deploy' as const, bytecodeHash: keccak256(artifact.bytecode) } : { kind: 'issue' as const, contract: address.parse(setting('REGISTRY_ADDRESS')), cardId: cardId.parse(values['card-id']), wallet: address.parse(values.wallet ?? ZeroAddress) };
-        result = await execute(context, operation, state, signer);
+        const ens = values['recipient-ens'] !== undefined ? createEnsResolver(process.env.ENS_SEPOLIA_RPC_URL) : undefined;
+        try {
+          const recipient = ens ? await confirmEnsRecipient({
+            name: values['recipient-ens'] ?? '', resolve: ens.resolve,
+            requireEoa: async wallet => { await ens.requireEoa(wallet); if (await provider.getCode(wallet) !== '0x') throw new Error('ENS recipient must be an EOA on both chains'); },
+            confirm: async resolved => {
+              if (!process.stdin.isTTY) throw new Error('ENS confirmation requires an interactive terminal');
+              const prompt = createInterface({ input: process.stdin, output: process.stderr });
+              try { return (await prompt.question(`Sepolia ENS ${resolved.name} resolves to ${resolved.address}. Allow this wallet on chain ${context.chainId}? Type yes: `)).trim() === 'yes'; }
+              finally { prompt.close(); }
+            },
+          }) : undefined;
+          const keyFile = values.keystore ?? setting('ISSUER_KEYSTORE_PATH');
+          const signer = await Wallet.fromEncryptedJson(await readFile(keyFile, 'utf8'), await password());
+          const operation = command === 'deploy' ? { kind: 'deploy' as const, bytecodeHash: keccak256(artifact.bytecode) } : { kind: 'issue' as const, contract: address.parse(setting('REGISTRY_ADDRESS')), cardId: cardId.parse(values['card-id']), wallet: address.parse(recipient?.address ?? values.wallet ?? ZeroAddress) };
+          result = await execute(context, operation, state, signer, ens && recipient ? { recipient, recheck: () => recheckEnsRecipient(recipient, ens.resolve) } : undefined);
+        } finally { ens?.destroy(); }
       }
     }
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   } finally { provider.destroy(); }
 }
-main().catch(() => { process.stderr.write('Issuer operation failed. Check command, configuration, network, and saved state. No automatic resend was performed.\n'); process.exitCode = 1; });
+main().catch(error => { if (error instanceof EnsError) process.stderr.write(`${error.code}\n`); process.stderr.write('Issuer operation failed. Check command, configuration, network, and saved state. No automatic resend was performed.\n'); process.exitCode = 1; });

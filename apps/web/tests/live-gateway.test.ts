@@ -205,3 +205,15 @@ test('observed MultiBaas gas shortage becomes a user-actionable error only for r
   const unrelated = syntheticGateway(path => path.endsWith('/methods/register') ? Response.json({ status: 400, message: 'another error' }, { status: 400 }) : undefined);
   await assert.rejects(() => unrelated.gateway.buildRegistrationTransaction({ cardId, walletAddress: wallet, nickname }), error => error instanceof ApiError && error.status === 503 && error.code === 'UPSTREAM_UNAVAILABLE');
 });
+test('ENS search filters indexed owner and splits only log range errors', async () => {
+  const { gateway, calls } = syntheticGateway((_path, body) => {
+    if(body?.method !== 'eth_getLogs') return undefined;
+    const filter=(body.params as {fromBlock:string;toBlock:string}[])[0]!;
+    if(filter.fromBlock==='0xa' && filter.toBlock==='0x14') return Response.json({jsonrpc:'2.0',id:1,error:{code:-32000,message:'block range too large'}});
+    return Response.json({jsonrpc:'2.0',id:1,result:filter.toBlock==='0x14'?[{...log(),logIndex:'0x0'}]:[]});
+  });
+  const logs=await gateway.registrationLogs(wallet,10,20);
+  assert.equal(logs.length,1);assert.equal(logs[0]?.cardId,cardId);
+  const filters=calls.filter(c=>c.body?.method==='eth_getLogs').map(c=>(c.body!.params as {topics:string[]}[])[0]!);
+  assert.equal(filters.length,3);assert.deepEqual(filters[0]?.topics,[encodedLog.topics[0],null,encodedLog.topics[2]]);
+});

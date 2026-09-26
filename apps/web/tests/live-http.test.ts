@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { handleCardRequest, handleConnectionRequest, handlePrepareRequest } from "../src/backend/http";
+import { handleEnsPrimaryNameRequest, handleEnsCardsRequest, handleCardRequest, handleConnectionRequest, handlePrepareRequest } from "../src/backend/http";
 import { ConnectionResponse, ErrorResponse } from "../src/generated/validators.js";
 import { sample } from "../src/generated/fixtures";
 
 async function configured(env: Record<string, string | undefined>, run: () => Promise<void>) {
   const old = { ...process.env };
-  for (const name of Object.keys(process.env)) if (/^(MULTIBAAS_|REGISTRY_|CURVEGRID_|CHAIN_ID|ALLOWED_UI_ORIGINS|PUBLIC_API_ORIGIN|BACKEND_MODE)/.test(name)) delete process.env[name];
+  for (const name of Object.keys(process.env)) if (/^(ENS_|MULTIBAAS_|REGISTRY_|CURVEGRID_|CHAIN_ID|ALLOWED_UI_ORIGINS|PUBLIC_API_ORIGIN|BACKEND_MODE)/.test(name)) delete process.env[name];
   Object.assign(process.env, env);
   try { await run(); } finally { process.env = old; }
 }
@@ -93,5 +93,31 @@ test('wallet rejection logs correlate with the response without exposing private
     const body = await response.json();
     assert.equal(body.error.code, 'WALLET_NOT_ALLOWED');
     assert.equal(body.error.diagnostics, undefined);
+  });
+});
+test('optional ENS endpoint rejects bad input and fails without affecting legacy endpoints', async(t)=>{
+  t.mock.method(globalThis,'fetch',()=>{throw new Error('Must not contact upstream');});
+  await configured(live,async()=>{
+    for(const query of ['name=bad','name=a.eth&name=b.eth','name=a.eth&extra=x']) {
+      assert.equal((await handleEnsCardsRequest(new Request(`${base}/api/v1/ens/cards?${query}`))).status,400);
+    }
+    const response=await handleEnsCardsRequest(new Request(`${base}/api/v1/ens/cards?name=shomeikun.eth`));
+    assert.equal(response.status,503);assert.equal(response.headers.get('cache-control'),'no-store');
+    assert.equal((await response.json()).error.code,'ENS_NOT_CONFIGURED');
+  });
+  await configured({BACKEND_MODE:'mock'},async()=>{
+    assert.equal((await handleConnectionRequest(new Request(base))).status,200);
+    assert.equal((await handleEnsCardsRequest(new Request(`${base}/api/v1/ens/cards?name=shomeikun.eth`))).status,503);
+  });
+});
+
+test('primary name absence is optional and bad input fails before network',async(t)=>{
+  t.mock.method(globalThis,'fetch',()=>{throw new Error('Must not contact upstream');});
+  await configured(live,async()=>{
+    const address='0x2222222222222222222222222222222222222222';
+    const response=await handleEnsPrimaryNameRequest(new Request(`${base}/api/v1/ens/primary-name?address=${address}`));
+    assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
+    assert.deepEqual((await response.json()).data,{address,name:null,ensChainId:11155111});
+    assert.equal((await handleEnsPrimaryNameRequest(new Request(`${base}/api/v1/ens/primary-name?address=invalid`))).status,400);
   });
 });

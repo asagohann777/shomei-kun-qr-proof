@@ -80,3 +80,7 @@ npm test
 ## Curvegrid Testnetの実接続
 
 `BACKEND_MODE=live`、接続確認API、MultiBaas Gateway、専用Worker構成を追加した。設定・UI接続・検証の手順は [Curvegrid連携の起動手順](../../specs/CURVEGRID_INTEGRATION_RUNBOOK.md) を参照。既存mockの固定応答は維持する。実環境のキーと配置先を設定するまでは接続成功にならない。
+
+## ENS wallet card lookup
+
+`GET /api/v1/ens/cards?name=NAME&cursor=OPTIONAL_CURSOR` resolves Sepolia ENS and returns verified Curvegrid registration records. Set the optional server-only `ENS_SEPOLIA_RPC_URL` to enable it. Existing endpoints do not require ENS configuration. See [ENS integration](../../specs/ENS_INTEGRATION.md) and the OpenAPI contract for response fields and restart/error semantics.

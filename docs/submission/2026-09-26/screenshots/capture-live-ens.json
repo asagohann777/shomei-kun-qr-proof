@@ -1,0 +1,32 @@
+{
+  "capturedAt": "2026-09-26T09:19:02.008Z",
+  "base": "https://shomei-kun-integration.dptr.workers.dev/ui/",
+  "browser": "149.0.7827.55",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "deviceScaleFactor": 2,
+  "locale": "en-US",
+  "captures": [
+    {
+      "file": "10-ens-search-en.png",
+      "description": "ENS name or wallet address input",
+      "source": "https://shomei-kun-integration.dptr.workers.dev/ui/",
+      "mode": "live API and real registered records; no wallet signing"
+    },
+    {
+      "file": "11-ens-results-en.png",
+      "description": "Actual registrations returned for shomeikun.eth",
+      "source": "https://shomei-kun-integration.dptr.workers.dev/ui/",
+      "mode": "live API and real registered records; no wallet signing"
+    },
+    {
+      "file": "12-live-record-en.png",
+      "description": "Actual registered owner and card record",
+      "source": "https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=test-20260926-002",
+      "mode": "live API and real registered records; no wallet signing"
+    }
+  ],
+  "errors": []
+}

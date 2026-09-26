@@ -2,6 +2,7 @@
 import { AbstractProvider, Interface, Signer, Transaction, TransactionRequest, ZeroAddress, getAddress, getCreateAddress, keccak256 } from 'ethers';
 import artifact from '../abi/OwnershipRegistry.json';
 import { Operation, State, loadState, saveState, withStateLock } from './state';
+import type { EnsResolution } from './ens';
 import { RegistryApi } from './multibaas';
 
 const abi = new Interface(artifact.abi);
@@ -72,7 +73,7 @@ export async function resume(context: Context, file: string, rebroadcast = false
   });
 }
 
-export async function execute(context: Context, operation: Operation, file: string, signer: Signer): Promise<Result> {
+export async function execute(context: Context, operation: Operation, file: string, signer: Signer, ens?: { recipient: EnsResolution; recheck: () => Promise<void> }): Promise<Result> {
   return withStateLock(file, async () => {
     await verifyNetwork(context);
     const previous = await loadState(file);
@@ -105,8 +106,12 @@ export async function execute(context: Context, operation: Operation, file: stri
       if (fees.gasPrice == null) throw new Error('Missing gas price');
       Object.assign(request, { type: 0, gasPrice: fees.gasPrice });
     }
+    if (ens) {
+      if (operation.kind !== 'issue' || getAddress(operation.wallet) !== getAddress(ens.recipient.address)) throw new Error('ENS recipient mismatch');
+      await ens.recheck();
+    }
     const rawTransaction = await signer.signTransaction(request);
-    const state: State = { version: 1, chainId: context.chainId, issuer: getAddress(context.issuer), label: context.label, contractVersion: context.version, operation, nonce, rawTransaction, transactionHash: keccak256(rawTransaction) };
+    const state: State = { version: 1, chainId: context.chainId, issuer: getAddress(context.issuer), label: context.label, contractVersion: context.version, operation, nonce, rawTransaction, transactionHash: keccak256(rawTransaction), ...(ens ? { ensRecipient: ens.recipient } : {}) };
     verifyState(state, context);
     await saveState(file, state);
     await context.provider.broadcastTransaction(rawTransaction);

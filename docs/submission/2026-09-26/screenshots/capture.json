@@ -1,7 +1,8 @@
 {
-  "capturedAt": "2026-09-26T05:12:57.697Z",
-  "commit": "5d3e676e3271e04ab9b83219dafe78821fd4af18",
-  "base": "http://127.0.0.1:4189",
+  "capturedAt": "2026-09-26T09:17:27.240Z",
+  "workingTreeDirty": true,
+  "commit": "7913be95f0206a7ec4e2112a6b4aadad4dd908fe",
+  "base": "http://127.0.0.1:4173",
   "browser": "Chromium 149.0.7827.55",
   "viewport": {
     "width": 390,
@@ -15,7 +16,7 @@
     {
       "file": "01-home-en.png",
       "description": "Home and QR scan entry",
-      "heading": "Check ownership with QR",
+      "heading": "Check card registration",
       "mode": "mock API, mock wallet, mock camera"
     },
     {

@@ -481,3 +481,55 @@ Chromium/WebKitの日英320px・390pxで表示と操作を確認し、カメラ�
 ## 2026-09-26: MITライセンスとREADMEの調整
 
 ユーザーの指示でソースコードにMITを採用し、LICENSE、SPDX識別子、生成コードのヘッダー、パッケージ情報を揃えた。提供素材の権利は別扱いとした。READMEの指定文と出典リンクを削除し、素材提供者のGitHubリンクを追加。Codexが整備と検証を担当。詳細は[ライセンス方針](LICENSE_POLICY.md)。大会期間との対応は未確認。
+
+## 2026-09-26: Optional ENS recipient and wallet registration search
+
+The human revised the ENS design to remove card subnames and new Registry/Resolver deployments, retain optional ENS and the existing QR flow, and search existing registration events by the resolved wallet. Codex implemented the resolver and CLI checks in `contracts/cli`, the typed search endpoint and event verification in `apps/web`, the optional Japanese/English search in `prototypes/mobile-ui`, corresponding tests, and `specs/ENS_INTEGRATION.md`. OpenAPI generated types and validators were regenerated. This entry records work on this date; it does not independently establish event eligibility.
+
+Verification: contract/CLI tests 21 passed, API tests 76 passed, UI tests 78 passed. Contract and API TypeScript checks passed. OpenAPI generation consistency, strict OpenSpec validation, Next.js build, UI builds and the Cloudflare Worker integration build passed. The Worker build confirmed runtime-only environment bindings and its embedded-credential check passed. Chromium and WebKit verified ENS search, partial versus empty results, pagination, existing detail navigation, Japanese labels, 320px layout, input escaping and the QR entry. Browser tests use synthetic API responses.
+
+A read-only Sepolia lookup resolved `shomeikun.eth` to `0xc22D961e56b70a73f6dCB1EC0a47b7Da1Fe38FDd`. The human acquired the name and confirmed access to the same wallet in PC Chrome and mobile MetaMask. Live card issuance and registration, deployment of the ENS changes, and physical-device verification are deferred. No ENS changes were deployed by this implementation pass. Test procedures and these limits are recorded in `specs/ENS_INTEGRATION.md`.
+
+The existing full UI browser regression also passed on Chromium 149 and WebKit 26.5 with no console errors.
+
+### ENS UI review in mock mode
+
+After the user could not see the ENS changes in the local mock, Codex added the same search entry to mock mode and a fixture adapter in `prototypes/mobile-ui/src/ens-mock.js`. `/?preview=ens` opens it directly. The screen identifies the results as samples, supports a paged list, empty/error states, and opens existing mock card details. Live mode retains the real API adapter. This enables UI review without credentials or transactions.
+
+### ENS screen design revision
+
+The human requested a pale ENS button matching the QR action and a clearer card-search screen. Codex used the frontend-design skill to keep the existing blue/white identity, shorten the screen title, place search in a white input panel, separate the resolved wallet from results, and show the existing card artwork, ID, registered nickname and record action in each row. Technical and fixture instructions moved into expandable help. The mock at port 4173 reflects the revision. Chromium and WebKit passed search, pagination and detail navigation at 320px; the UI suite passed 78 tests. Design decisions are in `specs/ENS_UI_DESIGN.md`.
+
+### Primary name display and live read verification
+
+The human added Sepolia Primary name display to the registration screen, with mandatory forward-address confirmation, address-only fallback and stale-result protection on account changes. Codex added the optional typed `/api/v1/ens/primary-name` endpoint, a resolver method, UI lookup controller and mock name-present/unset toggle. Registration identity and authorization still use the wallet address. A read-only real RPC call verified `0xc22D961e56b70a73f6dCB1EC0a47b7Da1Fe38FDd` reverses to `shomeikun.eth` and forwards to the same address.
+
+A separate real read through the implemented search service returned two confirmed registrations, `test-20260926-002` at block 18834 and `mobile-ui-20260926-manual` at block 18782, and completed the scan. This verifies real ENS plus Curvegrid lookup from the local runtime; it does not establish deployed Worker behavior. Deployment remains pending the target-specific approval requested after automatic approval review rejected the external mutation.
+
+### Direct address search and copy cleanup
+
+The human requested direct wallet address search and matching home copy, and removed the mock primary-name toggle from the product screen. The input now accepts ENS or an address; direct addresses bypass ENS and return null `ensChainId`. A real read with ENS configuration removed returned the same two registered cards for the user's address. Chromium verified the revised home title/actions, address search, absent toggle and dedicated unset preview URL. API tests passed 78 cases. Primary-name logic had passed 22 contract/CLI tests and 80 UI tests, including stale response rejection; browser checks passed in Chromium and WebKit. Deployment remains unverified pending the previously requested approval.
+
+
+### Approved real deployment and Worker fix
+
+The user explicitly requested urgent deployment. The validation Worker was deployed with server-side runtime settings, excluding issuer/admin credentials. Direct address search succeeded; ENS initially failed because Workers does not support the fetch redirect error mode. Codex reproduced the error in Worker logs, changed RPC/CCIP requests to manual redirect mode with explicit 3xx rejection, removed temporary diagnostic output, and redeployed. Deployed Primary name and ENS card search then returned HTTP 200, `shomeikun.eth`, and two verified registrations. The added redirect test passed with the other ENS tests. The normal integration Worker is being updated with the verified implementation.
+
+
+The normal integration Worker deployment completed. Public URL: https://shomei-kun-integration.dptr.workers.dev/ui/ . Published code version before the runtime-secret update: `d4fa748b-1aaf-4c14-9d36-a48de310b63e`. After runtime settings were applied, the public Primary name endpoint returned `shomeikun.eth`. Chromium verified real ENS search and WebKit verified direct-address search, with two results and successful navigation to registered card details; no page errors occurred. Screenshots are local tmp artifacts. Actual MetaMask transaction signing remains a separate user-operated check.
+
+### Submission refresh after user testing
+
+The user reported successful operation after deployment and requested updated specifications, screenshots and submission text. SPEC, ARCHITECTURE, DEMO, ENS_INTEGRATION and the README now cover optional recipient issuance, ENS/address search and verified Primary name display. The nine English mock-flow screenshots were recaptured and three English live ENS/record screenshots added. Capture metadata distinguishes fixtures from actual API records. The live capture now includes `test-20260926-006` alongside the previously observed registrations.
+
+Plain-text English submission fields are stored outside Git at `/private/tmp/shomei-submission-ens-20260926`: short description, description, how it is made, AI use and technology names. They preserve Curvegrid Testnet gas requirements, separate Sepolia ENS from the registration chain, and describe MultiBaas and ENS integration without claiming unverified prize eligibility.
+
+The user confirmed the manual verification environment as PC Chrome with MetaMask. This report is not treated as evidence of an iPhone test.
+
+### Live ENS-restricted issuance
+
+Following explicit user approval, the actual issuer CLI ran with `--recipient-ens shomeikun.eth` and issued `ens-shomeikun-20260926-01`. Recipient confirmation and keystore unlock completed; transaction `0xa7cf862b4f592c745f75340dd43ab198bbe57334ab8c8b9f3ef23fd438b4c96f` succeeded at block 19313. RPC confirmed the fixed allowed wallet `0xc22D961e56b70a73f6dCB1EC0a47b7Da1Fe38FDd`, and the public API returned the unregistered card. `eth_call` accepted registration simulation from this address and rejected a different wallet. The card itself remains unregistered; no user-wallet transaction was signed. The initial attempt used the host Node18 and exited before confirmation or signing; the successful run used Node22.23.1. State and keys remain private on ThinkPad, with no secret values recorded here.
+
+### Unresolved iPhone recovery report
+
+The user reported an app crash during the iPhone test and "結果を確認できません" after reopening. A subsequent public API read returned the test card as unregistered with no evidence. A pending transaction has not been ruled out. Codex requested the last completed action and MetaMask activity status; no retry or local attempt deletion was performed. The user requested a checkpoint commit before further investigation. iPhone verification remains incomplete.

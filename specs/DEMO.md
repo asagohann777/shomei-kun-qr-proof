@@ -7,6 +7,15 @@
 | 実登録とカメラ読取り | https://shomei-kun-integration.dptr.workers.dev/ui/ |
 | UI検討用モック | https://shomei-kun-ui-mock.dptr.workers.dev/ |
 
+## ENS・アドレス検索を試す
+
+1. 実接続URLで「ENS名・アドレスで探す」を押す。英語表示は「Find by ENS or address」。
+2. `shomeikun.eth` を検索する。登録済みカードの画像・ID・登録名を確認する。
+3. 「登録記録を見る」でカード詳細を開く。閲覧にはMetaMask接続もガスも不要。
+4. `0xc22D961e56b70a73f6dCB1EC0a47b7Da1Fe38FDd` を入力して同じ一覧を確認する。
+
+登録画面でこのウォレットを接続すると、Sepoliaで逆引き・正引き一致を確認した `shomeikun.eth` をアドレスの上に表示する。未設定ならアドレスのみ。登録に使うネットワークは引き続きCurvegrid Testnetで、ENS確認のためにウォレットをSepoliaへ切り替える必要はない。
+
 ## 実登録を試す
 
 MetaMaskを用意し、登録に使うウォレットへCurvegrid TestnetのテストETHを補充する。カードは発行済み・未登録のものを使う。既存カードのQRやURLを利用できる。

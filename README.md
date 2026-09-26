@@ -4,7 +4,7 @@
 
 # Shomei-kun QR Proof
 
-Scan a card's QR code to check its registered owner.
+Find card registrations by QR, ENS name, or wallet address.
 
 ![Shomei-kun cover image](docs/submission/2026-09-26/branding/shomei-kun-cover.png)
 
@@ -12,7 +12,9 @@ Scan a card's QR code to check its registered owner.
 
 Shomei-kun QR Proof lets you scan a card's QR code to see which wallet it is registered to. The demo uses a trading card featuring Shomei Ichiro, a fictional baseball player, to show how an owner registers a card and how someone else checks the record.
 
-Every flow starts with a QR scan. If the card is unregistered, enter a nickname and approve the registration in MetaMask. If it is already registered, the app shows its registered owner and transaction details. Viewing a record does not require a wallet connection. The interface supports Japanese and English.
+QR scanning is the main entry point. You can also search by ENS name or wallet address. If the card is unregistered, enter a nickname and approve the registration in MetaMask. If it is already registered, the app shows its registered owner and transaction details. Viewing a record does not require a wallet connection. The interface supports Japanese and English.
+
+ENS names resolve on Sepolia; card records remain on Curvegrid Testnet. Search `shomeikun.eth` to see its wallet’s registered cards, then open a card’s registration record. The registration screen also shows a connected wallet’s Primary name when reverse and forward resolution agree. Names are display labels; ownership and permissions remain address-based.
 
 The card ID, the registering wallet address, and the nickname are recorded on the blockchain. Anyone can return to the record through the same QR code. This demo supports one-time registration, with no editing, deletion, or ownership transfer after registration.
 
@@ -44,6 +46,9 @@ Screenshots of the English interface.
 | Registration in progress | [View](docs/submission/2026-09-26/screenshots/07-registration-progress-en.png) |
 | Registration complete | [View](docs/submission/2026-09-26/screenshots/08-registration-complete-en.png) |
 | Record details | [View](docs/submission/2026-09-26/screenshots/09-record-details-en.png) |
+| ENS and address search | [View](docs/submission/2026-09-26/screenshots/10-ens-search-en.png) |
+| Live registered cards | [View](docs/submission/2026-09-26/screenshots/11-ens-results-en.png) |
+| Live card record | [View](docs/submission/2026-09-26/screenshots/12-live-record-en.png) |
 
 ## Existing project and this implementation
 
@@ -54,7 +59,7 @@ Here, we apply that approach to physical cards, QR codes, and wallet-based regis
 | Scope | Work |
 | --- | --- |
 | Pre-existing work | The Shomei-kun concept, photo and video registration, album management, visibility settings, sharing through URLs, and the use of blockchain as external evidence |
-| Developed in this repository | Card ID issuance, QR reading, wallet-based owner registration, nickname recording, public record viewing, Japanese and English UI, and QR reading through the camera or photos |
+| Developed in this repository | Card ID issuance, QR reading, wallet-based owner registration, nickname recording, public record viewing, Japanese and English UI, QR reading through the camera or photos, optional ENS recipient issuance, ENS/address search, and verified Primary name display |
 
 The description of existing features is based on materials provided by the project. See [pre-existing work](specs/PRE_EXISTING_WORK.md) for sources and reuse details, and the [development log](specs/HACKATHON_CHANGES.md) for implementation and verification records.
 
@@ -66,7 +71,7 @@ Continuity includes "Extend Open Source" and “Ship a Feature.” The specific 
 
 ## Implementation and development records
 
-The UI uses JavaScript, Tailwind CSS, and daisyUI. The API uses Next.js and Cloudflare Workers. Registration uses Solidity, Curvegrid MultiBaas, and MetaMask. The connected demo has been tested on Curvegrid Testnet. See the [registration demo record](specs/OPEN_REGISTRATION_DEMO.md) for environment details and verification results.
+The UI uses JavaScript, Tailwind CSS, and daisyUI. The API uses Next.js and Cloudflare Workers. Registration uses Solidity, Curvegrid MultiBaas, and MetaMask. ENS resolution uses ethers 6.17.0 on Sepolia. The connected demo has been tested on Curvegrid Testnet. See the [registration demo record](specs/OPEN_REGISTRATION_DEMO.md) for environment details and verification results.
 
 - [Specification](specs/SPEC.md), [architecture](specs/ARCHITECTURE.md), and [demo guide](specs/DEMO.md)
 - [Run the UI locally](prototypes/mobile-ui/README.md), [API](apps/web/README.md), and [contracts](contracts/README.md)

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source": "codex:UserPromptSubmit",
+  "captured_at": "2026-09-26T09:33:14.848537+00:00",
+  "session_id": "01a0dc17-6562-7900-9202-41fa136ce12f",
+  "turn_id": "01a0dd0f-c59a-7270-9f55-8a3108e99c1b",
+  "prompt": "<send_user_message_question_reply>\n[{\"answer\":\"アプリが途中で落ちた後開き直したら　結果が確認できませんと表示された\",\"question\":\"残るiPhone確認です。MetaMask内ブラウザで https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=ens-shomeikun-20260926-01 を開き、登録画面でウォレット接続後に shomeikun.eth が表示されますか？取引承認までは不要です。\",\"questionItemId\":\"[\\\"request_user_input_async\\\",\\\"call_X9RYiSnjNQZJK3MrKA2rClbZ\\\",0]\"}]\n</send_user_message_question_reply>",
+  "model": "gpt-6-astra"
+}
