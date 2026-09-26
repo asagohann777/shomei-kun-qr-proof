@@ -45,20 +45,33 @@
   h1, h2, p, dd { overflow-wrap: anywhere; }
 }
 @layer utilities {
-  .phone { --scene-image: none; max-width: 480px; min-height: 100svh; margin: auto; background-color: #eaf4ff; background-image: var(--scene-image); background-size: cover; background-position: center; padding-top: env(safe-area-inset-top); padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+  .phone { --scene-image: url("./assets/flow-background.jpg"); max-width: 480px; min-height: 100svh; margin: auto; background-color: #eaf4ff; background-image: linear-gradient(180deg, #ffffffed 0%, #ffffff99 25%, #ffffff14 55%, #ffffff8c 100%), var(--scene-image); background-size: 100% 100%, 100% max(100svh, 850px); background-repeat: no-repeat; background-position: center top; padding-top: env(safe-area-inset-top); padding-bottom: max(28px, env(safe-area-inset-bottom)); }
   .app-header { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 10px; padding: 22px 20px 8px; }
   .brand { display: grid; text-align: center; color: #080e48; line-height: 1.15; text-decoration: none; }
+  .home-scene { --scene-image: url("./assets/home-background.jpg"); }
+  .brand-art { display: block; width: 150px; height: 77px; position: relative; overflow: hidden; margin: auto; mix-blend-mode: multiply; }
+  .brand-art img { position: absolute; width: 206px; max-width: none; left: -28px; top: -69px; }
+  .home-scene .app-header { padding-top: 32px; align-items: start; }
+  .home-scene .brand-art { width: 240px; height: 123px; }
+  .home-scene .brand-art img { width: 330px; left: -45px; top: -110px; }
+  .home-scene .app-header { grid-template-columns: 36px minmax(0, 1fr) 36px; gap: 0; padding-inline: 12px; }
+  .home-scene .round-button { width: 36px; height: 36px; }
+  .intro-qr { display: block; width: 240px; max-width: 85%; margin: auto; mix-blend-mode: multiply; }
+  .page-title { text-shadow: 0 1px 8px white, 0 0 20px white; }
+  .demo-label { background: #ffffffb3; width: fit-content; margin-inline: auto; padding: 2px 10px; border-radius: 12px; }
+  .process-copy { background: #ffffffc9; border-radius: 12px; padding: 8px; }
   .brand-name { font-size: clamp(24px, 7vw, 32px); font-weight: 800; letter-spacing: -.04em; }
   .brand-subtitle { font-size: 18px; font-weight: 700; margin-top: 3px; }
   .round-button { width: 44px; height: 44px; display: grid; place-items: center; background: white; border-radius: 50%; font-size: 20px; }
   .round-button:disabled { opacity: .3; }
-  .demo-label { text-align: center; color: #47617d; font-size: 10px; margin: 8px 0 0; }
+  .demo-label { text-align: center; color: #47617d; font-size: 10px; margin: 8px auto 0; }
   .page { padding: 30px 24px 0; }
   .page-title { font-size: clamp(23px, 6vw, 28px); font-weight: 800; line-height: 1.4; text-align: center; letter-spacing: -.04em; text-wrap: balance; }
   .icon { width: 24px; height: 24px; flex-shrink: 0; display: inline-block; vertical-align: middle; }
   .trading-card { width: 56%; max-width: 205px; position: relative; margin: 24px auto; }
-  .trading-card > img:first-child { width: 100%; height: auto; border: 2px solid white; border-radius: 10px; }
-  .card-qr { position: absolute; width: 24%; right: 6%; bottom: 13%; border: 2px solid white; }
+  .card-art { position: relative; aspect-ratio: 940 / 1290; overflow: hidden; border-radius: 16px; filter: drop-shadow(0 3px 7px #0056a829); }
+  .card-art img { position: absolute; width: 125.53%; max-width: none; height: 103.34%; left: -12.77%; top: -1.55%; }
+  .card-qr { position: absolute; width: 23%; right: 7%; bottom: 11%; border: 2px solid white; }
   .info-panel {
     border-radius: 20px;
     padding: 20px 16px;
@@ -171,7 +184,7 @@
   .orbit-tracer::before { content: ""; position: absolute; width: 7px; height: 7px; left: calc(50% - 3px); top: -3px; background: white; border-radius: 50%; box-shadow: 0 0 7px 3px #57dfff, 0 0 18px #0068f5; }
   .registration-card { position: absolute; z-index: 3; top: 19%; left: 25%; width: 50%; animation: card-hover 4.8s ease-in-out infinite; }
   .registration-card .trading-card { width: 100%; max-width: none; margin: 0; filter: drop-shadow(0 0 8px #6de2ff8c); }
-  .registration-card .trading-card > img:first-child { border-color: #efffff; box-shadow: 0 0 0 1px #b4edff, inset 0 0 4px white; }
+  .registration-card .card-art { border-color: #efffff; box-shadow: 0 0 0 1px #b4edff, inset 0 0 4px white; }
   .network-cube { position: absolute; z-index: 4; width: 15%; aspect-ratio: 1; display: grid; place-items: center; color: #efffff; background: radial-gradient(ellipse, #42d5ffba 5%, #0875f542 50%, transparent 72%); filter: drop-shadow(0 0 5px #00aaff); animation: cube-glow 3.6s ease-in-out infinite; }
   .network-cube .icon { width: 87%; height: 87%; stroke-width: .9; fill: #008dff33; }
   .cube-top { top: 1%; left: 42.5%; }
@@ -194,7 +207,8 @@
 
   .process-copy { text-align: center; font-size: 14px; color: #47617d; line-height: 1.8; margin-top: 14px; }
   .page > .process-copy + .info-panel { margin-top: 24px; }
-  .entry-page .scan-intro { text-align: center; padding-block: 18px; }
+  .entry-page .scan-intro { text-align: center; width: 240px; max-width: 85%; margin: 40px auto 24px; padding: 4px; background: #ffffffd9; border: 1px solid white; border-radius: 28px; box-shadow: inset 0 0 12px #fff, 0 0 18px #69ddff80; backdrop-filter: blur(8px); }
+  .scan-intro .intro-qr { width: 100%; max-width: none; border-radius: 24px; }
   .scan-intro .trading-card { width: 60%; }
   .camera-page { position: relative; padding-top: 55px; }
   .flash-button { position: absolute; right: 24px; top: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-size: 12px; font-weight: 700; min-width: 48px; min-height: 52px; border-radius: 12px; }
@@ -234,7 +248,8 @@
   .camera-page { padding-top: 50px; }
   .app-header { padding-inline: 16px; }
   .bottom-actions { padding-inline: 30px; }
-  .brand-name { font-size: 24px; }
+  .home-scene .brand-art { width: 210px; height: 108px; }
+  .home-scene .brand-art img { width: 288px; left: -39px; top: -96px; }
   .register-page .page-title, .panel-title { font-size: 21px; }
   .record-table { font-size: 12px; }
   .record-table dt, .record-table dd { padding: 8px; }
