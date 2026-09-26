@@ -450,3 +450,7 @@ Chromium/WebKitの日英320px・390pxで表示と操作を確認し、カメラ�
 同時にユーザーから公開Git履歴のテストカード記録を除去する指示を受け、未マージのPRブランチを修正した。カードの再発行は行っていない。GitHubの旧コミット参照が残る制約を含め、計画・検証の詳細は `METAMASK_PREPARATION_PLAN.md` に記録する。
 
 最終公開versionは `caadbc80-87ac-414f-9024-ed63342b7344`。UI単体74件、既存モック/実接続のブラウザ試験、CSP付き復帰試験、実SDK起動、Worker試験が成功。公開資産24件の一致、公開一覧の404、API readyを確認した。iPhone実機での往復は未確認。
+
+## 2026-09-26: integrationの実カメラを有効化
+
+ユーザーの試験依頼により、Codexが最新mainの取り込みを確認し、専用integrationを `UI_CAMERA_MODE=live` で再ビルド・公開した。カメラ本体は変更せず、既定モックを維持。公開動画・写真QRの検証スクリプトと起動手順を追加した。Worker versionは `7a4a7673-a63b-465e-8cc8-a648561931fe`。公開資産24件の一致、Chromiumの動画QR読取り、WebKitの拒否後の写真読取りが成功。実機未確認。大会期間との対応は未確認。詳細は `INTEGRATION_CAMERA_PLAN.md`。
