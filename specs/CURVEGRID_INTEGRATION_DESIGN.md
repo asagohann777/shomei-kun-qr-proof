@@ -1,90 +1,92 @@
-# Curvegrid Testnet連携の詳細設計
+English | [日本語](CURVEGRID_INTEGRATION_DESIGN.ja.md)
 
-2026-09-26訂正: デモの登録許可は全員。CLI省略時はallowedWallet=0で発行し、任意の本人ウォレットが初回登録できる。以下の指定許可ウォレットに関する記述は、非ゼロを指定した限定カードのみを指す。最新の配置・検証は [全員登録計画](OPEN_REGISTRATION_DEMO.md) を参照。
+# Curvegrid Testnet integration design
 
-状態: **実装済み・実環境の接続確認待ち。** 2026-09-26 JST。承認対象は `453387e`。リベース後の同一設計は `b537e04`。承認の出典は [変更記録](HACKATHON_CHANGES.md) を参照。
+Correction dated 2026-09-26: demo registration is open to everyone. When the CLI recipient option is omitted, issuance uses allowedWallet=0 and any user's wallet can perform the first registration. The designated-wallet restrictions below apply only to restricted cards issued with a nonzero address. See the [open registration plan](OPEN_REGISTRATION_DEMO.md) for the latest deployment and verification.
 
-[計画](CURVEGRID_INTEGRATION_PLAN.md) / [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) / [既存モック設計](BACKEND_DESIGN.md)
+Status at this design stage: implemented, awaiting live connectivity verification. Dated 2026-09-26 JST. The approved commit was `453387e`; the same design after rebase was `b537e04`. See the [change log](HACKATHON_CHANGES.md) for the approval source.
 
-## 1. レビュー対象と設計時点の現状
+[Plan](CURVEGRID_INTEGRATION_PLAN.md) / [Draft PR #1](https://github.com/asagohann777/shomei-kun-qr-proof/pull/1) / [Existing mock design](BACKEND_DESIGN.md)
 
-ユーザーが決めたのは、Curvegrid Testnet、実際の登録・書込み、新規の所有者登録コントラクト、自由入力のニックネーム、通常ブラウザからMetaMaskへの接続、API・コントラクト・CLIとUIの担当分離である。本書のABI、設定名、エラー、制限値、CLI操作はこれらを具体化した提案で、設計承認まで確定扱いにしない。
+## 1. Review scope and state at design time
 
-| 項目 | 現状 | 本設計の差分 |
+The user selected Curvegrid Testnet, real registration writes, a new owner-registration contract, free-form nicknames, MetaMask connection from normal browsers, and separate API/contract/CLI and UI responsibilities. The ABI, setting names, errors, limits, and CLI operations in this document turn those decisions into a proposal. They were not final until design approval.
+
+| Item | State at design time | Change in this design |
 | --- | --- | --- |
-| Web API | Next.js、固定mockのみ。3 API実装済み | パスを保ち、liveと接続確認を追加 |
-| チェーン | DTOとServiceに80002・固定サンプル参照 | mockの80002を維持し、liveは配置設定を参照 |
-| 所有者登録 | サンプル名、模擬取引のみ | 実際の許可ウォレット、自由入力、ABIで生成された取引 |
-| コントラクト・CLI | 未実装 | Solidity、配置・発行・読取りCLI |
-| UI | 独立した静的モック | UI担当が画面とMetaMask Connectを実装 |
-| 公開 | UIモックだけ公開済み | バックエンドを別Workerへ配置する。今回は公開しない |
+| Web API | Next.js, fixed mocks only, three APIs implemented | Keep paths and add live mode and connection checks |
+| Chain | DTO and Service refer to 80002 and fixed samples | Keep 80002 in mock mode; live mode uses deployment settings |
+| Owner registration | Sample name and simulated transactions only | Actual allowed wallet, free-form input, and ABI-generated transactions |
+| Contract and CLI | Not implemented | Solidity and deployment, issuance, and read CLI |
+| UI | Independent static mock | UI owner implements screens and MetaMask Connect |
+| Publication | Only the UI mock is public | Deploy the backend to another Worker; no publication in this design update |
 
-`specs/SPEC.md` と `specs/ARCHITECTURE.md` のAmoyは最終目標として残す。本changeは先行するCurvegrid Testnet検証を定義する。既存F01〜F10・A01〜A11全部の達成を意味せず、とくにA07の無資格・独立公開RPC照合は対象外。
+Amoy in `specs/SPEC.md` and `specs/ARCHITECTURE.md` remains the final target. This change defines earlier Curvegrid Testnet validation. It does not satisfy all existing F01–F10 and A01–A11 requirements. In particular, A07's credential-free verification through an independent public RPC is out of scope.
 
-## 2. 担当とモジュール境界
+## 2. Responsibilities and module boundaries
 
 ```text
-UI担当: スマホ画面 / MetaMask Connect / 再読込後の追跡
-    | 公開API                           | 署名・送信
+UI owner: mobile screens / MetaMask Connect / tracking after reload
+    | Public API                        | Signing and sending
 Next.js Route Handler                  MetaMask --> Curvegrid Web3 RPC
     |
 Registration Service --> RegistrationGateway
-                             | mock: 現在の固定応答
+                             | mock: existing fixed responses
                              | live: MultiBaas REST API --> Curvegrid Testnet
 
-ローカル発行者CLI --> MultiBaas管理・取引作成 / ローカル署名 --> Web3 RPC
+Local issuer CLI --> MultiBaas management and transaction preparation / local signing --> Web3 RPC
 ```
 
-バックエンド担当は `apps/web/src/backend/`、API Route Handler、OpenAPI、コントラクト、CLI、Workers構成を所有する。UI担当はページ、コンポーネント、CSS、翻訳、ブラウザ側のウォレット・追跡処理を所有する。APIへの接続例とABI成果物を引き渡す。共通のpackage/lockfile変更はバックエンドの基盤追加後にUI担当が取り込み、同一ファイルの同時編集を避ける。
+The backend owner maintains `apps/web/src/backend/`, API Route Handlers, OpenAPI, contracts, CLI, and Workers configuration. The UI owner maintains pages, components, CSS, translations, and browser wallet and tracking logic. The backend supplies API examples and ABI artifacts. The UI owner incorporates shared package and lockfile changes after the backend foundation is added, avoiding simultaneous edits to the same files.
 
-- `config`: 環境設定をmock/liveの判別可能な型へ変換する。リクエスト本文で接続先を選ばない。
-- `http`: パス・JSON・Origin・ヘッダー検証、共通応答、例外の秘匿化。
-- `service`: 登録条件と取引の対応を照合する。固定sampleをliveの判定に流用しない。
-- `multibaas-gateway`: REST呼出し、応答の実行時検証、ABIに基づく内部型への変換。
-- 既存Mock GatewayとMock Walletはmock専用として維持する。実ウォレットSDKはUI側に置く。
+- `config` converts environment settings into discriminated mock/live types. Request bodies do not select destinations.
+- `http` validates paths, JSON, origins, and headers; produces shared responses; and sanitizes exceptions.
+- `service` checks registration conditions and transaction correspondence. It does not use fixed samples to decide live results.
+- `multibaas-gateway` calls REST, validates responses at runtime, and converts them to internal types through the ABI.
+- Existing Mock Gateway and Mock Wallet remain mock-only. The real wallet SDK belongs in the UI.
 
-内部Gatewayの `registry` に加え、接続状態、ブロック、取引input、レシートblockHash/raw logsを扱える型を設計する。外部JSONは境界で検証し、不正応答を503へ変換する。公開DTOはOpenAPIから生成し、Workers用の検証関数は現在と同様に事前生成する。
+Alongside the internal Gateway's `registry`, types must support connection status, blocks, transaction input, and receipt blockHash and raw logs. Validate external JSON at boundaries and convert invalid responses to 503. Generate public DTOs from OpenAPI and precompile Workers validators as before.
 
-## 3. 設定と信頼境界
+## 3. Configuration and trust boundaries
 
-| 設定 | 保管先・用途 |
+| Setting | Storage and purpose |
 | --- | --- |
-| `BACKEND_MODE` | `mock` または `live`。未指定・未知値は設定エラー |
-| `MULTIBAAS_BASE_URL` | サーバー設定。HTTPSのデプロイメントURL、`/api/v0`まで指定 |
-| `MULTIBAAS_API_KEY` | Cloudflare Secret。読取りと未署名取引作成だけのアプリ用キー |
-| `CHAIN_ID` | liveの期待する数値ID。MultiBaas環境から確認した値を設定し、80002を流用しない |
-| `REGISTRY_ADDRESS` / `REGISTRY_CONTRACT_LABEL` / `REGISTRY_CONTRACT_VERSION` | 固定した配置先とMultiBaas LibraryのABI定義 |
-| `REGISTRY_DEPLOYMENT_BLOCK` / `REGISTRY_ISSUER` | イベント開始ブロックと期待する発行者 |
-| `CURVEGRID_PUBLIC_WEB3_RPC_URL` | ウォレット配布用の専用公開Web3キーで作ったHTTPS RPC URL |
-| `ALLOWED_UI_ORIGINS` | カンマ区切りの完全一致Origin。空なら同一Originのみ許可 |
-| `PUBLIC_API_ORIGIN` | このAPI自身のHTTPS Origin。ローカル開発だけlocalhostのHTTPを許可 |
+| `BACKEND_MODE` | `mock` or `live`; missing or unknown values are configuration errors |
+| `MULTIBAAS_BASE_URL` | Server setting; HTTPS deployment URL including `/api/v0` |
+| `MULTIBAAS_API_KEY` | Cloudflare Secret; application key limited to reads and unsigned transaction preparation |
+| `CHAIN_ID` | Expected numeric live ID, checked against the MultiBaas environment; do not reuse 80002 |
+| `REGISTRY_ADDRESS` / `REGISTRY_CONTRACT_LABEL` / `REGISTRY_CONTRACT_VERSION` | Fixed deployment and MultiBaas Library ABI definition |
+| `REGISTRY_DEPLOYMENT_BLOCK` / `REGISTRY_ISSUER` | Event starting block and expected issuer |
+| `CURVEGRID_PUBLIC_WEB3_RPC_URL` | HTTPS RPC URL created with a dedicated public Web3 key for wallet distribution |
+| `ALLOWED_UI_ORIGINS` | Comma-separated exact origins; empty allows only the same origin |
+| `PUBLIC_API_ORIGIN` | This API's HTTPS origin; localhost HTTP allowed only for local development |
 
-Curvegrid Testnetのchain ID、RPC URL、コントラクト、発行者、MultiBaasラベルの実値は未取得。ユーザーの作成済み環境に設定する値であり、架空値を補って接続成功にしない。
+At design time, actual Curvegrid Testnet chain ID, RPC URL, contract, issuer, and MultiBaas label were not obtained. These values belong to the user's existing environment. Do not fill them with invented values and claim connectivity.
 
-`BACKEND_MODE=live` だけが設定され、接続値が不足している場合、Worker自体は起動可能にして接続確認APIが不足項目名を返す。カード・登録APIは503で停止する。ビルド時にSecretを要求しない。mock/liveのモード指定そのものの不足や未知値は引き続き設定エラーにする。live設定の一部欠落をmockで補わない。
+With only `BACKEND_MODE=live` set and connection values missing, the Worker may start so the connection API can return missing setting names. Card and registration APIs stop with 503. Secrets are not required at build time. A missing or unknown mode itself remains a configuration error. Partial live settings do not fall back to mock values.
 
-公開Web3 RPC URLはブラウザ・MetaMaskへ渡る設定として扱う。MultiBaasの「public Web3 key」で発行した専用URLだけを使い、管理APIキーをURLやブラウザへ出さない。APIキーとRPC URL全体を診断ログへ出さない。CLIの管理キーと発行者鍵はCloudflareへ設定しない。
+Treat the public Web3 RPC URL as a setting exposed to the browser and MetaMask. Use only a dedicated URL issued with a MultiBaas public Web3 key. Do not expose admin API keys through URLs or browsers. Do not log API keys or complete RPC URLs. Do not configure the CLI admin key or issuer key in Cloudflare.
 
-CORSはOrigin完全一致。許可Originへだけ `Access-Control-Allow-Origin` と `Vary: Origin` を付ける。Cookie/credentialsは使わない。OPTIONSはGET/POSTとContent-Typeを許可し204。OriginなしのCLI要求は受理し、未許可・`null` Originは403。CORSを本人認証とは扱わない。実際の登録権限はコントラクトで強制する。
+CORS matches origins exactly. Add `Access-Control-Allow-Origin` and `Vary: Origin` only for allowed origins. Do not use cookies or credentials. OPTIONS allows GET, POST, and Content-Type and returns 204. Accept CLI requests without Origin. Reject unapproved origins and `null` origins with 403. CORS is not user authentication; the contract enforces registration permissions.
 
-## 4. 公開API契約
+## 4. Public API contract
 
-既存の成功 `{meta:{mode},data}` とエラー `{meta:{mode},error:{code,message}}` を維持する。`message` は診断用の英語。UIはcodeと状態から日英文言を選ぶ。全応答に `Cache-Control: no-store` を必須とし、配信側の追加指定を許容する。
+Keep the existing success `{meta:{mode},data}` and error `{meta:{mode},error:{code,message}}` formats. `message` is diagnostic English. The UI chooses Japanese or English copy from the code and state. Every response requires `Cache-Control: no-store`, with additional delivery directives allowed.
 
-| API | liveの処理 |
+| API | Live behavior |
 | --- | --- |
-| `GET /api/v1/connection` | 設定、MultiBaas認証、チェーン、最新ブロック、RPC、コントラクトを順に確認 |
-| `GET /api/v1/cards/{cardId}` | コントラクトのカード状態と登録証跡を取得。未接続の第三者も利用可能 |
-| `POST /api/v1/cards/{cardId}/registration/prepare` | 登録条件を確認し、MultiBaasから未署名register取引を取得 |
-| `GET /api/v1/cards/{cardId}/transactions/{txHash}` | 取引・レシート・イベント・現在の登録内容を照合 |
+| `GET /api/v1/connection` | Check configuration, MultiBaas authentication, chain, latest block, RPC, and contract in sequence |
+| `GET /api/v1/cards/{cardId}` | Read contract state and registration evidence; available to viewers without a wallet connection |
+| `POST /api/v1/cards/{cardId}/registration/prepare` | Check registration conditions and obtain an unsigned register transaction from MultiBaas |
+| `GET /api/v1/cards/{cardId}/transactions/{txHash}` | Compare the transaction, receipt, event, and current registration |
 
-liveでは `X-Mock-Scenario` が存在したら400 `INVALID_MOCK_SCENARIO`。既存mockのliveヘッダー拒否試験はこのコードへ揃える。mockの3 API、固定値、19シナリオは維持する。接続APIのmock応答は `mode:mock` を明示し、`status:"mock"` と固定registryだけを返す。実接続のready状態に見せない。
+In live mode, any `X-Mock-Scenario` header returns 400 `INVALID_MOCK_SCENARIO`. Align existing live-header rejection tests with this code. Preserve the three mock APIs, fixed values, and 19 scenarios. The mock connection response explicitly returns `mode:mock`, `status:"mock"`, and a fixed registry only. It must not resemble live ready status.
 
-### 接続確認
+### Connection checks
 
-設定不足は503 `CONFIGURATION_MISSING`。このコードに限り `error.details` を `{missingSettings: string[]}` として追加し、値は返さない。それ以外のエラーは既存のcode/message形式を使う。詳細フィールドはOpenAPIでコード別のunionとして定義する。
+Missing settings return 503 `CONFIGURATION_MISSING`. Only this code adds `error.details` as `{missingSettings: string[]}`; never return setting values. Other errors retain code/message. Define details as a code-specific union in OpenAPI.
 
-成功時のdataは次の構造とする。値は設定・実取得値で埋め、mock用の値を混ぜない。
+Successful data has the following structure. Populate values from configuration and actual reads without mixing in mock values.
 
 ```text
 {
@@ -100,92 +102,92 @@ liveでは `X-Mock-Scenario` が存在したら400 `INVALID_MOCK_SCENARIO`。既
 }
 ```
 
-MultiBaasのchain ID、RPCの `eth_chainId`、期待設定を比較する。MultiBaasにリンクしたaddress/ABI version、RPCの `eth_getCode`、コントラクトの `issuer()` / `schemaVersion()` を確認する。期待するABIだけを使用し、リクエストで任意の関数を受け付けない。readyはその時点の疎通成功で、未接続のMetaMaskや将来の取引成功を保証しない。登録準備でもチェーンと配置先の対応を確認する。
+Compare the MultiBaas chain ID, RPC `eth_chainId`, and expected configuration. Check the MultiBaas-linked address and ABI version, RPC `eth_getCode`, and contract `issuer()` and `schemaVersion()`. Use only the expected ABI; requests cannot select arbitrary functions. Ready means connectivity succeeded at that time. It does not guarantee an unconnected MetaMask wallet or a future transaction. Registration preparation also checks chain and deployment correspondence.
 
-### カードと登録準備
+### Cards and registration preparation
 
-既存の `cardId` の英数字・`_`・`-`、1〜64文字を維持する。住所・ハッシュの形式も維持し、16進値だけを小文字へ正規化する。カード名は今回「証明一郎」のアプリ側表示値とし、別選手・画像管理のAPIは追加しない。
+Keep `cardId` restricted to 1–64 alphanumeric, `_`, or `-` characters. Preserve address and hash formats and lowercase only hexadecimal values. The app supplies the card name Shomei Ichiro. Do not add APIs for other players or image management.
 
-登録準備の必須JSONは `walletAddress`、`chainId`、`nickname` の3フィールドだけ。本文上限は既存どおり16 KiB。自由入力はliveだけに導入し、UTF-8で1〜96バイト、空白除去・Unicode正規化なしとする。JSONの孤立サロゲートを400にし、エンコード時の置換文字による変化を防ぐ。OpenAPIにliveのUTF-8制約を記載し、バイト長とUnicodeの妥当性はHTTP境界で検証する。mockの既存入力契約は維持する。
+Preparation requires exactly three JSON fields: `walletAddress`, `chainId`, and `nickname`. Keep the 16 KiB body limit. Introduce free-form input only in live mode, with 1–96 UTF-8 bytes and no trimming or Unicode normalization. Reject isolated JSON surrogates with 400 to prevent changes through replacement characters during encoding. Document live UTF-8 restrictions in OpenAPI and check byte length and Unicode validity at the HTTP boundary. Preserve the existing mock input contract.
 
-形式・サイズ、liveのシナリオヘッダー、設定、上流取得、未発行、登録済み、チェーン、許可ウォレットの順で判定する。サーバーでのアドレス一致は取引準備の条件であり、本人確認済みとはしない。
+Check format and size, the live scenario header, settings, upstream retrieval, unissued state, already-registered state, chain, and allowed wallet in that order. Server-side address equality is a preparation condition, not proof of identity.
 
-返す取引は既存形式の `{chainId,from,to,data,value:"0"}`。nonce/gas/手数料は含めずMetaMask側に委ねる。ABIでcalldataをdecodeし、`register(cardId,nickname)`、from、to、chainId、valueを検証してから返す。liveでは `data:"0x"` を拒否する。準備要求は一切送信しない。
+Return the existing transaction format `{chainId,from,to,data,value:"0"}`. Omit nonce, gas, and fees; MetaMask chooses them. Decode calldata through the ABI and verify `register(cardId,nickname)`, from, to, chainId, and value before returning it. Reject `data:"0x"` in live mode. Preparation never sends a transaction.
 
-APIに入力した名前が登録結果と同じであることをUIも照合する。APIへクライアントの期待値を渡して、それ自体をチェーン証拠にする処理は作らない。
+The UI also checks that the submitted name matches the registration result. Do not treat client-supplied expected values as chain evidence.
 
-### エラー
+### Errors
 
-既存400/404/409/413/415/422/500/503を維持し、次を追加する。mockの既存エラー応答は変更しない。
+Preserve existing 400, 404, 409, 413, 415, 422, 500, and 503 behavior, and add the following. Existing mock error responses remain unchanged.
 
-| HTTP・code | 条件 |
+| HTTP and code | Condition |
 | --- | --- |
-| 400 `INVALID_INPUT` | liveの名前が空・96バイト超過・不正なUnicodeを含む場合も含む |
-| 403 `ORIGIN_NOT_ALLOWED` | 許可されていないOrigin |
-| 503 `CONFIGURATION_MISSING` | live設定が不足。項目名だけを追加情報に含める |
-| 503 `CONNECTION_MISMATCH` | チェーン・配置先・発行者・schemaVersionが設定と一致しない |
-| 503 `MULTIBAAS_AUTH_FAILED` | 上流の401/403。利用者のウォレット認証失敗とは表示しない |
-| 503 `UPSTREAM_TIMEOUT` | 上流呼出しの時間切れ |
-| 503 `UPSTREAM_UNAVAILABLE` | ネットワーク、429/5xx、不明な404、JSON/ABI不正など |
+| 400 `INVALID_INPUT` | Includes empty live names, names over 96 bytes, and invalid Unicode |
+| 403 `ORIGIN_NOT_ALLOWED` | Unapproved origin |
+| 503 `CONFIGURATION_MISSING` | Missing live settings; details include names only |
+| 503 `CONNECTION_MISMATCH` | Chain, deployment, issuer, or schemaVersion differs from configuration |
+| 503 `MULTIBAAS_AUTH_FAILED` | Upstream 401/403; do not present as the user's wallet authentication failure |
+| 503 `UPSTREAM_TIMEOUT` | Upstream call timed out |
+| 503 `UPSTREAM_UNAVAILABLE` | Network errors, 429/5xx, unknown 404, invalid JSON or ABI, and similar failures |
 
-GET connectionの例: 未設定なら503とmissingSettings、認証失敗なら503 MULTIBAAS_AUTH_FAILED、設定した別チェーンへ接続した場合は503 CONNECTION_MISMATCH。成功と通信障害を200の同じ状態で表さない。
+For GET connection, missing settings return 503 with missingSettings, authentication failure returns 503 MULTIBAAS_AUTH_FAILED, and a different configured chain returns 503 CONNECTION_MISMATCH. Do not represent success and communication failure as the same 200 state.
 
 ## 5. MultiBaas Gateway
 
-ブラウザからMultiBaas管理RESTを直接呼ばない。WorkerのfetchでベースURLと固定パスを組み立て、Bearerキーを付ける。fetchのredirectはmanualにし、3xxを上流エラーとして拒否する。1回の上流呼出しは10秒、1 API全体は30秒で打ち切り、自動再送・自動リトライは行わない。ログには操作・エラー分類・サービス種別・HTTP status・例外名だけを残す。
+The browser must not call MultiBaas management REST directly. Worker fetch combines the base URL with fixed paths and adds the Bearer key. Use manual redirects and reject 3xx as upstream errors. Limit each upstream call to 10 seconds and each complete API request to 30 seconds. Do not automatically resend or retry. Log only operation, error category, service type, HTTP status, and exception name.
 
-| Gateway操作 | API・変換方針 |
+| Gateway operation | API and conversion policy |
 | --- | --- |
-| 接続状態 | `GET /chains/ethereum/status` の `result.chainID` とblockNumber |
-| 最新・特定ブロック | `GET /chains/ethereum/blocks/{block}`。`latest`または番号を指定 |
-| readCard / issuer / schemaVersion | `POST /chains/ethereum/addresses/{address}/contracts/{label}/methods/{method}` の参照関数。実行先と関数は固定 |
-| buildRegistrationTransaction | 同じ関数APIへ `register` とargs/from/`signAndSubmit:false` を渡す |
-| getTransaction | `GET /chains/ethereum/transactions/{hash}`。hash、chain、from、to、inputを内部型に変換 |
-| getReceipt | `GET /chains/ethereum/transactions/receipt/{hash}`。status、hash、blockHash、blockNumber、raw logsを検証 |
-| findRegistrationEvent | `GET /events` をcontract_address・event_signatureで絞り、ページ内のcardKey/cardIdを照合。配置ブロック以前を除外する |
+| Connection status | `result.chainID` and blockNumber from `GET /chains/ethereum/status` |
+| Latest or specific block | `GET /chains/ethereum/blocks/{block}`, using `latest` or a number |
+| readCard / issuer / schemaVersion | Read functions through `POST /chains/ethereum/addresses/{address}/contracts/{label}/methods/{method}` with fixed destination and function |
+| buildRegistrationTransaction | The same methods API with `register`, args, from, and `signAndSubmit:false` |
+| getTransaction | `GET /chains/ethereum/transactions/{hash}`; convert hash, chain, from, to, and input to internal types |
+| getReceipt | `GET /chains/ethereum/transactions/receipt/{hash}`; validate status, hash, blockHash, blockNumber, and raw logs |
+| findRegistrationEvent | Filter `GET /events` by contract_address and event_signature, compare cardKey/cardId within pages, and exclude events before deployment |
 
-応答ラッパー `{status,message,result}` を検証する。未署名取引は `result.tx` と `submitted:false` を要求する。txにchainIdフィールドは定義されていないため、検証したMultiBaasのchainIDから公開取引のchainIdを設定する。取引取得は `result.data.input`、`result.from`、`result.isPending` を使う。isPending=trueの対象取引はreceiptの404を待たずpendingにできる。
+Validate the `{status,message,result}` wrapper. Unsigned transactions require `result.tx` and `submitted:false`. The tx format has no chainId field, so set the public transaction chainId from the verified MultiBaas chainID. Transaction retrieval uses `result.data.input`, `result.from`, and `result.isPending`. A matching transaction with isPending=true may be reported pending without waiting for a receipt 404.
 
-SDKの広い型をそのまま内部へ渡さない。十進/0x数量はパーサーを分け、chain IDとブロック番号は安全な整数だけを受理する。金額は10進文字列、calldataとログは0xバイト列とする。レシートのstatusは成功1・失敗0だけを受理する。
+Do not pass broad SDK types directly into internal logic. Use separate decimal and 0x quantity parsers. Accept only safe integers for chain IDs and block numbers. Amounts are decimal strings; calldata and logs are 0x byte strings. Receipt status accepts only success 1 or failure 0.
 
-MultiBaasは参照関数の `result.output` を任意型として定義している。`getCard` は後述の5項目を返すABIに固定し、配列ならABI順、オブジェクトならABI出力名による形だけを厳密に変換する。boolを文字列からtruthy判定したり、名前をJSON.stringifyで補わない。実環境で取得した応答を秘匿化してfixture化し、追加形式が必要ならAdapterの設計を改訂する。不明形式を推測で受理しない。
+MultiBaas defines read-function `result.output` as arbitrary data. Fix `getCard` to the five-output ABI below. Strictly convert arrays in ABI order or objects with ABI output names. Do not interpret string booleans by truthiness or fill names with JSON.stringify. Sanitize real responses into fixtures and revise the adapter design when additional formats are needed. Do not guess how to accept unknown formats.
 
-MultiBaasの一般的な404は、未発行カードや未取得取引と同じ意味ではない。カード未発行は `getCard` の正常応答 `exists=false` だけで判断する。取引不存在を明示する正常応答・確認済みの上流エラー仕様がない場合は503にする。実環境の404を無条件で200 unknownやpendingに変えない。
+A generic MultiBaas 404 does not mean an unissued card or an unseen transaction. A card is unissued only when a successful `getCard` response has `exists=false`. Without a successful response or verified upstream error contract explicitly establishing transaction absence, return 503. Do not unconditionally convert real 404s to 200 unknown or pending.
 
-イベント一覧にcardId専用のフィルターはない。`contract_address` と `event_signature` を指定し、limit=10とoffsetで最大10ページを読む。カードキーは取得後に検証する。上限か時間切れまでに探索を完了できなければ503にし、未登録や証跡なしと断定しない。イベント内の取引hashは `transaction.txHash` を使う。
+The event listing has no cardId-specific filter. Set `contract_address` and `event_signature` and read up to 10 pages using limit=10 and offset. Validate the card key after retrieval. If the limit or timeout prevents a complete search, return 503 rather than claiming unregistered status or no evidence. Use `transaction.txHash` for the event's transaction hash.
 
-公開カードのownerはコントラクト状態から取得する。登録証跡はイベント検索で候補を得たあと、その取引レシートのログと状態を照合して返す。正常な検索結果が空なら `evidence:pending` としてownerを保持する。検索通信が失敗した場合は503。配置先・カードが違う候補を登録証跡にしない。
+Read the public card owner from contract state. Find candidate registration evidence through event search, then compare receipt logs and state before returning it. If a successful search is empty, retain the owner and return `evidence:pending`. A failed search request returns 503. Candidates for another deployment or card are not registration evidence.
 
-## 6. 取引照合と復帰
+## 6. Transaction checks and return handling
 
-取引のchain ID、hash、from、toに加え、inputをABIでdecodeして関数とカードIDを確認する。該当カードへのregister取引であると確認できる前に、pendingやrevertedと判定しない。
+Alongside chain ID, hash, from, and to, decode input through the ABI to check the function and card ID. Do not report pending or reverted before proving that the transaction calls register for the requested card.
 
-| 条件 | 公開結果 |
+| Condition | Public result |
 | --- | --- |
-| 通信成功と確認済みの仕様で取引不存在を判断できた | unknown / TRANSACTION_NOT_SEEN |
-| 対象のregister取引で `isPending=true`、または確認済みの上流仕様でレシート待ちと判断できた | pending |
-| 対象のregister取引で失敗レシートを確認 | reverted |
-| 成功レシート、正しいイベント、カード状態が一致 | confirmed |
-| 別カード、関数、送信者、宛先、ログ、名前などの対応が不一致 | unknown / RECORD_MISMATCH |
-| API/RPC通信自体が失敗 | 503。unknownに置き換えない |
+| Successful communication and verified behavior establish transaction absence | unknown / TRANSACTION_NOT_SEEN |
+| Matching register transaction has `isPending=true`, or verified upstream behavior establishes receipt waiting | pending |
+| Failed receipt for the matching register transaction | reverted |
+| Successful receipt, correct event, and card state match | confirmed |
+| Card, function, sender, destination, logs, name, or other correspondence differs | unknown / RECORD_MISMATCH |
+| API or RPC communication itself fails | 503; do not replace with unknown |
 
-confirmedではraw logsをローカルABIでdecodeし、emitter、cardKey、cardId、owner、nickname、取引・ブロックを照合する。関数inputの名前とイベント・現在状態の名前も同じであることを求める。ブロック番号から取得したblockHashとレシートのblockHashを比較し、現在の正規ブロック上の1確認を基準とする。最終確定や将来の再編がないことを保証する表現は使わない。再照会で対応が失われたら確認不能に戻せる契約とする。
+For confirmed, decode raw logs with the local ABI and compare emitter, cardKey, cardId, owner, nickname, transaction, and block. The input name must match both event and current state. Compare the blockHash obtained by block number with the receipt blockHash. Use one confirmation on the current canonical block, without claiming finality or freedom from future reorganizations. A later lookup may return an unconfirmed result if correspondence is lost.
 
-イベントインデックスが遅れていても、照会したレシート内ログで確認できればconfirmedにする。取引の再確認から送信APIを呼ばない。サーバーは登録セッション・取引のDBを持たず、API要求だけで再照合する。
+Even if the event index lags, matching receipt logs can establish confirmed status. Transaction rechecks never call a sending API. The server keeps no registration-session or transaction database; it verifies each API request again.
 
-UI担当への引渡し条件:
+UI handoff conditions:
 
-1. 接続APIのreadyと実アカウント・chain IDを確認し、公開同意後にprepareを呼ぶ。
-2. prepare応答のmodeがliveであることとABI・カード・名前・宛先・valueを確認し、送信直前にアカウント/チェーンを再取得する。
-3. MetaMaskへ署名・送信を依頼する。拒否後は確認を開始しない。
-4. hashが得られたら `{chainId,contractAddress,cardId,txHash,nickname}` を端末に保持し、照会する。確認用APIの公開DTOは保存内容を証拠にしない。
-5. 再読込・アプリ復帰は照会だけを再開する。hashが返る前に接続が失われた場合は「送信結果不明」とし、自動再送しない。MetaMaskの履歴からhashを取得して再確認する手順を渡す。
+1. Check connection API ready status, the actual account, and chain ID. Call prepare after consent to publication.
+2. Check live mode, ABI, card, name, destination, and value in the prepare response. Read account and chain again immediately before sending.
+3. Ask MetaMask to sign and send. Do not start confirmation after rejection.
+4. After receiving a hash, save `{chainId,contractAddress,cardId,txHash,nickname}` on the device and query it. The public confirmation DTO does not treat saved client data as evidence.
+5. On reload or return, resume only the query. If connection is lost before a hash is returned, report an unknown send outcome and do not resend automatically. Provide a procedure to obtain the hash from MetaMask history and recheck it.
 
-MetaMask Connect EVMの導入、状態表示、端末保存、実機試験のブラウザ操作はUI担当が実装する。本PRはこれらのコードを追加しない。
+The UI owner implements MetaMask Connect EVM, state displays, device storage, and physical-device browser tests. This PR does not add those UI implementations.
 
-## 7. コントラクト
+## 7. Contract
 
-SolidityとHardhatを使い、コンパイル対象EVMはParisに固定する案とする。Curvegridの最新EVM機能対応を仮定しない。最終採用バージョンは実装時に互換条件を確認してlockfileとコンパイラ設定へ固定する。
+The proposal uses Solidity and Hardhat and fixes the target EVM to Paris. Do not assume support for the latest EVM features on Curvegrid. At implementation time, check compatibility and pin final versions in the lockfile and compiler configuration.
 
 ```text
 constructor(address issuer_)
@@ -200,103 +202,105 @@ CardRegistered(bytes32 indexed cardKey, string cardId,
                address indexed owner, string nickname)
 ```
 
-`cardKey = keccak256(bytes(cardId))` をmappingキーとする。カードIDの元文字列はイベントに残す。Cardはexists、allowedWallet、owner、nicknameを保持し、registeredはowner != address(0)から導出する。issuerはimmutableで、ゼロアドレスを拒否する。管理者の変更、proxy、upgrade、転送、削除、任意外部呼出しは持たない。
+Use `cardKey = keccak256(bytes(cardId))` as the mapping key. Keep the original card ID string in events. Card stores exists, allowedWallet, owner, and nickname. Derive registered from owner != address(0). The immutable issuer rejects the zero address. There is no administrator replacement, proxy, upgrade, transfer, deletion, or arbitrary external call.
 
-issueはmsg.sender == issuer、IDがASCII英数字/`_`/`-`の1〜64バイト、未発行、allowedWallet != 0を要求する。発行後の許可ウォレット変更も拒否する。発行は登録完了ではない。
+In this original restricted-card design, issue requires msg.sender == issuer, a 1–64 byte ID containing ASCII letters, digits, `_`, or `-`, no existing issuance, and allowedWallet != 0. It also rejects changes to the allowed wallet after issuance. Issuance does not complete registration. The correction at the start of this document supersedes the zero-address restriction for unrestricted demo cards.
 
-registerはカードの存在、未登録、msg.sender == allowedWallet、名前のバイト長1〜96を要求する。ownerとnicknameを同じ取引で保存してイベントを出す。nonpayableとし、送金を受けない。コントラクトの名前制約はバイト長であり、実名・唯一性・Unicode正規化を保証しない。APIのUTF-8境界検証をコントラクトが代行したとは扱わない。
+For a restricted card, register requires that the card exists, is unregistered, msg.sender == allowedWallet, and the name is 1–96 bytes. It saves owner and nickname in the same transaction and emits an event. It is nonpayable and accepts no funds. The contract's name constraint is byte length, not real identity, uniqueness, or Unicode normalization. It does not replace the API's UTF-8 boundary validation.
 
-`getCard` の未発行は `(false,0,false,0,"")`。二重登録はコントラクト側でも拒否し、APIの事前確認と送信の間に状態が変わっても最後の書込みで上書きしない。custom errorは UnauthorizedIssuer、InvalidCardId、InvalidWallet、CardAlreadyIssued、CardNotFound、AlreadyRegistered、WalletNotAllowed、InvalidNicknameLength とする。
+An unissued `getCard` returns `(false,0,false,0,"")`. The contract also rejects duplicate registration, preventing a later write from overwriting a registration if state changes between API checks and sending. Custom errors are UnauthorizedIssuer, InvalidCardId, InvalidWallet, CardAlreadyIssued, CardNotFound, AlreadyRegistered, WalletNotAllowed, and InvalidNicknameLength.
 
-## 8. 発行者CLIと再実行
+## 8. Issuer CLI and reruns
 
-CLIはNode.js/TypeScript、ローカル署名とABI処理にethersを使用する。コントラクトのコンパイル・ローカル試験はHardhat。ブラウザの署名ライブラリはUI担当の選定に委ね、EIP-1193と公開取引形式で接続する。
+The CLI uses Node.js and TypeScript, with ethers for local signing and ABI handling. Hardhat compiles contracts and runs local tests. The UI owner chooses the browser signing library and integrates through EIP-1193 and the public transaction format.
 
-| コマンド | 動作 |
+| Command | Behavior |
 | --- | --- |
-| `issuer deploy --state <file> --keystore <file>` | コンパイル済みABI/bytecodeをMultiBaas Libraryへ登録し、未署名配置取引を作成。ローカル署名・送信後にreceiptと配置先を確認し、ABIリンク・イベント同期設定を行う |
-| `issuer issue --card-id <id> --wallet <address> --state <file> --keystore <file>` | 既発行状態を読み、未署名issueをMultiBaasで作成して照合。ローカル署名・送信・確認後に公開確認用API URLを出力 |
-| `issuer show --card-id <id>` | MultiBaas経由で状態を表示。署名鍵は不要 |
-| `issuer resume --state <file>` | 同じ記録の取引を確認し、配置後リンクなどの未完了処理を再開。別取引を自動生成しない |
+| `issuer deploy --state <file> --keystore <file>` | Register compiled ABI/bytecode in the MultiBaas Library and prepare unsigned deployment. After local signing and sending, verify receipt and deployment, then configure ABI linking and event synchronization |
+| `issuer issue --card-id <id> --wallet <address> --state <file> --keystore <file>` | Read existing issuance and prepare and validate unsigned issue through MultiBaas. After local signing, sending, and confirmation, print the public verification API URL |
+| `issuer show --card-id <id>` | Display state through MultiBaas; no signing key required |
+| `issuer resume --state <file>` | Check the recorded transaction and resume incomplete steps such as post-deployment linking. Never automatically create another transaction |
 
-Library登録は `POST /contracts/{label}` に `label,contractName,version,rawAbi,bin` を送る。rawAbiはABI JSONの文字列。配置は `POST /contracts/{label}/{version}/deploy` にconstructor引数、from、signAndSubmit:falseを渡す。receiptのcontractAddressを正として配置成功を判断し、API応答の任意フィールドdeployAtだけに依存しない。リンクは `POST /chains/ethereum/addresses/{address}/contracts` にlabel/version/startingBlockを送る。startingBlockは配置receiptの数値を10進文字列にし、再開時にlatestへ置換しない。
+The table preserves the original restricted-issuance command. For current unrestricted demo issuance, omit `--wallet`, as described in the opening correction.
 
-CLIは別の `MULTIBAAS_ADMIN_API_KEY` と `ISSUER_KEYSTORE_PATH` を使う。復号パスワードは非表示の対話入力。鍵・パスワードをargvや出力、PRへ残さない。発行者と登録者の鍵を兼用する前提にしない。Web APIにissue/deploy操作を追加しない。
+Library registration sends `label,contractName,version,rawAbi,bin` to `POST /contracts/{label}`. rawAbi is a JSON ABI string. Deployment sends constructor arguments, from, and signAndSubmit:false to `POST /contracts/{label}/{version}/deploy`. The receipt's contractAddress establishes successful deployment; do not rely only on an arbitrary deployAt response field. Linking sends label/version/startingBlock to `POST /chains/ethereum/addresses/{address}/contracts`. Convert startingBlock from the deployment receipt number to a decimal string; do not replace it with latest on resume.
 
-署名前にRPCのchain IDと発行者アドレスを照合し、pending nonce、gas見積り、手数料を取得する。baseFee対応時はEIP-1559、それ以外はlegacyの手数料を使う。deployではbytecodeとconstructor引数、issueでは宛先・関数・引数・valueをローカルABIで照合する。照合や見積りが失敗したら署名・送信しない。確定したnonceと手数料を含む同一取引だけを再送対象にする。
+The CLI uses a separate `MULTIBAAS_ADMIN_API_KEY` and `ISSUER_KEYSTORE_PATH`. Enter the decryption password through hidden terminal input. Do not leave keys or passwords in argv, output, or PRs. Do not assume issuer and registering wallets share a key. Do not add issue or deploy operations to the Web API.
 
-stateファイルはGit管理外、0600権限とし、chain、issuer、コントラクト/bytecode hash、引数、nonce、署名済みraw tx、そのhash、工程を保存する。秘密鍵は保存しないが、署名済み取引は再送可能なため公開しない。送信前に原子的に保存し、同じstateへの並行操作は排他ファイルで拒否する。
+Before signing, compare RPC chain ID and issuer address, then obtain pending nonce, gas estimate, and fees. Use EIP-1559 when baseFee is supported and legacy fees otherwise. Check deployment bytecode and constructor arguments, or issuance destination, function, arguments, and value, against the local ABI. If validation or estimation fails, do not sign or send. Only the same transaction with its fixed nonce and fees may be rebroadcast.
 
-resumeは最初に既存hashを照会する。見つからないと正常確認できた場合だけ、明示的な `--rebroadcast` で同一raw txを再送できる。通信失敗だけで再送しない。nonceが別取引に使用されていたら要確認として停止する。中断後に新しいstateへ自動退避しない。
+Keep the state file outside Git with mode 0600. Store chain, issuer, contract or bytecode hash, arguments, nonce, signed raw transaction, its hash, and the current step. It has no private key, but the signed transaction can be rebroadcast, so do not publish it. Save atomically before sending. A lock file rejects concurrent operations on the same state.
 
-同じcardIdが既発行の場合、許可ウォレットが一致すれば取引を送らず既存状態を表示する。不一致なら失敗。Libraryの同じlabel/versionでABI/bytecodeが一致すれば再利用し、不一致なら上書きせず停止する。リンクでは配置ブロックを `startingBlock` に必ず設定し、イベント同期を有効にする。配置先の実値は成功後に出力し、環境設定へ反映する。
+Resume first queries the existing hash. Only after a successful check establishes absence may explicit `--rebroadcast` send the identical raw transaction again. Do not resend merely because communication failed. If another transaction consumed the nonce, stop for review. Do not automatically switch to a new state file after interruption.
 
-## 9. 配置、並行開発、移行
+For an already-issued cardId, display existing state without sending if the allowed wallet matches; otherwise fail. Reuse the same Library label/version only if ABI and bytecode match. Stop without overwriting mismatches. Always set linking `startingBlock` to the deployment block and enable event synchronization. After success, print actual deployment values and apply them to environment configuration.
 
-Worker名は `shomei-kun-integration`。既存 `shomei-kun-ui-mock` と `shomei-kun-api-mock` の設定を上書きしない。専用Wrangler設定を追加して明示的に選び、self-referenceも同じWorker名へ向ける。Next.jsとOpenNextは現在の構成を使い、R2/D1は追加しない。
+## 9. Deployment, parallel development, and migration
 
-現在のOpenAPIを直接変更するのは設計承認後。まず共通DTO・fixture・ABIを更新し、UI担当へ契約変更を知らせる。その後Gateway・Service・CLIを実装する。既存mockは引き続きローカルと既存設定で試せる状態を保つ。
+The Worker name is `shomei-kun-integration`. Do not overwrite `shomei-kun-ui-mock` or `shomei-kun-api-mock` settings. Add and explicitly select a dedicated Wrangler configuration, with self-reference pointing to the same Worker name. Use the current Next.js and OpenNext setup without adding R2 or D1.
 
-liveのchainIdは正の安全な整数へ一般化し、値そのものは配置設定で制約する。meta.mode、未登録/登録済み、証跡none/pending/available、取引pending/confirmed/reverted/unknownは維持する。新しい接続応答とエラーだけを追加し、生成型・validator・契約試験を同じ変更で更新する。
+Change the current OpenAPI only after design approval. Update shared DTOs, fixtures, and ABI first, and inform the UI owner of contract changes. Then implement Gateway, Service, and CLI. Keep existing mock behavior available locally and through its existing configuration.
 
-別OriginのUIは、UI担当がAPI base URLを設定する。API担当は実際のUI Originを許可リストに設定する。ワイルドカードCORSや任意RPCの中継を作らない。URLが未定でもAPIコードを設計でき、実値は配置時の設定項目として扱う。
+Generalize live chainId to a positive safe integer and constrain the actual value through deployment settings. Preserve meta.mode, unregistered/registered states, none/pending/available evidence, and pending/confirmed/reverted/unknown transaction states. Add only the new connection response and errors. Update generated types, validators, and contract tests in the same change.
 
-設計承認後の公開手順は、ローカル試験、コントラクト配置、権限・設定確認、Worker公開、実API読取り、本人署名による登録、別端末読取りの順。APIキー未設定やスマホ未検証の段階を「実疎通済み」としない。今回のPR更新ではデプロイしない。
+For a UI on another origin, the UI owner configures the API base URL and the API owner allowlists the actual UI origin. Do not add wildcard CORS or an arbitrary RPC relay. API design can proceed before URLs are known; actual values are deployment settings.
 
-Workerの問題は前バージョンへ戻す。チェーン上の登録はロールバックしない。コントラクト変更が必要なら別配置と新しいカードIDで検証し、既存記録を消さない。Amoy移行も別配置として扱い、Curvegridの記録が自動移行するとは説明しない。
+After design approval, publish in this order: local tests, contract deployment, permission and configuration checks, Worker publication, real API reads, registration signed by the owner, and reads from another device. Do not call the integration verified while API keys are missing or phone checks are incomplete. This PR design update does not deploy.
 
-## 10. 試験と受け入れ条件
+Roll back Worker problems to the previous version. Chain registrations cannot be rolled back. If the contract needs changes, test a separate deployment with new card IDs and preserve existing records. Treat Amoy migration as a separate deployment too; do not claim Curvegrid records migrate automatically.
 
-以下は未実施の試験計画。既存モック試験が通った事実と、新しい実接続試験を分ける。
+## 10. Tests and acceptance criteria
 
-| ID | 試験・期待結果 | 実行環境 |
+These were planned, unexecuted tests at design time. Distinguish passed existing mock tests from new real-connection tests.
+
+| ID | Test and expected result | Environment |
 | --- | --- | --- |
-| C01 | mockの既存3 API・19シナリオ・固定値が変わらない。liveでモックヘッダー拒否 | Node / Next.js / Workers |
-| C02 | 設定不足、管理REST認証拒否、違うchain、違う配置先を成功にしない。Secretを応答・ログへ出さない | 契約試験 + 設定後の実環境 |
-| C03 | 許可Origin・同一Origin・Originなし・拒否OriginとOPTIONS。エラーにもno-store | HTTP |
-| C04 | 未発行404、上流404は503、登録済み409、別wallet/chain422、自由入力の1/96/97バイト・日本語・孤立サロゲート | API |
-| C05 | 発行権限、ゼロaddress、ID不正、重複発行、未発行登録、別wallet、再登録、同時競合、名前長 | ローカルEVM |
-| C06 | register calldata、from/to/chain/valueの改変を準備または確認で拒否 | Gateway / Service |
-| C07 | 別card/owner/name/log、失敗receipt、未取得、通信失敗、blockHash不一致を区別 | Gateway / Service |
-| C08 | イベント検索が空でもowner保持。検索通信失敗は503。receiptだけで照合可能 | Gateway / Service |
-| C09 | 配置・リンクの中断、同一stateの再開、同一cardの再発行、異なる引数、並行CLIを試験。新しい取引を勝手に送らない | ローカル + 設定後の実環境 |
-| C10 | 設定後のGET connection、カード取得、実取引登録、再読込・未接続の別端末読取りが一致 | Curvegrid Testnet |
-| C11 | 通常ブラウザ→MetaMask→復帰、拒否、アカウント/chain切替、hash取得前の切断、送信後再照会、自動再送なし | UI担当とのスマホ結合試験 |
-| C12 | 320/390px・PC幅、日英、表示崩れとコンソールエラーを確認 | UI担当 |
+| C01 | Existing three mock APIs, 19 scenarios, and fixed values unchanged; mock headers rejected in live mode | Node / Next.js / Workers |
+| C02 | Missing settings, REST authentication rejection, wrong chain, and wrong deployment never return success; no Secrets in responses or logs | Contract tests and configured live environment |
+| C03 | Allowed, same, absent, and rejected origins and OPTIONS; errors also use no-store | HTTP |
+| C04 | Unissued 404, upstream 404 as 503, registered 409, other wallet/chain 422, free-form 1/96/97-byte names, Japanese, isolated surrogates | API |
+| C05 | Issuer permissions, zero address, invalid ID, duplicate issuance, unissued registration, another wallet, repeat and concurrent registration, name length | Local EVM |
+| C06 | Modified register calldata, from, to, chain, or value rejected during preparation or confirmation | Gateway / Service |
+| C07 | Distinguish wrong card, owner, name, logs, failed receipt, absence, communication failure, and blockHash mismatch | Gateway / Service |
+| C08 | Retain owner on empty event search; search failure returns 503; receipt alone can establish a match | Gateway / Service |
+| C09 | Interrupted deployment/linking, resume of the same state, reissuance of the same card, different arguments, and concurrent CLI; no unsolicited new transaction | Local and configured live environment |
+| C10 | After configuration, connection GET, card reads, real registration, reload, and disconnected reads from another device agree | Curvegrid Testnet |
+| C11 | Browser to MetaMask and back, rejection, account/chain switching, loss before hash, re-query after sending, no automatic resend | Phone integration with UI owner |
+| C12 | Check 320/390px and desktop widths, Japanese and English, layout failures, and console errors | UI owner |
 
-C10/C11の実測記録にはchain ID、contract、cardId、登録hash、block、使用端末、確認日時を残す。APIキーや署名済みraw txは含めない。F/A要件への適用範囲を記録し、A07の公開チェーン照合は未達のままにする。
+For C10/C11, record chain ID, contract, cardId, registration hash, block, device, and check time. Do not include API keys or signed raw transactions. Record coverage of F/A requirements and keep A07 public-chain verification incomplete.
 
-## 11. レビューの確認項目
+## 11. Review checklist
 
-- 自由入力の1〜96 UTF-8バイトと文字列を変えない方針。
-- 発行者固定・許可変更なし・一度限りの登録ABI。
-- 別URLのAPI、接続確認応答、エラー、CORS、公開Web3設定をUIへ渡す境界。
-- ローカル暗号化キーストア、再開用state、配置・発行CLIの操作。
-- 既存mock互換性と、ユーザー承認後にだけ実装・実接続検証へ進む手順。
+- Free-form input of 1–96 UTF-8 bytes with no string modification.
+- Fixed issuer, immutable allowed wallet, and one-time registration ABI.
+- Boundaries for the separate API URL, connection response, errors, CORS, and public Web3 settings passed to the UI.
+- Local encrypted keystore, resume state, and deployment and issuance CLI operations.
+- Existing mock compatibility and implementation and live verification only after user approval.
 
-承認済みのPRコミットSHAとユーザーの確認への参照は変更記録に保存した。OpenSpecのartifactが揃っていても承認済みにしない。
+The change log records the approved PR commit SHA and the user's confirmation. Complete OpenSpec artifacts alone do not establish approval.
 
-## 12. 根拠と未取得の環境情報
+## 12. Sources and environment information not yet obtained
 
-公式資料から確認したAPIの使い方と、接続していない実環境の事実を分ける。MultiBaasのURL、キー、実ABI応答、RPC、chain ID、権限、同期状態、スマホ動作は未確認。後から設定・取得する値であり、設計の成功例ではない。
+Distinguish documented API usage from facts about an environment not yet connected at design time. MultiBaas URL, keys, actual ABI responses, RPC, chain ID, permissions, synchronization, and phone behavior were unverified. They are values to configure or retrieve later, not successful design examples.
 
-- [Curvegrid TestnetのWeb3設定とFaucet](https://docs.curvegrid.com/multibaas/networks/curvegrid-testnet/)
-- [管理APIキーと公開Web3キー](https://docs.curvegrid.com/multibaas/api-keys/)
-- [未署名取引とブラウザ署名](https://docs.curvegrid.com/multibaas/getting-started/build-a-frontend/)
-- [MultiBaas TypeScript SDKのChains API](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/ChainsApi.md)
-- [コントラクト管理](https://docs.curvegrid.com/multibaas/manage-contracts/)
+- [Curvegrid Testnet Web3 settings and faucet](https://docs.curvegrid.com/multibaas/networks/curvegrid-testnet/)
+- [Management API keys and public Web3 keys](https://docs.curvegrid.com/multibaas/api-keys/)
+- [Unsigned transactions and browser signing](https://docs.curvegrid.com/multibaas/getting-started/build-a-frontend/)
+- [MultiBaas TypeScript SDK Chains API](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/ChainsApi.md)
+- [Contract management](https://docs.curvegrid.com/multibaas/manage-contracts/)
 - [MetaMask Connect EVM](https://docs.metamask.io/metamask-connect/evm/)
-- [関数引数と未署名取引](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/PostMethodArgs.md)
-- [未署名txのフィールド](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/TransactionToSignTx.md)
-- [参照関数のoutput](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/MethodCallResponse.md)
-- [取引とisPending](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/TransactionData.md)
-- [イベント一覧](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/EventsApi.md)
-- [Library登録](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/BaseContract.md)
-- [リンクと開始ブロック](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/LinkAddressContractRequest.md)
-- [会話の選択と出典](../docs/prompts/curvegrid-integration-decisions.md)
+- [Function arguments and unsigned transactions](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/PostMethodArgs.md)
+- [Unsigned transaction fields](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/TransactionToSignTx.md)
+- [Read-function output](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/MethodCallResponse.md)
+- [Transactions and isPending](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/TransactionData.md)
+- [Event listing](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/EventsApi.md)
+- [Library registration](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/BaseContract.md)
+- [Linking and starting blocks](https://github.com/curvegrid/multibaas-sdk-typescript/blob/main/docs/LinkAddressContractRequest.md)
+- [Conversation decisions and sources](../docs/prompts/curvegrid-integration-decisions.md)
 
-## 13. 実装への参照
+## 13. Implementation references
 
-[起動・UI接続手順](CURVEGRID_INTEGRATION_RUNBOOK.md)、[SolidityとCLI](../contracts/README.md)、[OpenAPI](openapi.yaml) を参照。ABIはコンパイル成果物をAPIとCLIで共有する。MultiBaasのABIリンクはaddress取得のcontractsで確認し、Libraryのラベル・バージョンとABIも照合する。
+See the [startup and UI connection runbook](CURVEGRID_INTEGRATION_RUNBOOK.md), [Solidity and CLI guide](../contracts/README.md), and [OpenAPI](openapi.yaml). The API and CLI share the compiled ABI artifact. Check MultiBaas ABI linking through the address's contracts and compare the Library label, version, and ABI.
 
-本書のC10/C11/C12は実環境・UI担当との結合確認として残る。ローカル試験を実疎通の実績には数えない。
+C10/C11/C12 in this document remain live-environment and UI integration checks at this stage. Local tests are not evidence of real connectivity.

@@ -1,38 +1,40 @@
-# Curvegrid疎通試験と課題
+English | [日本語](CURVEGRID_CONNECTIVITY_REPORT.ja.md)
 
-2026-09-26 JST。初回対象はPR #1の `bcfcede`。初回は設定不足で停止した。その後、ユーザーが設定した認証情報でMultiBaasの状態・ブロック・Libraryを実際に読み取り、今回のABI登録に成功した。その後、Testnetへの配置・発行・登録とローカルAPIの証跡読取りに成功した。専用Workerでも接続・所有者・登録取引・再読込み・二重登録拒否を確認した。ローカルAPI起動、管理REST疎通、チェーン書込みを区別する。
+# Curvegrid connectivity tests and issues
 
-最新UIへの接続・署名・公開ブラウザ試験の追加結果は [UI接続結果](UI_LIVE_CONNECTION_REPORT.md) を参照。
+2026-09-26 JST. The initial target was PR #1 at `bcfcede`. The first attempt stopped because settings were missing. Using credentials later configured by the user, the team read MultiBaas status, blocks, and Library entries and registered this ABI. Deployment, issuance, registration on the testnet, and evidence retrieval through the local API then succeeded. The dedicated Worker also passed connectivity, owner, registration transaction, reload, and duplicate-registration rejection checks. Local API startup, management REST access, and chain writes are distinct results.
 
-## 最新mainの取込み
+See the [UI connection report](UI_LIVE_CONNECTION_REPORT.md) for later results involving the latest UI, signing, and public browser tests.
 
-ユーザーの指示で `git pull --rebase origin main` を実行した。取得できた `origin/main` は `cdb1ffe`。初回時点は取り込み済みだった。今回の終了前に再取得すると `origin/main` は `3598094` へ進んでいたため、そこへリベースした。`HACKATHON_CHANGES.md` の追記競合はUI・API双方を残して解消した。リベース前後の `apps/web` と `contracts` の差分は0件で、検証済みコードは同一。
+## Incorporating the latest main
 
-## 初回に実行した確認
+At the user's request, `git pull --rebase origin main` fetched `origin/main` at `cdb1ffe`. The branch already included it at the first check. Before completion, a second fetch found `origin/main` at `3598094`, so the work was rebased onto that commit. An append conflict in `HACKATHON_CHANGES.md` was resolved by preserving both UI and API entries. There were no differences in `apps/web` or `contracts` before and after the rebase, so the verified code remained unchanged.
 
-| 確認 | 実測結果 |
+## Initial checks
+
+| Check | Observed result |
 | --- | --- |
-| 接続設定の有無 | 専用worktree・元の作業場所のルート、apps/web、contractsの `.env*` / `.dev.vars*` とシェル変数を確認。MultiBaas関連設定なし。値は出力していない |
-| live API起動 | `BACKEND_MODE=live PUBLIC_API_ORIGIN=http://127.0.0.1:3108 npm run start -- --hostname 127.0.0.1 --port 3108` で起動 |
-| `GET /api/v1/connection` | 503、`meta.mode=live`、`CONFIGURATION_MISSING`、`Cache-Control: no-store` |
-| `GET /api/v1/cards/connectivity-check` | 同じ503。未発行・未登録の判定やカード発行はしていない |
-| 登録準備へのOPTIONS | 204。同一Originを許可し、GET/POSTとContent-Typeのpreflightに応答 |
-| Cloudflare専用Worker | 外部ネットワーク権限で `wrangler deployments list --config wrangler.integration.jsonc` を実行。`shomei-kun-integration` は未存在、Cloudflare code 10007 |
+| Connection settings | Checked `.env*`, `.dev.vars*`, and shell variables in the dedicated worktree and original checkout, including root, apps/web, and contracts. No MultiBaas settings were present. Values were not printed |
+| Live API startup | Started with `BACKEND_MODE=live PUBLIC_API_ORIGIN=http://127.0.0.1:3108 npm run start -- --hostname 127.0.0.1 --port 3108` |
+| `GET /api/v1/connection` | 503, `meta.mode=live`, `CONFIGURATION_MISSING`, and `Cache-Control: no-store` |
+| `GET /api/v1/cards/connectivity-check` | Same 503. No classification as unissued or unregistered, and no card issuance |
+| OPTIONS for registration preparation | 204. Allowed the same origin and answered preflight for GET, POST, and Content-Type |
+| Dedicated Cloudflare Worker | Ran `wrangler deployments list --config wrangler.integration.jsonc` with external network access. `shomei-kun-integration` did not exist; Cloudflare code 10007 |
 
-Cloudflareの結果は専用Workerの不存在であり、認証情報の不正やMultiBaasの障害とは判断しない。APIは固定mockへ切り替わらず、設定不足で停止した。既存UI用Workerは変更していない。
+The Cloudflare result indicated a missing dedicated Worker, not invalid credentials or a MultiBaas outage. The API stopped on missing settings rather than switching to fixed mocks. The existing UI Worker was not changed.
 
-## 課題と対応（初回）
+## Initial issues and actions
 
-| ID | 分類 | 課題・影響 | 次の対応 |
+| ID | Classification | Issue and impact | Next action |
 | --- | --- | --- | --- |
-| C-01 | 実測した阻害要因 | MultiBaas接続設定がなく、チェーンへ到達できない | 設定済みファイルの場所を確認する。未設定ならgit管理外の `apps/web/.env.local` へ設定する |
-| C-02 | 実測した未配置 | 専用Workerがなく、別URLから呼べない | 接続確認後、専用構成へ変数・Secretを登録して配置する |
-| C-03 | 書込み試験の前提 | 配置先・発行者・許可ウォレット・署名手段が未提供。コントラクトの実際の配置有無は未確認 | 既配置ならその情報を設定。新規配置ならCLI用管理キー、発行者キーストア、ガス代を準備する。復号パスワードは本人が端末入力する |
-| C-04 | 未検証 | MultiBaasの実応答形式、権限、ABIリンク、イベント同期の互換性が未確認 | 接続後に実応答を検証し、機密情報を除いたfixtureと結果を保存する |
-| C-05 | UI結合の前提 | このPRはAPI・コントラクト・CLIを担当。既存のUIモックは実MetaMask署名へ未接続 | UI担当と接続先・実ウォレット・スマホ復帰の試験を合わせる |
-| C-06 | ローカル起動の注意 | `next start` がstandalone構成用serverの使用を推奨する警告を出す。今回のHTTP応答は取得できた | 開発中の確認は `npm run dev`、Workersの確認は専用OpenNext構成を使用する。Cloudflare配置失敗とは扱わない |
+| C-01 | Observed blocker | Missing MultiBaas settings prevented chain access | Locate a configured file or set values in Git-excluded `apps/web/.env.local` |
+| C-02 | Observed missing deployment | No dedicated Worker was available at a separate URL | After connectivity checks, configure variables and Secrets and deploy the dedicated configuration |
+| C-03 | Write-test prerequisite | Deployment, issuer, allowed wallet, and signing method were not provided. Actual contract deployment was unknown | Configure an existing deployment or prepare a CLI admin key, issuer keystore, and gas for a new deployment. The owner enters the password at the terminal |
+| C-04 | Unverified | Real MultiBaas formats, permissions, ABI links, and event synchronization compatibility were unknown | Verify real responses after connecting and save sanitized fixtures and results |
+| C-05 | UI integration prerequisite | This PR covered API, contract, and CLI. The existing UI mock did not sign with real MetaMask | Coordinate endpoint, real wallet, and phone-return tests with the UI owner |
+| C-06 | Local startup note | `next start` warned that the standalone server was recommended. HTTP responses were obtained | Use `npm run dev` for development and dedicated OpenNext configuration for Workers. Do not classify this as Cloudflare deployment failure |
 
-C-01で不足したAPI設定は以下の9項目。`PUBLIC_API_ORIGIN` は今回ローカル試験用に指定した。
+C-01 lacked these nine API settings. `PUBLIC_API_ORIGIN` was supplied for the local test.
 
 ```text
 MULTIBAAS_BASE_URL
@@ -46,114 +48,116 @@ REGISTRY_ISSUER
 CURVEGRID_PUBLIC_WEB3_RPC_URL
 ```
 
-項目の用途は [起動手順](CURVEGRID_INTEGRATION_RUNBOOK.md) を参照。APIキー・秘密鍵・復号パスワードをチャットやPRへ貼らない。
+See the [runbook](CURVEGRID_INTEGRATION_RUNBOOK.md) for each setting's purpose. Do not paste API keys, private keys, or decryption passwords into chat or PRs.
 
-## 設定後に行う試験
+## Tests after configuration
 
-1. MultiBaasとRPCのchain ID、配置先のコード、ABI、発行者を照合し、接続確認APIのreadyを確認する。
-2. 試験専用カードを発行し、未登録状態と許可ウォレットを確認する。
-3. 本人ウォレットで登録し、取引hashと成功receipt、イベント、現在owner・名前を照合する。
-4. 同じQRのカードを再読込・別端末から確認する。二重登録と許可外ウォレットの操作を拒否することを確かめる。
-5. chain ID・contract・card ID・取引hash・block・確認日時・端末を保存し、成功した試験だけをOpenSpecで完了にする。
+1. Compare MultiBaas and RPC chain IDs, deployed code, ABI, and issuer. Confirm that the connection API returns ready.
+2. Issue a dedicated test card and check its unregistered state and allowed wallet.
+3. Register with the owner's wallet. Compare the hash, successful receipt, event, current owner, and name.
+4. Reload the same QR card and check it from another device. Verify rejection of duplicate registration and unauthorized wallets.
+5. Save chain ID, contract, card ID, transaction hash, block, check time, and device. Mark only successful tests complete in OpenSpec.
 
-初回確認時点では配置・発行・登録・Worker公開は未実施だった。更新後の結果は以下を参照。
+At the first check, deployment, issuance, registration, and Worker publication had not happened. Later results follow.
 
-## 出典
+## Sources
 
-- [疎通試験と課題整理の依頼](../docs/prompts/2026-09-25/212734-547384-542a7b515a2144d98caa79fbd97635b9.json)
-- [最新mainへのリベース指示](../docs/prompts/2026-09-25/212840-675778-f0efeecdb2e447d5bf28a11e0031b256.json)
+- [Request for connectivity tests and issue review](../docs/prompts/2026-09-25/212734-547384-542a7b515a2144d98caa79fbd97635b9.json)
+- [Instruction to rebase onto the latest main](../docs/prompts/2026-09-25/212840-675778-f0efeecdb2e447d5bf28a11e0031b256.json)
 
-## 設定提供後の実測と修正
+## Observations and fixes after settings were supplied
 
-ユーザーが `.env.local` を用意した。設定名が `MULTIBASS_API_KEY` / `MULTIBASS_ENDPOINT_URL` だったため、秘密値を表示せず `MULTIBAAS_API_KEY` / `MULTIBAAS_BASE_URL` に揃えた。ファイル権限は0600、Git管理外を維持した。取得したチェーンIDと、登録したLibraryラベル・バージョンも同じファイルに保存した。
+The user prepared `.env.local`. The names `MULTIBASS_API_KEY` and `MULTIBASS_ENDPOINT_URL` were corrected to `MULTIBAAS_API_KEY` and `MULTIBAAS_BASE_URL` without printing secret values. The file remained mode 0600 and excluded from Git. The observed chain ID and registered Library label and version were saved in the same file.
 
-| 操作 | 実測結果 |
+| Operation | Observed result |
 | --- | --- |
-| チェーン状態GET | HTTP 200。chain ID / network IDは `2017072401`、ブロック `18763` |
-| 最新ブロックGET | HTTP 200。numberは10進文字列、hashは0x形式。Gatewayの期待形式に一致 |
-| 既存Library・リンク一覧GET | HTTP 200。今回のRegistryはなく、アドレスリンクは0件。既存Libraryは変更していない |
-| 今回のLibrary登録POST | 初回400 `unable to parse JSON`。binの0x接頭辞を保持すると200 |
-| Libraryの再利用 | `shomeikuncardregistry` / `1.0.0` のABI・bytecodeがローカル成果物と一致。再登録なしでCLI成功 |
+| Chain status GET | HTTP 200. Chain ID and network ID `2017072401`, block `18763` |
+| Latest block GET | HTTP 200. Number was a decimal string and hash had a 0x prefix, matching Gateway expectations |
+| Existing Library and link listing GET | HTTP 200. This Registry was absent and there were no address links. Existing Library entries were not changed |
+| Library registration POST | Initially 400 `unable to parse JSON`. Preserving the 0x prefix in bin returned 200 |
+| Library reuse | ABI and bytecode for `shomeikuncardregistry` / `1.0.0` matched the local artifact. CLI succeeded without re-registration |
 
-機密情報と既存プロジェクト情報を除いた [実測JSON](assets/curvegrid-connectivity/multibaas-readonly.json) を保存した。公開API全体のreadyや実ウォレットの登録成功を意味しない。
+[Observed JSON](assets/curvegrid-connectivity/multibaas-readonly.json) was saved without secrets or existing-project information. This did not yet prove that the public API was ready or that wallet registration worked.
 
-### C-07: ABI登録のbytecode形式（修正済み）
+### C-07: ABI registration bytecode format, fixed
 
-CLIは `bin` にbytecode先頭の `0x` を除いて送っていた。実MultiBaasはHTTP 400を返した。同じABI・ラベル・バージョンで接頭辞だけを保持すると200になったため、`contracts/cli/multibaas.ts` を修正した。POST内容に0x付きbytecodeが含まれる回帰試験を追加した。合成応答の従来試験では登録リクエストのこの条件を検証していなかった。
+The CLI removed the leading `0x` from bytecode in `bin`. Real MultiBaas returned HTTP 400. With the same ABI, label, and version, retaining only that prefix changed the response to 200. `contracts/cli/multibaas.ts` was fixed, and a regression test checks that POST includes 0x-prefixed bytecode. Earlier synthetic-response tests did not check this request condition.
 
-### 残る設定と実環境試験
+### Remaining settings and live tests
 
-- 専用公開Web3 RPC URLの追加後、eth_chainIdが `2017072401` であることを実測した。管理RESTキーをRPCへ流用していない。
-- ユーザーの選択で試験専用の発行者・登録者ウォレットを新規作成した。暗号化キーストアはGit管理外に0600で保存。Faucetから両ウォレットへ1 ETHずつ入金されたことを実測した。
-- コントラクト配置後、address・issuer・deployment blockを設定した。
-- 管理用キーとは別にDAppグループのアプリ用キーを作成した。状態・Library読取り200、管理用groups読取り403を確認。Workerに管理用キーを設定しない。
-- 専用Workerは公開済み。接続設定と公開先の実接続は確認済み。スマホ署名・復帰、別端末確認は未完了。
+- After adding a dedicated public Web3 RPC URL, `eth_chainId` was measured as `2017072401`. The admin REST key was not reused for RPC.
+- At the user's choice, dedicated issuer and registering wallets were created. Encrypted keystores were saved outside Git with mode 0600. Faucet deposits of 1 ETH to each wallet were observed.
+- After contract deployment, address, issuer, and deployment block were configured.
+- A separate application key was created in the DApp group. Status and Library reads returned 200, while admin groups reads returned 403. The Worker does not use the admin key.
+- The dedicated Worker was published. Live connectivity and public settings were verified. Phone signing, app return, and another-device checks remained incomplete.
 
-C-01・C-03は解消。C-04は実応答fixtureと回帰試験を追加した。C-02の公開先設定も完了し、C-05のスマホUI結合が残る。
+C-01 and C-03 were resolved. C-04 gained real-response fixtures and regression tests. C-02's public configuration was complete, leaving C-05 phone UI integration.
 
-修正後、CLIの型検証とコントラクト・CLI試験16件に成功した。Faucet対象の試験用公開アドレスは以下。秘密鍵・復号パスワードは記録しない。
+After the fix, CLI type checking and 16 contract and CLI tests passed. Public test addresses used for the faucet were:
 
-- 発行者: `0x742685dF0832515184334FaA2d28931AD2605100`
-- 登録者: `0xf12904Ef7aBfD79b68dcCdc7b30cFDE2D6BEeeb8`
+- Issuer: `0x742685dF0832515184334FaA2d28931AD2605100`
+- Registering wallet: `0xf12904Ef7aBfD79b68dcCdc7b30cFDE2D6BEeeb8`
 
-## 実チェーンでの配置・登録結果
+Private keys and decryption passwords are not recorded.
 
-| 項目 | 実測値 |
+## Actual chain deployment and registration results
+
+| Item | Observed value |
 | --- | --- |
 | Chain ID | 2017072401 |
 | Contract | `0xE226ABd4e3866568C7bd53a57f2CA4b619EFB47e` |
-| 配置取引 / block | `0xc8bce4cd994f9cb2520ef42e2b8aaae3e88173b26199841f23acbf9e81f994e1` / 18766 |
-| カードID | `connectivity-20260926-001` |
-| 発行取引 / block | `0xda58f704b15a05798b61b0a5b045b5906eb5ce9d9281fe35bd08a4fc0c5afec4` / 18767 |
-| 登録取引 / block | `0x83f7601a0eae1123029e0f407ecd5e72ebd4d9b34e5181363bf8cabab6a9cb12` / 18768 |
-| 名前 | おじいちゃんコンビニ |
-| API接続 | 200 ready。chain・code・ABI・issuerを照合 |
-| 未登録カード | 200 unregistered |
-| 許可外ウォレットの登録準備 | 422 WALLET_NOT_ALLOWED |
-| 本人の登録準備 | 200。from/to/chain/value/calldata照合後、本人の試験鍵で署名 |
-| 登録確認 | 200 confirmed。取引・receipt・イベント・現在owner一致 |
-| 公開カードの再照会 | 200 registered、evidence available。再読取りでも一致 |
+| Deployment transaction / block | `0xc8bce4cd994f9cb2520ef42e2b8aaae3e88173b26199841f23acbf9e81f994e1` / 18766 |
+| Card ID | `connectivity-20260926-001` |
+| Issuance transaction / block | `0xda58f704b15a05798b61b0a5b045b5906eb5ce9d9281fe35bd08a4fc0c5afec4` / 18767 |
+| Registration transaction / block | `0x83f7601a0eae1123029e0f407ecd5e72ebd4d9b34e5181363bf8cabab6a9cb12` / 18768 |
+| Name | おじいちゃんコンビニ |
+| API connection | 200 ready, with chain, code, ABI, and issuer compared |
+| Unregistered card | 200 unregistered |
+| Unauthorized wallet preparation | 422 WALLET_NOT_ALLOWED |
+| Owner preparation | 200. After comparing from, to, chain, value, and calldata, signed with the owner's test key |
+| Registration check | 200 confirmed. Transaction, receipt, event, and current owner matched |
+| Public card re-query | 200 registered, evidence available. Repeated reads matched |
 
-配置・発行はCLIのexecute/resumeを使用。登録は専用試験鍵を使うスクリプトで署名し、送信前に署名済み取引をGit管理外へ保存した。スマホやMetaMaskの操作成功を意味しない。二重発行・二重登録は実配置先へのeth_callでCALL_EXCEPTIONとなった。取引を追加送信した試験ではなく、RPCからrevert理由を取得できなかったため具体的なエラー名までは断定しない。
+Deployment and issuance used CLI execute/resume. A script signed registration with a dedicated test key and saved the signed transaction outside Git before sending. This did not prove phone or MetaMask operation. Duplicate issuance and registration produced CALL_EXCEPTION through eth_call against the deployed contract. No additional transaction was sent for those checks. RPC did not return a revert reason, so no specific error name is claimed.
 
-[実API応答fixture](assets/curvegrid-connectivity/api-responses.json) と [ローカルHTTP検証](assets/curvegrid-connectivity/local-api-verification.json) を保存。fixtureでRPCのchain/code応答のみ合成し、MultiBaasのカード・イベント・取引・receipt・blockは実測値で回帰検証する。
+[Real API fixtures](assets/curvegrid-connectivity/api-responses.json) and [local HTTP verification](assets/curvegrid-connectivity/local-api-verification.json) were saved. Regression tests synthesize only RPC chain/code responses; MultiBaas card, event, transaction, receipt, and block values are measured responses.
 
-### C-08: 開発サーバーのバンドラー差異（修正済み）
+### C-08: Development server bundler differences, fixed
 
-デフォルトのTurbopackで共通ABIが参照範囲外になり、範囲を広げても生成validatorのCJS importで `func1 is not a function` が発生した。`npm run dev` を既存buildと同じWebpackへ統一し、カードGETと登録準備POSTが200になることを実測した。
+Default Turbopack could not access the shared ABI. After expanding its scope, importing the generated CJS validator failed with `func1 is not a function`. `npm run dev` was changed to use Webpack, like the existing build. Card GET and registration preparation POST then returned 200 in actual checks.
 
-### C-09: イベント一覧の取得件数（修正済み）
+### C-09: Event page size, fixed
 
-`GET /events` のlimit=100は400 `invalid request`、limit=10は200だった。contract_addressとevent_signatureはそのままで、10件ずつ最大10ページに変更した。上限到達は503を維持し、証跡なしと断定しない。100件を超える登録の探索にはEvent Queryなど別方式の検討が必要。ページ幅・offsetの回帰試験と実応答fixtureの所有者・取引確認試験を追加した。クエリ項目は [Curvegrid公式API資料](https://docs.curvegrid.com/multibaas/api/get-event-count/) と照合し、許容件数は実環境で確認した。
+`GET /events` with limit=100 returned 400 `invalid request`, while limit=10 returned 200. Keeping contract_address and event_signature unchanged, the Gateway switched to up to 10 pages of 10 events. Reaching the limit still returns 503 rather than claiming no evidence. Searches beyond 100 registrations need another approach, such as Event Query. Regression tests cover page size, offset, and owner and transaction checks against real-response fixtures. Query fields were checked against [Curvegrid's official API documentation](https://docs.curvegrid.com/multibaas/api/get-event-count/); accepted sizes were checked in the actual environment.
 
-### C-10: OpenNextによるローカル環境値の取込み（修正済み）
+### C-10: OpenNext embedded local environment values, fixed
 
-OpenNext 1.20.6が `.env.local` の値を `.open-next/cloudflare/next-env.mjs` に含めることをビルド検査で検出した。配置処理を中断し、ビルド後に全モードの埋込み環境値を除去する `runtime-env-only.mjs` を追加。成果物内に元のキー・RPC値が残っていないことを検査してから再配置した。中断直後のdeployment一覧は空だった。管理用キー・秘密鍵は実行時設定の対象外。
+Build inspection found that OpenNext 1.20.6 included `.env.local` values in `.open-next/cloudflare/next-env.mjs`. Deployment was stopped. `runtime-env-only.mjs` was added to remove embedded environment values for every mode after building. Deployment resumed only after checking that the original keys and RPC values were absent from artifacts. The deployment list was empty immediately after the interrupted attempt. Admin keys and private keys are excluded from runtime configuration.
 
-### C-11: 公開WorkerのSecret保存（許可後に完了）
+### C-11: Public Worker Secrets, completed after approval
 
-専用URLは https://shomei-kun-integration.dptr.workers.dev 。初回配置versionは `8f5afe00-4234-436f-85ab-4382afc5fec1`。設定前の接続確認は503 CONFIGURATION_MISSINGだった。アプリ用APIキーと接続設定をCloudflare Secretへ保存する操作は、自動承認レビューが「この外部保存先への認証情報送信に明示的な許可が必要」として拒否した。ユーザーが「保存して疎通試験を進める」と明示的に許可した後、11項目のSecretを保存した。元のUI Workerは変更していない。
+The dedicated URL is https://shomei-kun-integration.dptr.workers.dev . The initial deployment version was `8f5afe00-4234-436f-85ab-4382afc5fec1`. Before configuration, the connection check returned 503 CONFIGURATION_MISSING. Automatic approval review rejected saving the app API key and connection settings to Cloudflare Secrets because sending credentials to that external destination required explicit authorization. After the user explicitly approved saving them and continuing connectivity tests, 11 Secrets were saved. The original UI Worker was unchanged.
 
-## 再現と残る確認
+## Reproduction and remaining checks
 
-`apps/web` で次を実行する。RPC URLは結果から除去する。
+Run the following in `apps/web`. The result removes the RPC URL.
 
 ```sh
 node scripts/verify-live.mjs http://127.0.0.1:3108 connectivity-20260926-001 0x83f7601a0eae1123029e0f407ecd5e72ebd4d9b34e5181363bf8cabab6a9cb12
 ```
 
-公開先の設定後は第1引数を専用Workerのoriginへ変更する。スマホMetaMaskの承認・拒否・切断・復帰、別端末のQR読取り、UI表示は未検証。C10のブラウザ条件とC11/C12、A07全体を完了とはしない。
+After configuring the public deployment, replace the first argument with the dedicated Worker origin. At this stage, phone MetaMask approval, rejection, disconnection, and return, another-device QR reading, and UI display remained unverified. C10 browser conditions, C11/C12, and all of A07 must not be marked complete.
 
-API試験66件とコントラクト・CLI試験16件、型検証、OpenNextビルドに成功。AIが疎通操作、問題切分け、実装修正、fixture・試験・文書を作成。人間が接続情報、公開RPC、試験鍵作成の方針とFaucet入金を提供した。大会期間との対応は未確認。
+API tests 66, contract and CLI tests 16, type checking, and the OpenNext build passed. AI performed connectivity operations, diagnosis, implementation fixes, and creation of fixtures, tests, and documents. Humans supplied connection settings, public RPC, the decision to create test keys, and faucet deposits. Correspondence with the hackathon period was not verified.
 
-### C-12: Workersのfetch redirect指定（修正・公開先で成功）
+### C-12: Workers fetch redirect setting, fixed and verified publicly
 
-公開Workerだけで接続確認が503になった。秘密値を伏せた診断ログで、ランタイムが `redirect: "error"` をTypeErrorとして拒否していると確認した。`manual` に変え、3xxを通常の上流HTTPエラーとして拒否する。別URLへの再送はしない。302応答で処理が失敗し、呼出しが1回で止まる回帰試験を追加した。呼出しコンテキスト変更では解消しなかったため、その仮修正は残していない。エラー本文を記録する一時診断も除去し、サービス種別・HTTP status・例外名だけを記録する。
+Only the public Worker returned 503 for connectivity. Sanitized diagnostic logs showed that the runtime rejected `redirect: "error"` with a TypeError. This was changed to `manual`, with 3xx rejected as normal upstream HTTP errors. Requests are not resent to another URL. A regression test verifies that a 302 fails after one call. Changing the call context did not fix the issue, so that temporary change was removed. Temporary logging of error bodies was also removed. Logs retain only service type, HTTP status, and exception name.
 
-## 公開Workerでの最終確認
+## Final public Worker checks
 
-最終配置versionは `04cbc950-4328-4f57-98c6-ba26e110f708`。`verify-live.mjs` を専用URLへ実行し、接続200 ready、カードGET 200 registeredを2回、取引GET 200 confirmed、二重登録準備409 ALREADY_REGISTEREDを確認した。[公開HTTP実測](assets/curvegrid-connectivity/worker-api-verification.json) に日時・応答を保存した。公開RPC URLは除去済み。
+The final deployment version for this report was `04cbc950-4328-4f57-98c6-ba26e110f708`. Running `verify-live.mjs` against the dedicated URL confirmed connection 200 ready, card GET 200 registered twice, transaction GET 200 confirmed, and duplicate preparation 409 ALREADY_REGISTERED. [Public HTTP observations](assets/curvegrid-connectivity/worker-api-verification.json) preserve times and responses with the public RPC URL removed.
 
-[CORS実測](assets/curvegrid-connectivity/worker-cors.json) ではUI OriginのOPTIONSが204、未許可Originは403。管理キーを保存せず、承認済みのアプリ用接続設定11項目をSecretへ保存した。Secret保存の承認待ちは解消した。
+[CORS observations](assets/curvegrid-connectivity/worker-cors.json) show 204 for the UI origin's OPTIONS and 403 for an unapproved origin. The 11 approved app connection settings were saved as Secrets, without the admin key. Secret storage was no longer awaiting approval.
 
-試験環境はLinux上のNode.js 22によるHTTPクライアントと試験専用鍵。スマホMetaMask・別端末QRのUI結合は残るため、OpenSpec 6.2の全条件と6.3は未完了。6.1・6.4は完了。
+The test environment was a Node.js 22 HTTP client on Linux with dedicated test keys. Phone MetaMask and another-device QR UI integration remained outstanding, so not all conditions in OpenSpec 6.2 and 6.3 were complete. Sections 6.1 and 6.4 were complete.

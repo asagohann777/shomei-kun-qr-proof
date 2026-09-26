@@ -1,10 +1,12 @@
-# Curvegrid連携の起動とUI接続
+English | [日本語](CURVEGRID_INTEGRATION_RUNBOOK.ja.md)
 
-APIは `apps/web`、コントラクトと発行者CLIは [contracts](../contracts/README.md) にある。画面とMetaMaskの接続コードは `prototypes/mobile-ui` にある。通常buildはmockを維持し、専用integration buildだけ実APIへ接続する。[UI接続の設定・実測](UI_LIVE_CONNECTION_REPORT.md)を参照。
+# Start the Curvegrid integration and connect the UI
 
-## ローカルで起動する
+The API is in `apps/web`. The contract and issuer CLI are in [contracts](../contracts/README.md). Screen and MetaMask integration code is in `prototypes/mobile-ui`. Normal builds retain mock behavior; only the dedicated integration build connects to the real API. See [UI connection settings and measured results](UI_LIVE_CONNECTION_REPORT.md).
 
-Node.js 22で実行する。
+## Run locally
+
+Use Node.js 22.
 
 ```sh
 cd apps/web
@@ -12,62 +14,62 @@ npm ci
 BACKEND_MODE=mock npm run dev
 ```
 
-`GET /api/v1/connection` は `mode:mock` と `status:mock` を返す。既存3 APIの固定応答と `X-Mock-Scenario` を使用できる。mockの取引をウォレットへ送らない。
+`GET /api/v1/connection` returns `mode:mock` and `status:mock`. The existing three APIs support fixed responses and `X-Mock-Scenario`. Do not send mock transactions to a wallet.
 
-実接続用の起動は `BACKEND_MODE=live npm run dev`。設定不足なら503 `CONFIGURATION_MISSING` を返す。値を固定モックで補わない。`.env.local` に以下を設定する。ファイルはGit管理外である。
+For a live connection, start with `BACKEND_MODE=live npm run dev`. Missing settings return 503 `CONFIGURATION_MISSING`; fixed mocks do not fill missing values. Set the following in `.env.local`, which is excluded from Git.
 
-| 設定 | 値の取得元 |
+| Setting | Value source |
 | --- | --- |
 | `BACKEND_MODE` | `live` |
-| `PUBLIC_API_ORIGIN` | ローカルなら `http://localhost:3000` |
-| `ALLOWED_UI_ORIGINS` | UIのOriginをカンマ区切り。空なら同一Originのみ |
-| `MULTIBAAS_BASE_URL` | 自分のMultiBaas配置URL。末尾は `/api/v0` |
-| `MULTIBAAS_API_KEY` | 読取り・未署名取引作成に限定したサーバー用キー |
-| `CHAIN_ID` | 自分のCurvegrid Testnetの実値 |
-| `CURVEGRID_PUBLIC_WEB3_RPC_URL` | 専用の公開Web3キーで作成したRPC URL |
-| `REGISTRY_ADDRESS` / `REGISTRY_ISSUER` | CLI配置後のアドレス・発行者 |
-| `REGISTRY_CONTRACT_LABEL` / `REGISTRY_CONTRACT_VERSION` | MultiBaasへ登録したLibraryのラベル・バージョン |
-| `REGISTRY_DEPLOYMENT_BLOCK` | 配置成功receiptのブロック番号 |
+| `PUBLIC_API_ORIGIN` | `http://localhost:3000` for local use |
+| `ALLOWED_UI_ORIGINS` | Comma-separated UI origins; empty permits only the same origin |
+| `MULTIBAAS_BASE_URL` | Your MultiBaas deployment URL ending in `/api/v0` |
+| `MULTIBAAS_API_KEY` | Server key limited to reads and unsigned transaction preparation |
+| `CHAIN_ID` | Actual value for your Curvegrid Testnet |
+| `CURVEGRID_PUBLIC_WEB3_RPC_URL` | RPC URL created with a dedicated public Web3 key |
+| `REGISTRY_ADDRESS` / `REGISTRY_ISSUER` | Address and issuer after CLI deployment |
+| `REGISTRY_CONTRACT_LABEL` / `REGISTRY_CONTRACT_VERSION` | Label and version registered in the MultiBaas Library |
+| `REGISTRY_DEPLOYMENT_BLOCK` | Block number in the successful deployment receipt |
 
-管理RESTキーや発行者秘密鍵を `NEXT_PUBLIC_*`、UI設定、会話、PRへ入れない。公開Web3 URLはMetaMaskに渡す用途のためブラウザから見える。
+Do not put the admin REST key or issuer private key in `NEXT_PUBLIC_*`, UI settings, conversations, or PRs. The public Web3 URL is visible to the browser because it is passed to MetaMask.
 
-## UIからAPIを呼ぶ
+## Call the API from the UI
 
-APIの形式は [OpenAPI](openapi.yaml) が正である。UIのAPI base URLに専用バックエンドのOriginを指定する。クロスOrigin要求はcredentialsなしで送る。未登録でもウォレット接続前にカードを読める。
+[OpenAPI](openapi.yaml) is the source of truth for API formats. Set the UI API base URL to the dedicated backend origin. Send cross-origin requests without credentials. Cards, including unregistered cards, can be read before connecting a wallet.
 
-1. `GET /api/v1/connection` を呼ぶ。`meta.mode === "live"` と `data.status === "ready"` の場合だけネットワーク設定を使う。
-2. `GET /api/v1/cards/{cardId}` でカードを読む。404は未発行。503を未登録表示に置き換えない。
-3. MetaMaskから実アドレスとchain IDを取得する。ユーザーが公開情報に同意した後、以下を送る。
+1. Call `GET /api/v1/connection`. Use network settings only when `meta.mode === "live"` and `data.status === "ready"`.
+2. Read the card with `GET /api/v1/cards/{cardId}`. A 404 means the card has not been issued. Do not display a 503 as unregistered.
+3. Read the actual address and chain ID from MetaMask. After the user consents to publication, send:
 
 ```http
 POST /api/v1/cards/{cardId}/registration/prepare
 Content-Type: application/json
 
-{"walletAddress":"<MetaMaskのアドレス>","chainId":2017072401,"nickname":"おじいちゃんコンビニ"}
+{"walletAddress":"<MetaMask address>","chainId":2017072401,"nickname":"おじいちゃんコンビニ"}
 ```
 
-`2017072401` は現在のintegrationのチェーンID。別の配置では接続応答・ウォレットの実値を使う。ニックネームは1〜96 UTF-8バイト。空白除去やUnicode正規化を行わない。
+`2017072401` is the current integration chain ID. For another deployment, use the connection response and the wallet's actual value. Nicknames must be 1–96 UTF-8 bytes. Do not trim whitespace or normalize Unicode.
 
-4. 応答のmode、chainId、from、to、valueとregisterの引数をABIで照合する。署名前に接続アドレスとchain IDを再取得し、変更されていたら準備をやり直す。
-5. `data.transaction` をMetaMaskへ渡す。`chainId` は数値、`value` は10進wei文字列なので、EIP-1193要求へ渡す際に16進数量へ変換する。nonce・gas・手数料はウォレットに委ねる。
-6. 送信hashを取得したら、chainId、contractAddress、cardId、hash、入力したnicknameを保存する。`GET /api/v1/cards/{cardId}/transactions/{hash}` で照合する。
+4. Validate the response mode, chainId, from, to, value, and register arguments against the ABI. Read the account and chain ID again before signing. If either changed, repeat preparation.
+5. Pass `data.transaction` to MetaMask. `chainId` is numeric and `value` is a decimal wei string, so convert them to hexadecimal quantities for EIP-1193. Let the wallet choose the nonce, gas, and fees.
+6. After receiving the transaction hash, save chainId, contractAddress, cardId, hash, and the entered nickname. Check `GET /api/v1/cards/{cardId}/transactions/{hash}`.
 
-`pending` は照会を続ける。`confirmed` は表示名・所有者が入力と一致するか確認する。`reverted` は失敗、`unknown` は理由codeに従って確認する。通信失敗はHTTPエラーとして表示する。復帰時は同じhashの照会を再開し、新しい取引を自動送信しない。hash取得前に切断した場合は送信結果不明とし、MetaMask履歴からhashを確認する。
+Continue checking `pending`. For `confirmed`, check that the name and owner match the input. `reverted` means failure. For `unknown`, follow the reason code. Display communication failures as HTTP errors. On return, resume checking the same hash without sending a new transaction automatically. If the connection is lost before a hash arrives, treat the send outcome as unknown and obtain the hash from MetaMask history.
 
-## Cloudflareの専用構成
+## Dedicated Cloudflare configuration
 
-`wrangler.integration.jsonc` は `shomei-kun-integration` 専用。既存mockの `wrangler.jsonc` とUI用Workerを変更しない。配置の指示を受けてから、Cloudflare側の変数へ上記の公開設定・配置設定を登録し、`MULTIBAAS_API_KEY` はSecretとして保存する。
+`wrangler.integration.jsonc` is dedicated to `shomei-kun-integration`. Do not change the existing mock `wrangler.jsonc` or UI Worker. After receiving deployment instructions, register the public and deployment settings above in Cloudflare and store `MULTIBAAS_API_KEY` as a Secret.
 
-ビルドとローカル検証は公開せずに実行できる。
+Build and verify locally without publishing:
 
 ```sh
 UI_CAMERA_MODE=live BACKEND_MODE=live npm run build:integration
 npm run test:worker:live
 ```
 
-`test:worker:live` は接続情報を持たない専用設定で、設定不足・CORS・mock指定拒否をローカルWorkers上で検証する。公開UIは `https://shomei-kun-integration.dptr.workers.dev/ui/`。
+`test:worker:live` uses a dedicated configuration without connection settings. It checks missing settings, CORS, and rejection of mock scenarios on local Workers. The public UI is `https://shomei-kun-integration.dptr.workers.dev/ui/`.
 
-## 検証を再実行する
+## Repeat verification
 
 ```sh
 cd contracts
@@ -89,20 +91,20 @@ UI_CAMERA_MODE=live BACKEND_MODE=live npm run build:integration
 npm run test:worker:live
 ```
 
-`live-gateway.test.ts` は合成応答、`live-recorded.test.ts` は今回のTestnetで取得したMultiBaas応答を使う。RPCのchain/codeは後者でも合成応答。設定提供後の疎通・スマホ署名・別端末確認は [実装タスク](../openspec/changes/curvegrid-testnet-integration/tasks.md) 6章で追跡する。
+`live-gateway.test.ts` uses synthetic responses. `live-recorded.test.ts` uses MultiBaas responses captured on this testnet; its RPC chain and code responses are still synthetic. Section 6 of the [implementation tasks](../openspec/changes/curvegrid-testnet-integration/tasks.md) tracks connectivity after configuration, phone signing, and checks from another device.
 
-## 実接続の設定とビルド
+## Live settings and builds
 
-`build:integration` と `build:worker` はOpenNextが取り込んだローカル環境値をビルド後に除去する。接続設定はWorkerの実行時bindingから供給する。生成物のキー・RPC値の検査に失敗した場合はデプロイしない。
+After the build, `build:integration` and `build:worker` remove local environment values that OpenNext included. Worker runtime bindings supply connection settings. Do not deploy if the scan for embedded keys or RPC values fails.
 
-Workerに設定するのは `MULTIBAAS_BASE_URL`、アプリ用 `MULTIBAAS_API_KEY`、`CHAIN_ID`、`REGISTRY_ADDRESS`、`REGISTRY_CONTRACT_LABEL`、`REGISTRY_CONTRACT_VERSION`、`REGISTRY_DEPLOYMENT_BLOCK`、`REGISTRY_ISSUER`、`CURVEGRID_PUBLIC_WEB3_RPC_URL`、`PUBLIC_API_ORIGIN`、`ALLOWED_UI_ORIGINS`。`.env.local` 全体をbulk登録しない。`MULTIBAAS_ADMIN_API_KEY`、キーストア、パスワードはCLI側だけで使用する。
+Configure these Worker settings: `MULTIBAAS_BASE_URL`, the app's `MULTIBAAS_API_KEY`, `CHAIN_ID`, `REGISTRY_ADDRESS`, `REGISTRY_CONTRACT_LABEL`, `REGISTRY_CONTRACT_VERSION`, `REGISTRY_DEPLOYMENT_BLOCK`, `REGISTRY_ISSUER`, `CURVEGRID_PUBLIC_WEB3_RPC_URL`, `PUBLIC_API_ORIGIN`, and `ALLOWED_UI_ORIGINS`. Do not bulk-upload all of `.env.local`. Use `MULTIBAAS_ADMIN_API_KEY`, the keystore, and the password only in the CLI environment.
 
-実測カードと再現コマンド、残る確認は [疎通試験記録](CURVEGRID_CONNECTIVITY_REPORT.md) を参照。
+See the [connectivity report](CURVEGRID_CONNECTIVITY_REPORT.md) for measured cards, reproduction commands, and remaining checks.
 
-### integrationでのカメラ試験
+### Camera checks in the integration build
 
-専用integrationは `UI_CAMERA_MODE=live` でビルドする。`apps/web/.env.local` にも同じ設定を保存できる。既定値はmockのままなので、UI検討用ビルドではカメラ権限を要求しない。
+Build the dedicated integration with `UI_CAMERA_MODE=live`. You can also save this setting in `apps/web/.env.local`. The default remains mock, so UI design builds do not request camera permission.
 
-公開 `/ui/` の「QRコードをスキャン」からカメラを許可し、既存カードのQRを読み取る。写真からの読取りも利用できる。登録するまでは取引を送信しない。
+On public `/ui/`, select the QR scan action, allow the camera, and scan an existing card's QR code. Reading from a photo is also available. No transaction is sent before registration.
 
-公開ビルドの確認は `prototypes/mobile-ui` で `node scripts/verify-camera-public.mjs` を実行する。Chromiumで動画のQRを読み取り、WebKitでカメラ拒否後に写真を読む。API応答は試験内で503に置き換え、読取りIDの引渡しと通信失敗表示を確認する。実カードの発行・登録は行わない。
+To check the public build, run `node scripts/verify-camera-public.mjs` in `prototypes/mobile-ui`. It reads a QR video in Chromium and a photo after camera denial in WebKit. The test substitutes a 503 API response to check delivery of the scanned ID and the communication-error display. It does not issue or register a real card.
