@@ -1,35 +1,37 @@
+English | [日本語](proposal.ja.md)
+
 # Proposal
 
 ## Why
 
-現状のAPIは固定モックで、MultiBaas・署名・チェーン記録を検証できない。UI開発と分離したURLでCurvegrid Testnetへの実接続を試すため、API・コントラクト・発行者CLIの詳細設計を先にレビューする。
+The current API is a fixed mock and cannot verify MultiBaas, signatures, or chain records. Review the detailed API, contract, and issuer CLI design first, to test a real Curvegrid Testnet connection at a URL separate from UI development.
 
 ## What Changes
 
-- `apps/web` にlive Gatewayと接続確認APIを追加する設計。既存mockの挙動を維持する。
-- 設定からチェーン・コントラクトを選び、自由入力のニックネームを本人取引で記録する。
-- 発行者を固定した一度限りの所有者登録コントラクトと、配置・発行・照会CLIを新規設計する。
-- 別Workerで公開するAPIとUI担当の画面・MetaMask接続の境界を定義する。
-- 計画保存、Draft PR、詳細設計、ユーザー承認、実装の順に進める。文書だけのPRを先に作成し、明示的な設計承認後にコードを追加する。
+- Design a live Gateway and connection-check API in `apps/web`, preserving existing mock behavior.
+- Select the chain and contract through configuration and record a free-form nickname in the owner's transaction.
+- Design a new one-time owner-registration contract with a fixed issuer and a deployment, issuance, and query CLI.
+- Define the boundary between the API on a separate Worker and the UI owner's screens and MetaMask connection.
+- Proceed through plan storage, Draft PR, detailed design, user approval, then implementation. Open a documentation-only PR first and add code after explicit design approval.
 
 ## Capabilities
 
 ### New Capabilities
 
-- `curvegrid-registration-backend`: Curvegrid Testnet向けのMultiBaas接続、公開読取り、本人登録用取引作成、記録照合、発行者CLIと配置設定。
+- `curvegrid-registration-backend`: MultiBaas connectivity for Curvegrid Testnet, public reads, transaction preparation for owner registration, record comparison, issuer CLI, and deployment configuration.
 
 ### Modified Capabilities
 
-なし。`openspec list --specs` は0件。既存の `specs/` の実装済みmock契約は保持し、承認後の差分をこのchangeで定義する。
+None. `openspec list --specs` returns zero specifications. Preserve the implemented mock contract in existing `specs/` and define approved changes in this change.
 
 ## Impact
 
-設計本文は [計画](../../../specs/CURVEGRID_INTEGRATION_PLAN.md) と [詳細設計](../../../specs/CURVEGRID_INTEGRATION_DESIGN.md) に置く。将来のコード変更対象は `apps/web/src/backend`、API Route Handler、OpenAPI、コントラクト・CLI、Workers構成。ブラウザ画面・MetaMask SDKはUI担当。
+The [plan](../../../specs/CURVEGRID_INTEGRATION_PLAN.md) and [detailed design](../../../specs/CURVEGRID_INTEGRATION_DESIGN.md) hold the design text. Future code targets are `apps/web/src/backend`, API Route Handlers, OpenAPI, contracts and CLI, and Workers configuration. Browser screens and MetaMask SDK belong to the UI owner.
 
-Amoyの80002固定をlive配置設定に置き換えるが、mockの既存応答値は変更しない。Curvegrid Testnetは独立した公開RPCによる検証の受け入れ条件を満たしたとは扱わない。実接続値・APIキーは未設定。コード実装は承認済み。マージ・公開は別途の指示に従う。
+Replace the fixed Amoy 80002 setting with live deployment configuration without changing existing mock response values. Curvegrid Testnet does not count as satisfying the acceptance criterion for verification through an independent public RPC. Live values and API keys are not configured. Code implementation is approved. Merging and publication follow separate instructions.
 
-## 2026-09-26の追加指示
+## Additional instructions on 2026-09-26
 
-ユーザーが最新mainのUIへのAPI接続・署名と環境変数によるmock維持を指示した。[UI接続計画](../../../specs/UI_LIVE_CONNECTION_PLAN.md) の範囲でブラウザ実装をこのPRに追加する。UIデザインは並行継続し、既存のmock公開先は維持する。
+The user requested API connectivity and signing in the latest main UI, with mock behavior retained through environment variables. Add browser implementation to this PR within the [UI connection plan](../../../specs/UI_LIVE_CONNECTION_PLAN.md). UI design continues in parallel, and the existing public mock remains.
 
-2026-09-26訂正: デモは任意の本人ウォレットが初回登録できる全員許可に変更する。エラー受付IDと診断コピーも追加し、既存記録を変更せず新記録先で実測する。
+Correction on 2026-09-26: change the demo to unrestricted first registration by any wallet owner. Add error request IDs and diagnostic copying, and measure behavior against a new registry without modifying existing records.

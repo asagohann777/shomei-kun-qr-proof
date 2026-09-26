@@ -1,19 +1,21 @@
+English | [日本語](proposal.ja.md)
+
 # Proposal
 
 ## Why
-ENS名またはアドレスからウォレットに登録されたカードを検索し、接続中ウォレットの検証済みPrimary nameを表示する。QRを起点とする既存操作を維持して、ENSv2 Continuity向けの実連携を追加する。
+Search cards registered to a wallet by ENS name or address and show the connected wallet's verified Primary name. Add real integration for ENSv2 Continuity while preserving existing QR-first operations.
 
 ## What Changes
-- ENSは検索・名前表示に任意で使う。新規発行は全員許可とし、旧CLIの受取人制限指定を削除する。
-- WebにENS名・アドレスからの登録カード一覧と既存詳細への導線、正引き一致したPrimary name表示を追加。
-- Sepolia ENSv2の解決とCurvegridのowner別イベント検索を追加。
-- 親名取得、カード別サブネーム、ENSコントラクト新規配置は行わない。
+- Use ENS optionally for search and name display. Make new issuance unrestricted and remove the old CLI recipient-restriction options.
+- Add a Web card list by ENS name or address, links to existing details, and Primary name display after forward-resolution verification.
+- Add Sepolia ENSv2 resolution and owner-filtered Curvegrid event search.
+- Do not acquire a parent name, create per-card subnames, or deploy new ENS contracts.
 
 ## Capabilities
 ### New Capabilities
-- `ens-wallet-card-search`: 任意のENS・アドレス検索と検証済みPrimary name表示。登録先を限定しない。
+- `ens-wallet-card-search`: Optional ENS and address search and verified Primary name display, without restricting the registration wallet.
 ### Modified Capabilities
-なし。既存の登録要件は維持する。
+None. Existing registration requirements remain.
 
 ## Impact
-contracts CLI、apps/web API・OpenAPI、mobile-ui、仕様と提出資料。既存コントラクト・カードの移行なし。秘密鍵はCLI端末に保持。
+Contracts CLI, apps/web API and OpenAPI, mobile-ui, specifications, and submission materials. No migration of existing contracts or cards. Private keys remain on the CLI host.

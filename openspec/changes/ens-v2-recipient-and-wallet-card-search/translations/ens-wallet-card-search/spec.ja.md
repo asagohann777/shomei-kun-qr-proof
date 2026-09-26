@@ -1,9 +1,9 @@
-English | [日本語](../../translations/ens-wallet-card-search/spec.ja.md)
+[English](../../specs/ens-wallet-card-search/spec.md) | 日本語
 
 # Spec Delta
 
 ## Purpose
-Search registered cards by ENS name or address and display the connected wallet's verified Primary name. ENS is optional. New cards do not restrict the registration wallet, and existing QR registration and viewing remain available.
+ENS名またはアドレスから登録カードを検索し、接続中ウォレットの検証済みPrimary nameを表示する。ENSは任意で、新規カードは登録先を限定せず、既存のQR登録・閲覧を維持する。
 
 ## ADDED Requirements
 

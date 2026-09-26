@@ -1,51 +1,53 @@
+English | [日本語](design.ja.md)
+
 # Design
 
-2026-09-26訂正: デモの登録許可は全員。CLI省略時はallowedWallet=0で発行し、任意の本人ウォレットが初回登録できる。以下の指定許可ウォレットに関する記述は、非ゼロを指定した限定カードのみを指す。最新の配置・検証は [全員登録計画](../../../../specs/OPEN_REGISTRATION_DEMO.md) を参照。
+Correction on 2026-09-26: demo registration is open to everyone. When omitted in the CLI, allowedWallet=0 permits first registration by any wallet owner. References below to a specified allowed wallet apply only to restricted cards with a nonzero value. See the [open-registration plan](../../../../specs/OPEN_REGISTRATION_DEMO.md) for current deployment and verification.
 
 ## Context
 
-背景は [proposal](proposal.md) を参照。現在のAPIはmockのみで、固定のAmoy chain IDを返す。実接続の設定値は未提供。UIは別担当が並行開発する。
+See the [proposal](proposal.md) for background. The API currently supports only mock mode and returns a fixed Amoy chain ID. Live settings have not been provided. Another owner is developing the UI in parallel.
 
-詳細なAPI形式、ABI、設定、エラー、CLI手順、試験条件は [詳細設計](../../../specs/CURVEGRID_INTEGRATION_DESIGN.md) を正とする。この文書は構成上の判断を記録する。ユーザーは詳細設計 `453387e` と同じPRでの実装を承認した。承認の出典は詳細設計から参照できる。
+The [detailed design](../../../specs/CURVEGRID_INTEGRATION_DESIGN.md) is authoritative for API formats, ABI, configuration, errors, CLI procedures, and test conditions. This document records architectural decisions. The user approved implementation in the same PR as detailed design `453387e`. The detailed design links to the approval source.
 
 ## Goals / Non-Goals
 
 **Goals:**
 
-- HTTP境界とGatewayで外部入力・上流応答を検証し、Serviceで登録条件を判定する。
-- MultiBaasから取引を準備し、本人のウォレット署名とチェーン記録を照合する。
-- UI側が独立して接続できるAPI契約と専用URLを用意する。
+- Validate external input and upstream responses at HTTP and Gateway boundaries, and evaluate registration conditions in the Service.
+- Prepare transactions through MultiBaas and verify owner-wallet signatures against chain records.
+- Provide an API contract and dedicated URL that the UI can use independently.
 
 **Non-Goals:**
 
-- 実カメラの実装。ブラウザのAPI/MetaMask接続は追加指示で対象に変更。
-- 登録の取消し、所有権移転、既存サービスの移行。
-- Curvegrid TestnetでAmoyの公開チェーン検証条件を達成したとすること。
+- Real-camera implementation. Additional instructions brought browser API and MetaMask connectivity into scope.
+- Registration cancellation, ownership transfer, or migration of the existing service.
+- Claiming that Curvegrid Testnet satisfies Amoy public-chain verification conditions.
 
 ## Decisions
 
-1. 既存Serviceにlive Gatewayを追加する。独立したAPIアプリを増やす案より、既存3 APIの契約試験を利用できる。liveでmockへ切り替える処理は設けない。
-2. MultiBaas REST APIで読取りと未署名取引作成を行う。サーバーによる代理署名は採用せず、登録者がMetaMaskで署名する。発行者CLIだけがローカルの暗号化キーストアを使う。
-3. 発行者固定・一度限りの登録コントラクトを配置する。更新可能な管理機能は今回の権限要件に不要なため追加しない。IDと許可ウォレットは発行時に固定する。
-4. ニックネームは1〜96 UTF-8バイトを提案する。正規化やtrimで本人が承認する文字列を変えない。実名や唯一性を証明する機能は持たない。
-5. 取引入力・receiptのログ・現在の状態を照合する。イベント索引だけに依存すると同期の遅れを未登録と誤認するため、状態と証跡の取得状況を分ける。
-6. 専用Workerと明示的なCORS許可リストを使う。同じUIのURLを変更する案は並行開発に影響するため採用しない。APIの所有範囲は詳細設計2章に従う。
-7. 発行CLIは送信前に署名済み取引と進行状態を保存する。再実行で新規取引を生成する案は二重送信につながるため、同一hashの確認と明示的な同一取引の再送に限定する。
+1. Add a live Gateway to the existing Service. This reuses contract tests for the three existing APIs, unlike creating a separate API app. Live mode has no mock fallback.
+2. Use MultiBaas REST API for reads and unsigned transaction construction. The registrant signs in MetaMask; the server does not sign on the user's behalf. Only the issuer CLI uses a local encrypted keystore.
+3. Deploy a one-time registration contract with a fixed issuer. Updatable administration is unnecessary for the current permissions, so it is not added. ID and allowed wallet are fixed at issuance.
+4. Propose nicknames of 1–96 UTF-8 bytes. Do not change the approved string through normalization or trimming. This does not prove a real name or uniqueness.
+5. Compare transaction input, receipt logs, and current state. Relying only on the event index could mistake indexing delay for an unregistered card, so separate registration state from evidence availability.
+6. Use a dedicated Worker and explicit CORS allowlist. Changing the same UI URL would affect parallel development, so that option is rejected. API responsibilities follow section 2 of the detailed design.
+7. Save the signed transaction and progress before sending from the issuance CLI. Creating a new transaction on rerun risks duplicate submission, so allow only checking the same hash and explicitly resending the same transaction.
 
 ## Risks / Trade-offs
 
-- MultiBaasの実際のABI出力形式と権限は未確認。接続設定後に機密情報を除いたfixtureを取得し、受理する形式を契約試験で確定する。
-- イベント索引が遅れる場合がある。登録状態を保持し、証跡だけをpendingとして扱う。検索の通信失敗は503を返す。
-- モバイルでウォレットから戻る前に接続が切れる場合がある。hash取得済みなら確認を再開し、未取得なら送信結果不明として自動再送を止める。画面実装はUI担当が行う。
-- Curvegrid Testnetの読取りは同一基盤に依存する。独立した公開RPCの受け入れ条件は未達として残す。
-- 登録後の変更はできない。検証用カードを使い、変更が必要なら別配置・新しいカードで試す。
+- Actual MultiBaas ABI response formats and permissions remain unverified. After configuration, capture sanitized fixtures and define accepted formats through contract tests.
+- Event indexing can lag. Preserve registration state and mark only evidence as pending. Search communication failures return 503.
+- Mobile connections may drop before returning from the wallet. Resume confirmation when a hash exists; otherwise show an unknown submission result and prevent automatic resubmission. The UI owner implements the screens.
+- Curvegrid Testnet reads depend on the same infrastructure. The independent-public-RPC acceptance condition remains unmet.
+- Registration cannot be changed. Use test cards and a separate deployment or new card when changes are needed.
 
 ## Migration Plan
 
-ユーザーによる詳細設計の確認後、ABI・DTO・fixtureを先に定めてUI担当へ共有する。コントラクト、CLI、Gateway、APIを実装し、既存mockと新しい契約試験を実行する。設定提供後に実応答を確認する。
+After human review of the detailed design, define and share ABI, DTOs, and fixtures with the UI owner first. Implement contracts, CLI, Gateway, and API, then run existing mock and new contract tests. Check actual responses after configuration is provided.
 
-配置・公開は別途その作業の指示を受けて行う。専用Workerの公開後、実APIとスマホの結合試験を記録する。障害時はWorkerを前バージョンに戻す。チェーン記録は削除しない。Amoy移行は別配置とする。
+Deploy and publish only under separate instructions for those actions. After publishing the dedicated Worker, record real API and smartphone integration tests. On failure, roll the Worker back to its previous version. Do not delete chain records. Migration to Amoy uses a separate deployment.
 
-## UI接続の追加設計
+## Additional UI connection design
 
-最新の追加指示と状態・モード・作業境界は [UI接続計画](../../../specs/UI_LIVE_CONNECTION_PLAN.md) を正とする。mock/mockを既定とし、live/mockは閲覧のみ、live/metamaskで本人署名を行う。mock/metamaskを拒否する。
+The [UI connection plan](../../../specs/UI_LIVE_CONNECTION_PLAN.md) governs the latest instructions, states, modes, and responsibilities. Default to mock/mock, make live/mock read-only, and use owner signatures in live/metamask. Reject mock/metamask.

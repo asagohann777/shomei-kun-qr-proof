@@ -1,225 +1,227 @@
-# Curvegrid登録バックエンド
+English | [日本語](../../translations/curvegrid-registration-backend/spec.ja.md)
+
+# Curvegrid registration backend
 
 ## Purpose
 
-Curvegrid TestnetとMultiBaasを使い、本人ウォレットによるカード所有者登録と公開確認を提供する。UIモックを維持し、接続準備・登録取引・証跡再取得を分けて扱う。
+Provide wallet-owner card registration and public verification with Curvegrid Testnet and MultiBaas. Preserve the UI mock and handle connection preparation, registration transactions, and evidence refresh separately.
 
 ## ADDED Requirements
 
-### Requirement: 明示的な接続先とモード
-システムはmock/liveを明示しなければならない（MUST）。liveは配置設定で指定したCurvegrid Testnetとコントラクトだけを扱い、障害時にmockへ切り替えてはならない（MUST NOT）。
+### Requirement: Explicit destination and mode
+The system MUST declare mock or live mode. Live mode MUST use only the Curvegrid Testnet and contract specified in deployment configuration and MUST NOT fall back to mock mode on failure.
 
-#### Scenario: live設定が不足
-- **WHEN** liveが選択されているが接続に必要な設定値がない
-- **THEN** APIは503 CONFIGURATION_MISSINGと不足項目名だけを返し、固定成功データを返さない
+#### Scenario: Missing live configuration
+- **WHEN** live mode is selected but required connection settings are missing
+- **THEN** the API returns 503 CONFIGURATION_MISSING with only missing field names and no fixed success data
 
-#### Scenario: モード指定が不正
-- **WHEN** BACKEND_MODEが未指定またはmock/live以外
-- **THEN** 設定エラーとして扱い、接続処理を開始しない
+#### Scenario: Invalid mode
+- **WHEN** BACKEND_MODE is absent or is neither mock nor live
+- **THEN** it is a configuration error and no connection begins
 
-#### Scenario: 接続先のチェーンが異なる
-- **WHEN** MultiBaas・RPC・期待するchain IDが一致しない
-- **THEN** 接続確認と登録準備は503 CONNECTION_MISMATCHになり、取引を渡さない
+#### Scenario: Chain mismatch
+- **WHEN** the MultiBaas, RPC, and expected chain IDs differ
+- **THEN** connection checks and registration preparation return 503 CONNECTION_MISMATCH without a transaction
 
-### Requirement: UIへ渡す接続状態
-接続確認APIは取得済みのチェーン・最新ブロック・配置先・公開Web3設定を返さなければならない（MUST）。サーバー用APIキーや管理キーを返してはならない（MUST NOT）。
+### Requirement: Connection state for the UI
+The connection API MUST return the retrieved chain, latest block, deployment target, and public Web3 settings. It MUST NOT return server API keys or administrative keys.
 
-#### Scenario: 接続確認に成功
-- **WHEN** 設定、認証、チェーン、RPC、配置先・ABI・発行者の照合が成功
-- **THEN** mode=live、status=readyと公開ネットワーク・registry・latestBlockを返す
+#### Scenario: Successful connection check
+- **WHEN** configuration, authentication, chain, RPC, deployment target, ABI, and issuer checks pass
+- **THEN** return mode=live, status=ready, and public network, registry, and latestBlock fields
 
-#### Scenario: 上流の認証拒否
-- **WHEN** MultiBaasが401または403を返す
-- **THEN** 503 MULTIBAAS_AUTH_FAILEDを返し、上流の本文やキーを出力しない
+#### Scenario: Upstream authentication rejection
+- **WHEN** MultiBaas returns 401 or 403
+- **THEN** return 503 MULTIBAAS_AUTH_FAILED without exposing the upstream body or keys
 
-### Requirement: 発行者による一度限りの発行
-コントラクトは固定の発行者だけにカードIDの発行を許可しなければならない（MUST）。発行済みIDや許可先を上書きしてはならない（MUST NOT）。
+### Requirement: One-time issuance by the issuer
+The contract MUST permit only the fixed issuer to issue card IDs. It MUST NOT overwrite an issued ID or its allowed wallet.
 
-#### Scenario: 正常な発行
-- **WHEN** 発行者が有効な未発行IDと許可ウォレットを発行
-- **THEN** カードは未登録になり、発行イベントを記録する
+#### Scenario: Successful issuance
+- **WHEN** the issuer issues a valid unused ID with an allowed wallet
+- **THEN** the card becomes unregistered and an issuance event is recorded
 
-#### Scenario: 重複・無権限・不正ID
-- **WHEN** 既発行ID、別発行者、範囲外のIDで発行を試す
-- **THEN** コントラクトは拒否し、元のカードを変更しない
+#### Scenario: Duplicate, unauthorized, or invalid ID
+- **WHEN** issuance is attempted with an existing ID, another issuer, or an out-of-range ID
+- **THEN** the contract rejects it without changing the original card
 
-### Requirement: 本人による初回登録
-コントラクトは発行済み・未登録・登録許可・送信ウォレット本人の条件を満たす取引だけを登録しなければならない（MUST）。ownerとnicknameを同一取引に結び付け、再登録・移転・取消し・上書きを提供してはならない（MUST NOT）。
+### Requirement: First registration by the wallet owner
+The contract MUST accept only transactions for issued, unregistered cards whose sender is permitted to register and controls the sending wallet. It MUST associate owner and nickname with the same transaction and MUST NOT provide re-registration, transfer, cancellation, or overwriting.
 
-#### Scenario: 登録可能な本人ウォレットで登録
-- **WHEN** 全員許可のカードまたは自分に限定されたカードへ、本人が有効なニックネームでregisterを送る
-- **THEN** ownerと名前を保存し、カードと所有者・名前を結び付けたイベントを記録する
+#### Scenario: Registration by a permitted wallet owner
+- **WHEN** the owner sends register with a valid nickname for an unrestricted card or a card restricted to that wallet
+- **THEN** save the owner and name and record an event associating the card, owner, and name
 
-#### Scenario: 競合またはなりすまし
-- **WHEN** 同じカードへ複数取引、未発行ID、許可外の送信者、登録済みカードへの再登録を試す
-- **THEN** 条件に合う最初の登録だけが成立し、他は拒否される
+#### Scenario: Competing registrations or impersonation
+- **WHEN** there are multiple transactions for the same card, an unissued ID, an unauthorized sender, or re-registration of a registered card
+- **THEN** only the first registration satisfying the conditions succeeds and all others are rejected
 
-### Requirement: 自由入力と未署名取引
-live APIはニックネームをUTF-8で1〜96バイトの入力として扱い、勝手に正規化してはならない（MUST NOT）。登録準備は署名・送信を行わず、接続先とABI内容を照合した未署名取引だけを返さなければならない（MUST）。
+### Requirement: Free-form input and unsigned transactions
+The live API MUST treat nicknames as 1–96 UTF-8 bytes and MUST NOT normalize them without permission. Preparation MUST return only an unsigned transaction whose destination and ABI contents have been checked, without signing or sending.
 
-#### Scenario: 正常な準備
-- **WHEN** 未登録カードに登録可能なアドレス・正しいchain ID・範囲内の名前を指定
-- **THEN** registerのcardIdと名前、from/to/chain/valueが照合された取引を返し、チェーン状態は変わらない
+#### Scenario: Successful preparation
+- **WHEN** an unregistered card receives a permitted address, correct chain ID, and name within limits
+- **THEN** return a transaction with verified register cardId and name arguments and from/to/chain/value fields, without changing chain state
 
-#### Scenario: 無効な入力
-- **WHEN** 名前が空・96バイト超過・不正Unicode、本文超過、未知フィールド、別chain、許可外walletを送る
-- **THEN** 定義された400/413/422で拒否し、未署名取引を渡さない
+#### Scenario: Invalid input
+- **WHEN** a name is empty, exceeds 96 bytes, or contains invalid Unicode, or the body is oversized, contains unknown fields, specifies another chain, or uses a disallowed wallet
+- **THEN** reject with the defined 400/413/422 response and do not return an unsigned transaction
 
-#### Scenario: MultiBaasの応答が意図と異なる
-- **WHEN** submitted=true、宛先・呼出し・引数の不一致、または不正な応答形式を受信
-- **THEN** 成功応答へ変換せず503とする
+#### Scenario: Unexpected MultiBaas response
+- **WHEN** the response has submitted=true, mismatched destination, call, or arguments, or an invalid format
+- **THEN** return 503 rather than convert it to success
 
-### Requirement: 未接続の公開読取り
-APIはウォレット未接続でもカード状態と所有者を取得できなければならない（MUST）。未発行、未登録、証跡待ち、通信失敗を区別しなければならない（MUST）。
+### Requirement: Public reads without wallet connection
+The API MUST retrieve card state and owner without a connected wallet. It MUST distinguish unissued cards, unregistered cards, pending evidence, and communication failures.
 
-#### Scenario: 未発行カード
-- **WHEN** 正常なコントラクト読取りがexists=falseを示す
-- **THEN** 404 CARD_NOT_FOUNDとし、自動発行しない
+#### Scenario: Unissued card
+- **WHEN** a successful contract read returns exists=false
+- **THEN** return 404 CARD_NOT_FOUND without automatic issuance
 
-#### Scenario: 証跡の検索同期が遅れている
-- **WHEN** 登録済みownerを取得し、正常に完了したイベント検索が空
-- **THEN** ownerを保持してevidence=pendingを返す
+#### Scenario: Evidence indexing delay
+- **WHEN** a registered owner is retrieved and a successful event search is empty
+- **THEN** retain the owner and return evidence=pending
 
-#### Scenario: MultiBaasの不明な404または通信障害
-- **WHEN** 上流の不存在仕様を確認できない404、失敗、不正応答を受信
-- **THEN** 503とし、未登録や取引不存在に変換しない
+#### Scenario: Unrecognized MultiBaas 404 or communication failure
+- **WHEN** an upstream 404 has no verified absence semantics, or an upstream failure or malformed response occurs
+- **THEN** return 503 without converting it to unregistered or transaction-not-found
 
-### Requirement: 取引と現在の記録の照合
-APIは取引、ABI引数、receipt、正規ブロックのログ、現在のカード記録が一致した場合だけconfirmedを返さなければならない（MUST）。
+### Requirement: Compare transactions with current records
+The API MUST return confirmed only when the transaction, ABI arguments, receipt, canonical block logs, and current card record match.
 
-#### Scenario: 正しい登録取引
-- **WHEN** 対象カードの成功取引・正しいイベント・現在ownerと名前・blockHashが一致
-- **THEN** confirmed、owner、登録hash、blockNumberを返す
+#### Scenario: Correct registration transaction
+- **WHEN** the card's successful transaction, correct event, current owner and name, and blockHash match
+- **THEN** return confirmed, owner, registration hash, and blockNumber
 
-#### Scenario: 異なる記録
-- **WHEN** cardId、関数、送信者、宛先、名前、イベント発行元、hash、blockのいずれかが不一致
-- **THEN** unknown/RECORD_MISMATCHを返し、confirmedにしない
+#### Scenario: Mismatched record
+- **WHEN** cardId, function, sender, destination, name, event emitter, hash, or block differs
+- **THEN** return unknown/RECORD_MISMATCH rather than confirmed
 
-#### Scenario: 確認中と失敗
-- **WHEN** 対象register取引のisPending=true、または対象取引の失敗receiptを確認
-- **THEN** 前者はpending、後者はrevertedとし、通信失敗と区別する
+#### Scenario: Pending and failed transactions
+- **WHEN** the target register transaction has isPending=true or its failure receipt is verified
+- **THEN** return pending for the former and reverted for the latter, separately from communication failure
 
-#### Scenario: 再確認
-- **WHEN** 送信済みhashの照会を繰り返す
-- **THEN** その時点の記録を再照合し、新しい取引を送信しない
+#### Scenario: Recheck
+- **WHEN** a submitted hash is queried repeatedly
+- **THEN** compare the records again at that time without sending a new transaction
 
-### Requirement: CLIの再開と鍵の分離
-発行者CLIは署名鍵をローカルで扱い、送信前に再開用情報を保存しなければならない（MUST）。再開で別の取引を自動生成してはならない（MUST NOT）。
+### Requirement: CLI resume and key separation
+The issuer CLI MUST handle signing keys locally and save resume information before sending. Resume MUST NOT automatically create a different transaction.
 
-#### Scenario: 配置後のリンクで中断
-- **WHEN** 配置取引が成功し、ABIリンク前にCLIが中断
-- **THEN** resumeは既存配置を確認してリンクだけを再開し、startingBlockを元の配置ブロックへ設定する
+#### Scenario: Interrupted linking after deployment
+- **WHEN** the deployment transaction succeeds and the CLI stops before ABI linking
+- **THEN** resume verifies the existing deployment, resumes only linking, and sets startingBlock to the original deployment block
 
-#### Scenario: 同じカードの再発行コマンド
-- **WHEN** 同じID・許可walletの発行を再実行
-- **THEN** 取引を送らず既存状態を返し、walletが異なれば失敗する
+#### Scenario: Repeated issuance command for the same card
+- **WHEN** issuance is rerun with the same ID and allowed wallet
+- **THEN** return existing state without sending a transaction, and fail if the wallet differs
 
-#### Scenario: 曖昧な送信結果
-- **WHEN** 送信後の通信障害で結果を確認できない
-- **THEN** 保存済みhashを照会し、通信失敗だけで再送せず、秘密鍵・署名済みraw txを公開しない
+#### Scenario: Ambiguous submission result
+- **WHEN** a communication failure after submission prevents confirmation
+- **THEN** query the saved hash, do not resubmit solely because of communication failure, and do not expose the private key or signed raw transaction
 
-### Requirement: 別URLとUI互換性
-バックエンドは既存UIモックと異なるWorkerへ配置しなければならない（MUST）。許可したUI OriginだけへCORSを付与し、既存mockの3 APIと固定シナリオを維持しなければならない（MUST）。
+### Requirement: Separate URL and UI compatibility
+The backend MUST use a different Worker from the existing UI mock. It MUST grant CORS only to allowed UI origins and preserve the existing mock's three APIs and fixed scenarios.
 
-#### Scenario: UIの別Originから要求
-- **WHEN** 設定済みUI OriginからAPIまたはpreflightを要求
-- **THEN** 対応するCORSを返し、許可外Originには403を返す
+#### Scenario: Request from a separate UI origin
+- **WHEN** the configured UI origin requests the API or preflight
+- **THEN** return the corresponding CORS headers and reject disallowed origins with 403
 
-#### Scenario: 既存mockを利用
-- **WHEN** mockモードで既存19シナリオを実行
-- **THEN** 既存の固定応答を返し、外部APIへ接続しない
+#### Scenario: Existing mock usage
+- **WHEN** the existing nineteen scenarios run in mock mode
+- **THEN** return their existing fixed responses without external API connections
 
-### Requirement: UIのモックと実接続の切替
-UIは環境変数でAPIとwalletを選択できなければならない（MUST）。既定はmock/mockとし、live/mockは閲覧専用、mock/metamaskは設定エラーにしなければならない（MUST）。
+### Requirement: Switchable mock and live UI
+The UI MUST select API and wallet modes through environment variables. It MUST default to mock/mock, treat live/mock as read-only, and reject mock/metamask as a configuration error.
 
-#### Scenario: UIデザインを続ける
-- **WHEN** 通常のmock buildを使う
-- **THEN** 実API・実walletに接続せず既存の表示シナリオを試せる
+#### Scenario: Continue UI design
+- **WHEN** the regular mock build is used
+- **THEN** existing display scenarios work without real API or wallet connections
 
-#### Scenario: 本人が実登録する
-- **WHEN** live/metamaskで本人が公開内容を確認し、照合済み取引を承認する
-- **THEN** walletが署名・送信し、APIで記録を照合した場合だけ確認済みになる
+#### Scenario: Owner performs real registration
+- **WHEN** in live/metamask mode the owner reviews public information and approves a verified transaction
+- **THEN** the wallet signs and sends, and the result becomes confirmed only after API record comparison
 
-#### Scenario: 送信中にページを離れる
-- **WHEN** 送信hash取得後または取得結果不明のままページを再表示する
-- **THEN** 保存した対象の照会だけを再開し、署名・新規送信を自動実行しない
+#### Scenario: Leave the page during submission
+- **WHEN** the page reopens after obtaining a submission hash or with its result unknown
+- **THEN** resume only queries for the saved target, without automatic signing or new submission
 
-### Requirement: デモの全員登録許可
+### Requirement: Unrestricted demo registration
 
-デモカードのallowedWalletがゼロアドレスの場合、任意の本人ウォレットからの初回登録を受理しなければならない（MUST）。発行CLIは省略時に全員許可とする。署名と初回登録後の不変性は維持する。
+When a demo card's allowedWallet is the zero address, the contract MUST accept first registration from any wallet owner. The issuance CLI defaults to unrestricted when the option is omitted. Signatures and immutability after first registration remain required.
 
-#### Scenario: 任意の参加者の初回登録
-- **WHEN** 任意の本人ウォレットが全員許可の未登録カードを登録する
-- **THEN** 送信者が所有者となり、別ウォレットを含めた後続の登録を拒否する
+#### Scenario: First registration by any participant
+- **WHEN** any wallet owner registers an unrestricted, unregistered card
+- **THEN** the sender becomes the owner and subsequent registrations, including those from other wallets, are rejected
 
-### Requirement: 登録準備時の残高不足
+### Requirement: Insufficient balance during preparation
 
-MultiBaasのregister準備が観測済みの残高不足を返す場合、APIは422 INSUFFICIENT_FUNDSとして案内しなければならない（MUST）。不明な上流エラーを残高不足と推測してはならない（MUST NOT）。
+When MultiBaas register preparation returns the observed insufficient-funds response, the API MUST report 422 INSUFFICIENT_FUNDS. It MUST NOT infer insufficient funds from unknown upstream errors.
 
-#### Scenario: ガス不足で準備できない
-- **WHEN** 残高0の本人ウォレットで登録準備を行い、MultiBaasが400 insufficient funds for transferを返す
-- **THEN** 画面でテストETHの補充を案内し、署名要求・取引送信を行わない
+#### Scenario: Preparation blocked by insufficient gas
+- **WHEN** a zero-balance wallet prepares registration and MultiBaas returns 400 insufficient funds for transfer
+- **THEN** the UI guides the user to add test ETH without requesting a signature or sending a transaction
 
-### Requirement: QRのカメラ・写真読取り
-UIは利用者の操作でカメラを起動し、端末内でQRを解析しなければならない（MUST）。対象のカードURLだけを受け付け、画像・動画をアップロードしてはならない（MUST NOT）。カメラは独立したmock/live設定を持つ。
+### Requirement: QR reading from camera and photos
+The UI MUST start the camera on user action and decode QR codes on-device. It MUST accept only supported card URLs and MUST NOT upload images or video. Camera mode has independent mock/live configuration.
 
-#### Scenario: QRの読取りに成功
-- **WHEN** 対象の公開ページまたはカードAPIのURLを動画・写真から検出する
-- **THEN** そのカードIDを現在のアプリで開き、カメラを停止する
+#### Scenario: Successful QR read
+- **WHEN** video or a photo contains a supported public-page or card-API URL
+- **THEN** open that card ID in the current app and stop the camera
 
-#### Scenario: 非表示から復帰
-- **WHEN** カメラ起動中にページが非表示になり、その後復帰する
-- **THEN** 非表示時にカメラを停止し、復帰後は利用者の再開操作を待つ
+#### Scenario: Return from a hidden page
+- **WHEN** a page with an active camera becomes hidden and later returns
+- **THEN** stop the camera while hidden and wait for user action to resume after return
 
-#### Scenario: カメラを許可しない
-- **WHEN** カメラを起動できない
-- **THEN** 再試行と写真読取りを案内し、模擬成功を表示しない
+#### Scenario: Camera permission unavailable
+- **WHEN** the camera cannot start
+- **THEN** offer retry and photo reading without simulated success
 
-### Requirement: iPhone・iPadのアプリ内登録
-実接続UIはiPhone・iPadの外部ブラウザから同じカードをMetaMask内ブラウザで開けなければならない（MUST）。カードID以外の入力や接続情報をリンクへ含めてはならない（MUST NOT）。
+### Requirement: In-app registration on iPhone and iPad
+The live UI MUST open the same card in MetaMask's browser from an external iPhone or iPad browser. It MUST NOT include input or connection information other than the card ID in the link.
 
-#### Scenario: 外部ブラウザで未登録カードを開く
-- **WHEN** iPhoneまたはiPadでMetaMask providerがない
-- **THEN** 入力前に「MetaMaskで開く」を表示し、直接のdappリンクへ同じカードURLを渡す。SDK接続を自動開始しない
+#### Scenario: Open an unregistered card in an external browser
+- **WHEN** an iPhone or iPad has no MetaMask provider
+- **THEN** show Open in MetaMask before input and pass the same card URL through a direct dapp link, without automatically starting SDK connection
 
-#### Scenario: iPadがデスクトップ表示を使う
-- **WHEN** Macintoshの識別情報と複数タッチ点を持つ端末で開く
-- **THEN** iPadとして同じアプリ移動導線を表示する
+#### Scenario: iPad uses desktop mode
+- **WHEN** the device reports Macintosh identification and multiple touch points
+- **THEN** identify it as an iPad and show the same app-navigation flow
 
-#### Scenario: アプリ内ブラウザが開かない
-- **WHEN** 利用者が「ページが開かないとき」を開く
-- **THEN** 同じカードのHTTPS URLとコピー操作を表示し、MetaMask内への貼付けを案内する
+#### Scenario: In-app browser does not open
+- **WHEN** the user opens the page-opening help
+- **THEN** show the same card's HTTPS URL and copy action, with instructions for pasting it into MetaMask
 
-#### Scenario: MetaMask内で開く
-- **WHEN** MetaMask providerがある
-- **THEN** 再びアプリ移動を求めず、本人の接続と登録へ進む
+#### Scenario: Open inside MetaMask
+- **WHEN** a MetaMask provider exists
+- **THEN** proceed to owner connection and registration without asking to switch apps again
 
-### Requirement: 接続準備と登録の分離
-UIは接続・ネットワーク追加・切替を登録取引と分けなければならない（MUST）。準備では登録取引を作成・送信してはならない（MUST NOT）。
+### Requirement: Separate connection preparation from registration
+The UI MUST separate connection, network addition, and network switching from registration transactions. Preparation MUST NOT create or send a registration transaction.
 
-#### Scenario: ネットワークの準備
-- **WHEN** 接続したウォレットが対象チェーンと異なる
-- **THEN** 切替を要求し、未対応チェーンの応答がある場合だけ追加を案内する
+#### Scenario: Prepare the network
+- **WHEN** the connected wallet is on a different chain
+- **THEN** request switching and offer network addition only after an unsupported-chain response
 
-#### Scenario: 承認待ちでアプリへ移動
-- **WHEN** 承認中にページが非表示になる
-- **THEN** 次の承認要求を止め、復帰後に状態を照合する。要求を重ねて送らない
+#### Scenario: Switch to the app during approval
+- **WHEN** the page becomes hidden during approval
+- **THEN** stop the next approval request and compare state on return, without overlapping requests
 
-#### Scenario: 応答を確認できない
-- **WHEN** 前面で60秒待っても準備の応答を確認できない
-- **THEN** 確認待ちと再確認の操作を示し、取消しや接続済みと決め付けない
+#### Scenario: Response remains unknown
+- **WHEN** a preparation response remains unknown after sixty foreground seconds
+- **THEN** show a waiting state and a recheck action without assuming cancellation or successful connection
 
-### Requirement: 初回登録の待機と証跡再取得
-UIは初回登録後に最大60秒、取引と証跡を確認しなければならない（MUST）。登録済みカードの取得を登録処理として表示してはならない（MUST NOT）。
+### Requirement: Initial registration wait and evidence refresh
+The UI MUST check transactions and evidence for up to sixty seconds after initial registration. It MUST NOT show retrieval of a registered card as registration in progress.
 
-#### Scenario: 証跡の反映だけが遅れる
-- **WHEN** 取引成功と所有者は一致するが、60秒以内に証跡検索へ反映されない
-- **THEN** 登録完了と証跡待ちを分けて表示する
+#### Scenario: Only evidence indexing is delayed
+- **WHEN** transaction success and owner match but evidence is not searchable within sixty seconds
+- **THEN** show registration complete and evidence pending separately
 
-#### Scenario: 取引成功を確認できない
-- **WHEN** 60秒以内に取引成功を確認できない
-- **THEN** 結果未確認と表示し、自動再送しない
+#### Scenario: Transaction success cannot be confirmed
+- **WHEN** transaction success cannot be confirmed within sixty seconds
+- **THEN** show an unconfirmed result without automatic resubmission
 
-#### Scenario: 登録済みカードの再取得
-- **WHEN** 利用者が証跡を再取得する
-- **THEN** カードと所有者を保持し、ステータス欄だけを更新する。失敗時も取得済みの情報を残す
+#### Scenario: Refresh a registered card
+- **WHEN** the user refreshes evidence
+- **THEN** keep the card and owner and update only the status, preserving retrieved information even on failure

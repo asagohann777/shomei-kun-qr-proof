@@ -1,63 +1,65 @@
+English | [日本語](tasks.ja.md)
+
 # Tasks
 
-詳細設計は承認済み。承認記録は specs/HACKATHON_CHANGES.md を参照。画面デザインはUI担当が並行継続。追加指示によりAPI/ブラウザSDKの接続をこのPRに含める。
+The detailed design is approved. See specs/HACKATHON_CHANGES.md for the approval record. The UI owner continues screen design in parallel. Additional instructions include API and browser SDK connections in this PR.
 
-## 1. 設計確認
+## 1. Design review
 
-- [x] 1.1 ユーザーによる詳細設計の確認を受け、対象コミットSHAと確認への参照を変更記録へ保存する。その記録で実装開始の許可を確認する。
+- [x] 1.1 Obtain the user's detailed-design review and save the reviewed commit SHA and approval reference in the change log. Use that record to verify permission to start implementation.
 
-## 2. コントラクトと共有契約
+## 2. Contracts and shared interfaces
 
-- [x] 2.1 Solidity・Hardhatの互換バージョンとParis設定を固定し、コンパイル成功を確認する。
-- [x] 2.2 issue/register/getCardとイベントを実装し、詳細設計C05の権限・境界・競合試験をローカルEVMで通す。
-- [x] 2.3 ABI成果物とコントラクト操作手順を保存し、再コンパイルでABIが一致することを確認する。
-- [x] 2.4 OpenAPIへ接続API、liveの可変chain ID・名前、新エラーを追加して型・validator・fixtureを生成する。既存mock応答の検証と新しい要求・応答例の検証を通し、UI担当への接続契約を文書化する。
+- [x] 2.1 Pin compatible Solidity and Hardhat versions and Paris settings, and verify successful compilation.
+- [x] 2.2 Implement issue/register/getCard and events, and pass the detailed design's C05 permission, boundary, and race tests on a local EVM.
+- [x] 2.3 Save ABI artifacts and contract procedures, and verify identical ABI output after recompilation.
+- [x] 2.4 Add the connection API, variable live chain ID and name, and new errors to OpenAPI, then generate types, validators, and fixtures. Pass existing mock-response and new request/response example validation, and document the UI connection contract.
 
-## 3. 設定とMultiBaas Gateway
+## 3. Configuration and MultiBaas Gateway
 
-- [x] 3.1 mock/live設定とSecretの境界を実装し、C02の不足設定・誤設定・秘匿化試験を通す。環境設定例に実キーを含めないことを確認する。
-- [x] 3.2 REST呼出し、期限、認証、不正応答処理を実装し、401/403/404/429/5xx・遅延・不正JSONが成功や未登録にならない試験を通す。
-- [x] 3.3 状態読取りとABI変換を実装し、未発行・登録済み・イベント空・検索障害のC04/C08試験を通す。
-- [x] 3.4 未署名取引の作成とABI照合を実装し、C06のfrom/to/chain/value/引数改変を拒否する試験を通す。
-- [x] 3.5 取引・receipt・ブロック・ログ照合を実装し、C07のpending/reverted/unknown/confirmedと通信失敗の試験を通す。上流応答の変換規則を文書へ反映する。
+- [x] 3.1 Implement mock/live configuration and Secret boundaries, and pass C02 missing-setting, invalid-setting, and redaction tests. Confirm that example configuration contains no real keys.
+- [x] 3.2 Implement REST calls, deadlines, authentication, and invalid-response handling. Test that 401/403/404/429/5xx, delays, and invalid JSON do not become success or unregistered state.
+- [x] 3.3 Implement state reads and ABI conversion, and pass C04/C08 tests for unissued, registered, empty events, and search failures.
+- [x] 3.4 Implement unsigned transaction creation and ABI comparison, and pass C06 rejection tests for changed from/to/chain/value fields and arguments.
+- [x] 3.5 Implement transaction, receipt, block, and log comparison. Pass C07 pending/reverted/unknown/confirmed and communication-failure tests. Document upstream response-conversion rules.
 
-## 4. APIと専用Worker設定
+## 4. API and dedicated Worker configuration
 
-- [x] 4.1 既存Serviceへlive Gatewayと自由入力検証を接続し、C01/C04のmock互換性・UTF-8・本文上限・シナリオヘッダー試験を通す。
-- [x] 4.2 GET connectionとCORSを実装し、C02/C03の接続状態・許可Origin・拒否Origin・OPTIONS・no-store試験を通す。
-- [x] 4.3 専用Worker構成と起動手順を追加し、Next.js/ローカルWorkersのHTTP試験・型検証・ビルドを通す。既存Worker名・設定が変わっていないことをdiffで確認する。
+- [x] 4.1 Connect the live Gateway and free-form input validation to the existing Service, and pass C01/C04 mock-compatibility, UTF-8, body-limit, and scenario-header tests.
+- [x] 4.2 Implement GET connection and CORS, and pass C02/C03 connection-state, allowed-origin, rejected-origin, OPTIONS, and no-store tests.
+- [x] 4.3 Add dedicated Worker configuration and startup instructions. Pass Next.js and local Workers HTTP tests, type checks, and builds. Confirm by diff that existing Worker names and configuration are unchanged.
 
-## 5. 発行者CLI
+## 5. Issuer CLI
 
-- [x] 5.1 暗号化キーストアの読込み、未署名取引照合、署名準備とstate保存を実装する。鍵漏えい防止・保存権限・排他・送信前保存の試験を通す。
-- [x] 5.2 deployとABIリンクを実装する。C09の配置後中断・resume・同一Library再利用・不一致拒否・startingBlock維持の試験を通す。
-- [x] 5.3 issue/show/resumeを実装し、C09の同一カード再実行・異なる許可先・曖昧な送信結果・明示的な同一取引再送を試験する。
-- [x] 5.4 CLIの設定・操作・再開手順を保存し、ローカル環境で記載コマンドを順に実行できることを確認する。
+- [x] 5.1 Implement encrypted-keystore loading, unsigned-transaction comparison, signing preparation, and state storage. Pass tests for key-leak prevention, storage permissions, exclusion, and saving before submission.
+- [x] 5.2 Implement deploy and ABI linking. Pass C09 tests for interruption after deployment, resume, reuse of the same Library, mismatch rejection, and startingBlock preservation.
+- [x] 5.3 Implement issue/show/resume and test C09 same-card reruns, different allowed recipients, ambiguous submission results, and explicit resending of the same transaction.
+- [x] 5.4 Save CLI configuration, operation, and resume procedures, and verify that the documented commands can run in sequence locally.
 
-## 6. 実環境とUIの結合確認
+## 6. Live environment and UI integration
 
-- [x] 6.1 接続設定の提供後、権限と実応答を確認し、機密情報を除いたMultiBaas fixtureを契約試験へ追加する。不明形式があれば設計を改訂し、推測でreadyにしない。
-- [ ] 6.2 配置・公開の指示を受け、コントラクト配置と専用Worker公開を行う。C10の接続確認・本人登録・再読込・別端末読取りを実測する。
-- [ ] 6.3 UI担当とC11/C12を確認し、スマホからMetaMaskへの遷移・復帰・拒否・切断・再照会と表示検証の結果を記録する。
-- [x] 6.4 実際のchain/contract/card/hash/blockと日時、未達条件、AI使用範囲を変更記録へ残す。記録からC10/C11を追跡でき、A07を達成済みと誤記していないことを確認する。
+- [x] 6.1 After receiving connection settings, verify permissions and real responses and add sanitized MultiBaas fixtures to contract tests. Revise the design for unknown formats rather than guessing ready status.
+- [ ] 6.2 After deployment and publication instructions, deploy the contract and dedicated Worker. Measure C10 connection checks, owner registration, reload, and reads on another device.
+- [ ] 6.3 Check C11/C12 with the UI owner and record smartphone MetaMask transition, return, rejection, disconnection, requery, and display results.
+- [x] 6.4 Record actual chain/contract/card/hash/block values, date and time, unmet conditions, and AI scope in the change log. Confirm that the records trace C10/C11 and do not wrongly mark A07 complete.
 
-## 7. 最新mainのUIへの接続
+## 7. Connect the latest main UI
 
-- [x] 7.1 モードと登録状態、並行作業の境界を設計し、最新mainのUIを基準にする。
-- [x] 7.2 build時のAPI/wallet切替を実装し、既定mock・live閲覧専用・不正な組合せの拒否を検証する。
-- [x] 7.3 既存画面を実APIへ接続し、所有者・証跡・カードIDと通信失敗を表示する。
-- [x] 7.4 MetaMask接続・chain切替・本人取引の照合と署名・アカウント変更を実装する。
-- [x] 7.5 送信状態の保存、連打防止、復帰後の照会、拒否・失敗・結果不明を検証する。
-- [x] 7.6 mock回帰・liveブラウザ試験・320/390px/desktopの表示を検証し、専用URLへUIを配置して実測範囲と残条件を記録する。
+- [x] 7.1 Design modes, registration states, and parallel-work boundaries against the latest main UI.
+- [x] 7.2 Implement build-time API/wallet switching and verify default mock, live read-only mode, and invalid-combination rejection.
+- [x] 7.3 Connect existing screens to the real API and display owner, evidence, card ID, and communication failures.
+- [x] 7.4 Implement MetaMask connection, chain switching, owner-transaction comparison and signing, and account changes.
+- [x] 7.5 Verify saved submission state, repeated-click prevention, queries after return, rejection, failure, and unknown results.
+- [x] 7.6 Verify mock regression, live browser tests, and 320px/390px/desktop display. Deploy the UI to the dedicated URL and record measured scope and remaining conditions.
 
-## 8. 全員登録デモと診断
+## 8. Open-registration demo and diagnostics
 
-- [x] 8.1 全員許可を既定にし、本人署名・初回登録のみの制約を維持する。
-- [x] 8.2 新コントラクトと未登録デモカードを配置し、公開APIの準備・イベント・取引照合を実測する。
-- [x] 8.3 エラー受付ID・構造化ログ・スマホでの診断コピーを追加して検証する。
+- [x] 8.1 Default to unrestricted registration while preserving owner signatures and first-registration-only constraints.
+- [x] 8.2 Deploy a new contract and unregistered demo cards, and measure public API preparation, event, and transaction comparisons.
+- [x] 8.3 Add and verify error request IDs, structured logs, and diagnostic copying on smartphones.
 
-## 9. 登録待機と登録後の再取得
+## 9. Registration wait and post-registration refresh
 
-- [x] 9.1 初回登録の取引・証跡確認を最大60秒待ち、未確認と確認済みを区別する。
-- [x] 9.2 再取得を登録処理から分離し、ステータスだけを更新する。
-- [x] 9.3 境界値とブラウザ表示を検証し、専用URLへ反映して記録する。
+- [x] 9.1 Wait up to sixty seconds for initial transaction and evidence confirmation, distinguishing unconfirmed from confirmed results.
+- [x] 9.2 Separate refresh from registration and update only status.
+- [x] 9.3 Verify boundaries and browser display, publish to the dedicated URL, and record results.
