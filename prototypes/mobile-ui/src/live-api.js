@@ -15,7 +15,7 @@ export class LiveError extends Error {
 
 export function createLiveApi(baseUrl, fetcher) {
   const base = baseUrl.replace(/\/$/, '');
-  async function request(path, validator, body) {
+  async function request(path, validator, body, timeout = 20000) {
     let response;
     const fail = code => {
       const rawId = response?.headers?.get('X-Request-ID');
@@ -28,7 +28,7 @@ export function createLiveApi(baseUrl, fetcher) {
         method: body ? 'POST' : 'GET',
         headers: body ? { 'Content-Type': 'application/json' } : {},
         ...(body ? { body: JSON.stringify(body) } : {}),
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(timeout),
       });
     } catch { throw fail('UPSTREAM_UNAVAILABLE'); }
     let json;
@@ -41,8 +41,8 @@ export function createLiveApi(baseUrl, fetcher) {
   const path = id => `/cards/${encodeURIComponent(id)}`;
   return {
     connection: () => request('/connection', ConnectionResponse),
-    card: id => request(path(id), CardResponse),
+    card: (id, timeout) => request(path(id), CardResponse, undefined, timeout),
     prepare: (id, input) => request(`${path(id)}/registration/prepare`, PrepareResponse, input),
-    transaction: (id, hash) => request(`${path(id)}/transactions/${hash}`, TransactionResponse),
+    transaction: (id, hash, timeout) => request(`${path(id)}/transactions/${hash}`, TransactionResponse, undefined, timeout),
   };
 }

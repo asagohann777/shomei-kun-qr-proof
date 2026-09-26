@@ -20,11 +20,11 @@ function fixture(o = {}) {
   if(url.endsWith('/connection')) data = connection;
   else if(url.endsWith('/prepare')) { prepared++; if(o.prepare) await o.prepare(change); const b = JSON.parse(init.body); data = { cardId: id, nickname: b.nickname, transaction: { chainId, from: account, to: address, value:'0', data: iface.encodeFunctionData('register', [id,b.nickname]) } }; if(o.mutate) data = o.mutate(data); }
   else if(url.includes('/transactions/')) { if(o.beforeTransaction) await o.beforeTransaction(); data = o.transaction ?? { cardId:id, transactionHash:hash, status:'confirmed', owner:{address:account,nickname}, blockNumber:2 }; }
-  else data = card;
+  else { if (o.beforeCard) await o.beforeCard(); data = card; }
   return { ok:true, json:async () => ({meta:{mode:o.mode ?? 'live'},data:o.malformed ? {} : data}) };
  };
- const controller = createLiveRegistration({apiMode:'live',walletMode:o.walletMode ?? 'metamask',apiBaseUrl:'https://api.example.test'}, o.changed ?? (() => {}), {fetch,storage,locks:o.locks ?? {request:async (_k,_o,fn) => fn({})},walletFactory:async args => {factories++;onChange=args.onChange;return wallet;},setTimeout:()=>0,clearTimeout(){}});
- return {controller,values,change,counts:()=>({sent,prepared,factories})};
+ const controller = createLiveRegistration({apiMode:'live',walletMode:o.walletMode ?? 'metamask',apiBaseUrl:'https://api.example.test'}, o.changed ?? (() => {}), {fetch,storage,locks:o.locks ?? {request:async (_k,_o,fn) => fn({})},walletFactory:async args => {factories++;onChange=args.onChange;return wallet;},setTimeout:o.setTimeout ?? (()=>0),clearTimeout(){},now:o.now});
+ return {controller,values,change,setCard: value => { card = value; },counts:()=>({sent,prepared,factories})};
 }
 async function ready(f){await f.controller.open(id);await f.controller.connect();}
 test('confirms authoritative ownership and persists hash',async()=>{const f=fixture();await ready(f);await f.controller.register(nickname);assert.equal(f.controller.getSnapshot().registration.kind,'confirmed');assert.equal(f.controller.getSnapshot().read.card.owner.nickname,nickname);assert.equal(JSON.parse([...f.values.values()][0]).hash,hash);assert.equal(f.counts().sent,1);});
@@ -131,4 +131,71 @@ test('reopening while an older confirmation is in flight starts its own confirma
   releaseOld();
   await first;
   assert.equal(f.controller.getSnapshot().registration.kind, 'confirmed');
+});
+
+const registered = { cardId: id, registry, playerName: '証明一郎', status: 'registered', owner: { address: account, nickname }, evidence: { status: 'pending' } };
+function clock() {
+  let time = 0, callback, delay;
+  return { now: () => time, setTimeout: (fn, ms) => { callback = fn; delay = ms; }, async tick(ms) { time += ms; callback = null; }, delay: () => delay };
+}
+test('initial registration waits for indexed evidence and finishes when it arrives', async () => {
+  const c = clock(), f = fixture({ ...c, send: async () => hash });
+  await ready(f); f.setCard(registered);
+  await f.controller.register(nickname);
+  assert.equal(f.controller.getSnapshot().registration.kind, 'pending');
+  await c.tick(59000); await f.controller.recheck();
+  assert.equal(f.controller.getSnapshot().registration.kind, 'pending');
+  assert.equal(c.delay(), 1000);
+  f.setCard({ ...registered, evidence: { status: 'available', transactionHash: hash, blockNumber: 2 } });
+  await c.tick(500); await f.controller.recheck();
+  assert.equal(f.controller.getSnapshot().registration.kind, 'confirmed');
+  assert.equal(f.counts().sent, 1);
+});
+test('at 60 seconds a verified registration can finish with evidence still pending', async () => {
+  const c = clock(), f = fixture({ ...c, send: async () => hash });
+  await ready(f); f.setCard(registered); await f.controller.register(nickname);
+  await c.tick(60000); await f.controller.recheck();
+  assert.equal(f.controller.getSnapshot().registration.kind, 'confirmed');
+  assert.equal(f.controller.getSnapshot().read.card.evidence.status, 'pending');
+  assert.equal(f.counts().sent, 1);
+});
+test('at 60 seconds an unconfirmed transaction remains unknown without resend', async () => {
+  const c = clock(), f = fixture({ ...c, transaction: { cardId: id, transactionHash: hash, status: 'pending' } });
+  await ready(f); await f.controller.register(nickname);
+  await c.tick(59000); await f.controller.recheck();
+  assert.equal(f.controller.getSnapshot().registration.kind, 'pending');
+  await c.tick(1000); await f.controller.recheck();
+  assert.equal(f.controller.getSnapshot().registration.kind, 'unknown');
+  assert.equal(f.controller.getSnapshot().registration.errorCode, 'CONFIRMATION_TIMEOUT');
+  await f.controller.register(nickname); assert.equal(f.counts().sent, 1);
+});
+test('refresh preserves registration and owner, deduplicates reads, and recovers from failure', async () => {
+  let gate, fail = false, reads = 0;
+  const f = fixture({ card: registered, beforeCard: async () => { reads++; if (gate) await gate; if (fail) throw Error('offline'); } });
+  await f.controller.open(id);
+  let release; gate = new Promise(resolve => { release = resolve; });
+  const refreshing = f.controller.refresh(); await f.controller.refresh();
+  assert.equal(reads, 2);
+  assert.equal(f.controller.getSnapshot().refresh.kind, 'checking');
+  assert.equal(f.controller.getSnapshot().registration.kind, 'idle');
+  assert.deepEqual(f.controller.getSnapshot().read.card, registered);
+  fail = true; release(); await refreshing;
+  assert.equal(f.controller.getSnapshot().refresh.kind, 'failed');
+  assert.deepEqual(f.controller.getSnapshot().read.card, registered);
+  gate = null; fail = false;
+  f.setCard({ ...registered, evidence: { status: 'available', transactionHash: hash, blockNumber: 2 } });
+  await f.controller.refresh();
+  assert.equal(f.controller.getSnapshot().refresh.kind, 'idle');
+  assert.equal(f.controller.getSnapshot().read.card.evidence.status, 'available');
+  assert.equal(f.counts().prepared, 0); assert.equal(f.counts().sent, 0);
+});
+test('late refresh cannot overwrite navigation', async () => {
+  let gate, release;
+  const f = fixture({ card: registered, beforeCard: async () => { if (gate) await gate; } });
+  await f.controller.open(id);
+  gate = new Promise(resolve => { release = resolve; });
+  const refreshing = f.controller.refresh(); await f.controller.open(null);
+  release(); await refreshing;
+  assert.equal(f.controller.getSnapshot().read.kind, 'not-found');
+  assert.equal(f.controller.getSnapshot().refresh.kind, 'idle');
 });

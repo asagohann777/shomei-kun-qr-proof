@@ -1,5 +1,7 @@
 export const liveMessages = {
   ja: {
+    checkingEvidence: '確認中', refreshFailed: '確認できませんでした', evidenceTitle: '取引情報の反映待ち', refreshEvidence: '再取得',
+    confirmingCopy: '完了まで最大1分ほどかかります。',
     insufficientFunds: 'ガス代が足りません。接続したウォレットにテスト用ETHを補充してください。',
     walletNotAllowedHelp: 'このカードの登録許可先と、接続中のウォレットが違います。許可されたアカウントに切り替えてください。',
     copyDiagnostics: 'エラー詳細をコピー', diagnosticsCopied: 'コピーしました。調査する相手に共有してください。',
@@ -17,6 +19,8 @@ export const liveMessages = {
     scanButton: '試験カードを確認', recordedNote: '登録取引と所有者を確認しました。',
   },
   en: {
+    checkingEvidence: 'Checking', refreshFailed: 'Could not check', evidenceTitle: 'Transaction details pending', refreshEvidence: 'Refresh',
+    confirmingCopy: 'This may take up to a minute.',
     insufficientFunds: 'Not enough gas. Add test ETH to the connected wallet.',
     walletNotAllowedHelp: 'This wallet is not authorized for this card. Switch to the authorized account.',
     copyDiagnostics: 'Copy error details', diagnosticsCopied: 'Copied. Share these details for investigation.',

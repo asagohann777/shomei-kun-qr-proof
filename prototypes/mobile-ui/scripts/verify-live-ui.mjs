@@ -24,7 +24,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     const page = await context.newPage();
     page.setDefaultTimeout(12000);
     const errors = [], screenshotWarnings = [], walletCalls = [], requests = [], assertions = [];
-    let screenshotActive = false, phase = 'unregistered', failRead = false, failPrepare = false, prepareError = 'WALLET_NOT_ALLOWED', txReads = 0;
+    let screenshotActive = false, phase = 'unregistered', evidencePending = false, cardGate = null, failRead = false, failPrepare = false, prepareError = 'WALLET_NOT_ALLOWED', txReads = 0;
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', message => {
       if (message.type() !== 'error') return;
@@ -71,7 +71,8 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         data = phase === 'confirmed' ? { cardId, transactionHash: hash, status: 'confirmed', owner: { address: account, nickname }, blockNumber: 11 } : { cardId, transactionHash: hash, status: 'pending' };
         validate = TransactionResponse;
       } else if (path === `/api/v1/cards/${cardId}`) {
-        data = { cardId, registry, playerName: '証明一郎', ...(phase === 'confirmed' ? { status: 'registered', owner: { address: account, nickname }, evidence: { status: 'available', transactionHash: hash, blockNumber: 11 } } : { status: 'unregistered', owner: null, evidence: { status: 'none' } }) };
+        if (cardGate) await cardGate;
+        data = { cardId, registry, playerName: '証明一郎', ...(phase === 'confirmed' ? { status: 'registered', owner: { address: account, nickname }, evidence: evidencePending ? { status: 'pending' } : { status: 'available', transactionHash: hash, blockNumber: 11 } } : { status: 'unregistered', owner: null, evidence: { status: 'none' } }) };
         validate = CardResponse;
       } else throw new Error(`Unexpected API request ${path}`);
       const body = { meta: { mode: 'live' }, data };
@@ -123,8 +124,12 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     assert(txReads > beforeReload);
     assert.equal(walletCalls.filter(method => method === 'eth_sendTransaction').length, 1);
     assertions.push('approval and pending use injected provider result; reload checks same hash without resend');
-    phase = 'confirmed';
+    phase = 'confirmed'; evidencePending = true;
     await page.reload();
+    await page.locator('.processing-page').waitFor();
+    await page.waitForTimeout(2700);
+    assert.equal(await page.locator('.result-page').count(), 0, 'wait for indexed evidence before completion');
+    evidencePending = false;
     await page.locator('.result-page').waitFor();
     assert.match(await page.locator('.record-table').innerText(), /おじいちゃんコンビニ/);
     assert.equal(await action('start-register').count(), 0);
@@ -142,6 +147,41 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     await page.locator('.result-page').waitFor();
     assert.equal(walletCalls.filter(method => method === 'eth_sendTransaction').length, 1);
     assertions.push('confirmed ownership and evidence survive fresh API read at 390, 320 and desktop');
+    await page.evaluate(() => localStorage.clear());
+    evidencePending = true;
+    await page.reload(); await action('refresh-evidence').waitFor();
+    await page.evaluate(() => { window.originalTable = document.querySelector('.record-table'); window.originalCard = document.querySelector('.trading-card'); });
+    let releaseCard;
+    cardGate = new Promise(resolve => { releaseCard = resolve; });
+    await action('refresh-evidence').click();
+    await page.locator('#evidence-status[aria-busy="true"]').waitFor();
+    assert.match(await page.locator('#evidence-status').innerText(), /確認中/);
+    assert(await action('refresh-evidence').isDisabled());
+    assert.equal(await page.locator('.processing-page').count(), 0);
+    assert(await page.evaluate(() => window.originalTable === document.querySelector('.record-table') && window.originalCard === document.querySelector('.trading-card')));
+    for (const width of [390, 320, 1365]) { await page.setViewportSize({ width, height: 844 }); await layout(`${width}-refreshing`); }
+    await action('scenarios').click(); await action('language').click();
+    await page.locator('#scenarios-dialog form button').click();
+    assert.match(await page.locator('#evidence-status').innerText(), /Checking/);
+    await page.setViewportSize({ width: 320, height: 844 }); await layout('320-refreshing-en');
+    await action('scenarios').click(); await action('language').click();
+    await page.locator('#scenarios-dialog form button').click();
+    await page.evaluate(() => { window.originalTable = document.querySelector('.record-table'); window.originalCard = document.querySelector('.trading-card'); });
+    releaseCard(); cardGate = null;
+    await page.locator('#evidence-status[aria-busy="false"]').waitFor();
+    failRead = true;
+    await action('refresh-evidence').click();
+    await page.waitForFunction(() => document.querySelector('#evidence-status').innerText.includes('確認できませんでした'));
+    assert.match(await page.locator('.record-table').innerText(), /おじいちゃんコンビニ/);
+    await page.setViewportSize({ width: 320, height: 844 }); await layout('320-refresh-failed');
+    failRead = false; evidencePending = false;
+    await action('refresh-evidence').click();
+    await page.waitForFunction(() => document.querySelector('#evidence-status').innerText.includes('登録取引と所有者を確認しました'));
+    assert(await page.evaluate(() => window.originalTable === document.querySelector('.record-table')));
+    await action('details').click();
+    assert.match(await page.locator('#details-dialog').innerText(), new RegExp(hash));
+    await page.locator('#details-dialog form button').click();
+    assertions.push('initial confirmation waits for evidence; refresh updates only status, preserves DOM and owner on failure, recovers and updates details');
     await page.evaluate(() => localStorage.clear());
     failRead = true;
     await page.reload();

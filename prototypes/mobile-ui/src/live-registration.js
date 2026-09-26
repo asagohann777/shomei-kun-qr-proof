@@ -16,10 +16,11 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
   if (!storage) { try { storage = globalThis.localStorage; } catch { /* Submission reports unavailable storage. */ } }
   const locks = dependencies.locks ?? globalThis.navigator?.locks;
   const setTimer = dependencies.setTimeout ?? globalThis.setTimeout;
+  const now = dependencies.now ?? Date.now;
   const clearTimer = dependencies.clearTimeout ?? globalThis.clearTimeout;
   const walletFactory = dependencies.walletFactory ?? (async options => (await import('./metamask-wallet.js')).createMetaMaskWallet(options));
-  let state = { read: { kind: 'loading' }, wallet: { kind: 'disconnected' }, registration: { kind: 'idle' }, walletRevision: 0, canRegister: false };
-  let wallet, cardId, generation = 0, disposed = false, timer, attempt, polls = 0, checking = null, submitting = false;
+  let state = { read: { kind: 'loading' }, wallet: { kind: 'disconnected' }, registration: { kind: 'idle' }, refresh: { kind: 'idle' }, walletRevision: 0, canRegister: false };
+  let wallet, cardId, generation = 0, disposed = false, timer, attempt, deadline = 0, verified = false, checking = null, submitting = false;
   const snapshot = () => structuredClone(state);
   function emit() {
     state.canRegister = config.walletMode === 'metamask' && state.read.kind === 'ready' && state.read.card.status === 'unregistered' && state.wallet.kind === 'connected' && state.wallet.chainId === state.read.connection.registry.chainId && !busy.has(state.registration.kind) && !submitting;
@@ -56,7 +57,7 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
     else state.registration = { kind: saved.status === 'rejected' ? 'idle' : 'unknown' };
   }
   async function open(id) {
-    const current = ++generation; cardId = id; attempt = null; polls = 0; clearTimer(timer);
+    const current = ++generation; cardId = id; attempt = null; deadline = 0; verified = false; state.refresh = { kind: 'idle' }; clearTimer(timer);
     state.read = { kind: 'loading' }; state.registration = { kind: 'idle' }; emit();
     if (!CardId(id)) { state.read = { kind: 'not-found' }; emit(); return; }
     try {
@@ -73,6 +74,25 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
       if (current !== generation || disposed) return;
       state.read = { kind: code(error) === 'CARD_NOT_FOUND' ? 'not-found' : 'unavailable', errorCode: code(error) }; emit();
     }
+  }
+  async function refresh() {
+    if (disposed || state.read.kind !== 'ready' || state.read.card.status !== 'registered' || state.refresh.kind === 'checking') return;
+    const current = generation;
+    state.refresh = { kind: 'checking' }; emit();
+    try {
+      const card = await api.card(cardId);
+      if (current !== generation || disposed) return;
+      identity(card, state.read.connection);
+      const previous = state.read.card;
+      if (card.status !== 'registered' || !same(card.owner.address, previous.owner.address) || card.owner.nickname !== previous.owner.nickname) throw new LiveError('RECORD_MISMATCH');
+      state.read = { ...state.read, card };
+      state.refresh = { kind: 'idle' };
+    } catch (error) {
+      if (current !== generation || disposed) return;
+      state.refresh = { kind: 'failed', errorCode: code(error) };
+      recordFailure({ operation: 'refreshEvidence', cardId, code: code(error) });
+    }
+    emit();
   }
   async function connect() {
     if (config.walletMode !== 'metamask' || state.read.kind !== 'ready' || state.wallet.kind === 'connecting' || busy.has(state.registration.kind)) return;
@@ -116,7 +136,7 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
           sending.hash = hash; sending.status = 'pending';
           try { save(sending); } catch { if (current === generation) registration({ kind: 'unknown', hash, errorCode: 'STORAGE_UNAVAILABLE' }); return; }
           if (current !== generation || disposed) return;
-          attempt = sending; polls = 0; registration({ kind: 'pending', hash }); await recheck();
+          attempt = sending; deadline = now() + 60000; verified = false; registration({ kind: 'pending', hash }); await recheck();
         } catch (error) {
           sending.status = error?.code === 4001 ? 'rejected' : 'unknown';
           try { save(sending); } catch { /* Original approval marker still prevents blind resend. */ }
@@ -127,7 +147,7 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
     finally { submitting = false; emit(); }
   }
   async function recheck(hash) {
-    if (checking === generation || disposed || state.read.kind !== 'ready') return;
+    if (checking === generation || disposed || state.read.kind !== 'ready' || state.registration.kind === 'confirmed') return;
     if (hash !== undefined) {
       if (!TransactionHash(hash) || !attempt) { registration({ kind: 'unknown', errorCode: 'INVALID_INPUT' }); return; }
       attempt = { ...attempt, hash, status: 'unknown' };
@@ -144,25 +164,42 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
     }
     if (!attempt?.hash) return;
     const current = generation, active = attempt;
+    if (!deadline || state.registration.kind === 'unknown') deadline = now() + 60000;
+    const finish = () => registration(verified ? { kind: 'confirmed', hash: active.hash } : { kind: 'unknown', hash: active.hash, errorCode: 'CONFIRMATION_TIMEOUT' });
+    const remaining = () => Math.max(1, Math.min(20000, deadline - now()));
+    if (now() >= deadline) { finish(); return; }
     checking = current; clearTimer(timer);
     try {
-      const result = await api.transaction(active.cardId, active.hash);
+      const result = await api.transaction(active.cardId, active.hash, remaining());
       if (current !== generation || disposed) return;
       if (result.cardId !== active.cardId || !same(result.transactionHash, active.hash)) throw new LiveError('RECORD_MISMATCH');
       if (result.status === 'confirmed') {
-        const card = await api.card(active.cardId);
+        const card = await api.card(active.cardId, remaining());
         if (current !== generation || disposed) return;
         identity(card, state.read.connection);
         if (card.status !== 'registered' || !same(card.owner.address, active.account) || card.owner.nickname !== active.nickname || !same(result.owner.address, active.account) || result.owner.nickname !== active.nickname) throw new LiveError('RECORD_MISMATCH');
         state.read = { ...state.read, card };
+        verified = true;
       }
-      active.status = result.status; save(active); registration({ kind: result.status, hash: active.hash });
-      if (result.status === 'pending' && ++polls < 12) timer = setTimer(() => void recheck(), 2500);
-      else if (result.status === 'pending') registration({ kind: 'unknown', hash: active.hash, errorCode: 'CONFIRMATION_TIMEOUT' });
-    } catch (error) { if (current === generation && !disposed) registration({ kind: 'unknown', hash: active.hash, errorCode: code(error) }); }
+      active.status = result.status; save(active);
+      const waiting = result.status === 'pending' || (result.status === 'confirmed' && state.read.card.evidence.status === 'pending');
+      if (!waiting) registration({ kind: result.status, hash: active.hash });
+      else if (now() >= deadline) finish();
+      else {
+        registration({ kind: 'pending', hash: active.hash });
+        timer = setTimer(() => void recheck(), Math.min(2500, deadline - now()));
+      }
+    } catch (error) {
+      if (current !== generation || disposed) return;
+      if (code(error) === 'UPSTREAM_UNAVAILABLE' && now() < deadline) {
+        registration({ kind: 'pending', hash: active.hash });
+        timer = setTimer(() => void recheck(), Math.min(2500, deadline - now()));
+      } else if (code(error) === 'UPSTREAM_UNAVAILABLE' && verified) finish();
+      else registration({ kind: 'unknown', hash: active.hash, errorCode: code(error) });
+    }
     finally { if (checking === current) checking = null; }
   }
   async function disconnect() { if (wallet) await wallet.disconnect(); setWallet(null); }
   function dispose() { disposed = true; generation++; clearTimer(timer); wallet?.dispose(); }
-  return { open, connect, switchChain, register, recheck, disconnect, dispose, getSnapshot: snapshot };
+  return { open, refresh, connect, switchChain, register, recheck, disconnect, dispose, getSnapshot: snapshot };
 }

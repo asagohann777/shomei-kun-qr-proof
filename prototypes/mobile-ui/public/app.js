@@ -103,8 +103,14 @@ function detailTable(includeOwner = true) {
   return `<dl class="record-table">${rows.map(([key, value]) => `<div><dt>${t(key)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl>`;
 }
 
+function evidenceStatus() {
+  const checking = liveSnapshot?.refresh.kind === 'checking';
+  const failed = liveSnapshot?.refresh.kind === 'failed';
+  const pending = state.card === 'evidence-pending';
+  return `<div class="recorded-note ${checking || pending || failed ? 'evidence-status-pending' : ''}">${checking ? '<span class="evidence-spinner" aria-hidden="true"></span>' : icon(pending || failed ? 'info' : 'check')}<div><strong>${t(checking ? 'checkingEvidence' : failed ? 'refreshFailed' : pending ? 'evidenceTitle' : 'recorded')}</strong><p>${t(pending || failed ? 'evidenceCopy' : 'recordedNote')}</p></div></div>${pending || failed || checking ? `<button class="btn btn-ghost evidence-refresh" data-action="refresh-evidence" ${checking ? 'disabled' : ''}>${t('refreshEvidence')}</button>` : ''}`;
+}
 function registeredView(completed = false) {
-  return `<section class="page result-page"><div class="status-symbol success">${icon('check')}</div><h1 class="page-title">${t(completed ? 'successTitle' : 'registered')}</h1>${tradingCard()}<div class="info-panel">${detailTable()}<div class="recorded-note">${icon('check')}<div><strong>${t('recorded')}</strong><p>${t(liveEnabled && state.card === 'evidence-pending' ? 'evidenceCopy' : 'recordedNote')}</p></div></div>${state.card === 'evidence-pending' ? `<div class="alert alert-warning"><div>${t('evidenceTitle')}<button class="btn btn-ghost" data-action="refresh-evidence">${t('refreshEvidence')}</button></div></div>` : ''}<div class="result-actions"><button class="btn btn-outline" data-action="details">${t('detailsButton')}</button><button class="btn btn-primary" data-action="home">${t('home')}</button></div></div></section>`;
+  return `<section class="page result-page"><div class="status-symbol success">${icon('check')}</div><h1 class="page-title">${t(completed ? 'successTitle' : 'registered')}</h1>${tradingCard()}<div class="info-panel">${detailTable()}<div id="evidence-status" role="status" aria-live="polite" aria-busy="${liveSnapshot?.refresh.kind === 'checking'}">${evidenceStatus()}</div><div class="result-actions"><button class="btn btn-outline" data-action="details">${t('detailsButton')}</button><button class="btn btn-primary" data-action="home">${t('home')}</button></div></div></section>`;
 }
 function cardView() {
   if (liveEnabled && (!liveSnapshot || liveSnapshot.read.kind === 'loading')) return `<section class="page"><h1 class="page-title" role="status">${t('loading')}</h1></section>`;
@@ -251,6 +257,7 @@ function liveNotice(code) {
   return 'apiFailed';
 }
 function receiveLive(snapshot) {
+  const statusOnly = liveSnapshot && (snapshot.refresh.kind === 'checking' || liveSnapshot.refresh.kind === 'checking') && root.querySelector('#evidence-status');
   const changedWallet = liveSnapshot && snapshot.walletRevision !== liveSnapshot.walletRevision;
   liveSnapshot = snapshot;
   if (changedWallet) { state.consent = false; if (state.view === 'review') state.view = 'register'; }
@@ -265,7 +272,10 @@ function receiveLive(snapshot) {
   const mapped = { preparing: 'approval', approval: 'approval', pending: 'confirming', unknown: 'unknown', rejected: 'rejected', reverted: 'failed', confirmed: 'success', failed: 'failed' }[stage];
   if (mapped && currentCardId) state.view = mapped;
   liveError = snapshot.registration.errorCode ? liveNotice(snapshot.registration.errorCode) : null;
-  render(true);
+  if (statusOnly) {
+    statusOnly.setAttribute('aria-busy', String(snapshot.refresh.kind === 'checking'));
+    statusOnly.innerHTML = evidenceStatus();
+  } else render(true);
 }
 async function openLiveCard(cardId) {
   currentCardId = cardId;
@@ -326,7 +336,9 @@ async function handleLiveAction(action) {
     try { await live?.recheck(hash || undefined); } catch { liveError = 'apiFailed'; render(); }
     return true;
   }
-  if (['refresh-evidence', 'retry-read'].includes(action)) { if (currentCardId) await live?.open(currentCardId); return true; }
+  if (action === 'details') render(true);
+  if (action === 'refresh-evidence') { await live?.refresh(); return true; }
+  if (action === 'retry-read') { if (currentCardId) await live?.open(currentCardId); return true; }
   return false;
 }
 if (liveEnabled) {
