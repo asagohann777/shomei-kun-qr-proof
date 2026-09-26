@@ -166,10 +166,31 @@
   .record-table > div { display: grid; grid-template-columns: 44% minmax(0, 1fr); border-radius: 8px; overflow: hidden; }
   .record-table dt { font-size: 12px; background: #dae8fb; color: #36587b; padding: 10px; display: flex; align-items: center; }
   .record-table dd { margin: 0; background: #f8fbff; font-weight: 700; padding: 10px; }
-  .consent-label { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; line-height: 1.7; margin-block: 18px; }
-  .consent-checkbox { flex-shrink: 0; width: 22px; height: 22px; accent-color: #0068f5; }
+  .consent-label { display: flex; align-items: flex-start; gap: 12px; line-height: 1.6; margin-block: 20px; cursor: pointer; }
+  .consent-label strong { display: block; font-size: 15px; font-weight: 700; }
+  .consent-label small { display: block; font-size: 12px; color: #47617d; margin-top: 3px; }
+  .consent-checkbox { appearance: none; position: relative; flex-shrink: 0; width: 24px; height: 24px; border: 1.5px solid #788899; border-radius: 7px; background: #ffffffed; margin-top: 1px; cursor: pointer; }
+  .consent-checkbox:checked { background: #0068f5; border-color: #0068f5; }
+  .consent-checkbox:checked::after { content: ""; position: absolute; left: 7px; top: 3px; width: 7px; height: 12px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
   .edit-button { display: flex; margin: 14px auto 0; min-height: 46px; min-width: 150px; }
-  .review-page .trading-card { width: 53%; }
+  .review-page { padding-top: 20px; }
+  .review-page > .page-title { font-size: 23px; }
+  .review-page .trading-card { width: 40%; margin-block: 16px 12px; }
+  .review-page .info-panel { padding: 20px 16px 18px; }
+  .review-record-table > div { grid-template-columns: 48% minmax(0, 1fr); }
+  .review-record-table dt > span:last-child { text-wrap: balance; }
+  .review-page .info-panel, .approval-page .info-panel { background: linear-gradient(135deg, #f7fbfff2, #dceafbdb 55%, #f5faffeb); }
+  .review-record-table dt { gap: 5px; padding: 5px 6px; font-size: 11px; }
+  .review-record-table dd { padding: 10px 8px; }
+  .field-icon { display: grid; place-items: center; flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: #edf8ff99; color: #1483ce; }
+  .field-icon .icon { width: 20px; height: 20px; stroke-width: 2; }
+  .review-record-table > div:nth-child(2) .field-icon { color: #080e48; }
+  .review-page .panel-primary:disabled { background: linear-gradient(120deg, #d8e5f1cc, #cdddea99); color: #77879c; border-color: transparent; }
+  .review-page .edit-button { border-radius: 18px; color: #1483ce; background: #ffffffb3; }
+  .approval-page .status-symbol { width: 50px; height: 50px; background: linear-gradient(145deg, #008cf5, #0068f5); }
+  .approval-page .process-copy { max-width: 94%; margin-inline: auto; padding: 10px 12px; }
+  .approval-page .info-panel { padding: 16px; margin-top: 20px; }
+  .decline-button { display: flex; min-width: 154px; min-height: 44px; margin: 12px auto 0; border-radius: 28px; border: 1px solid #73a9ed; background: linear-gradient(150deg, #ffffffd9, #d9eaff99); color: #3988d4; font-size: 16px; }
   .result-page .trading-card { width: 50%; margin-block: 16px; }
   .result-page .info-panel { padding: 14px 12px; }
   .result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }

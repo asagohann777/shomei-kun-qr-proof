@@ -110,3 +110,7 @@ LIVE_READONLY_UI_URL=http://127.0.0.1:4175 node scripts/verify-live-ui.mjs
 `verify-live-ui.mjs` はAPI応答とEIP-1193を差し替えるブラウザ試験。`verify-live-chain.mjs` は明示した専用鍵で実取引を送る手動実行用スクリプト。通常のテストには含めない。後者もスマホ実機のMetaMask試験とは区別する。
 
 実ウォレットを注入せずに配信bundleのSDK初期化を確認するには `node scripts/verify-metamask-sdk.mjs` を実行する。専用URLでMetaMaskの起動リンクとrelay接続開始を確認し、アプリへの移動直前で止める。取引は送信しない。
+
+## 承認・登録確認の追加図案
+
+2026-09-26受領の図案に合わせ、登録確認の項目アイコン・同意文・カードサイズと、ウォレット承認の情報パネル・拒否ボタンを調整した。`?scenario=unregistered` から「次へ」、サンプル接続、「次へ」で確認できる。同意チェック後の「登録する」で承認画面に進む。実接続では承認をMetaMask内で行う。日英・320px/390px・Chromium/WebKitで確認済み。この追加修正はローカルのみ。
