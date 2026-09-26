@@ -17,5 +17,5 @@ test('external iPhone and iPad browsers use in-app navigation, injected MetaMask
   assert.equal(useMetaMaskBrowser({ ...config, walletMode: 'mock' }, 'iPhone', null), false);
 });
 test('in-app link carries only the current card, without drafts or session parameters', () => {
-  assert.equal(metaMaskBrowserLink('https://demo.example/ui/?nickname=private#session', 'card-001'), 'https://link.metamask.io/dapp/demo.example/ui/?cardId=card-001');
+  assert.equal(metaMaskBrowserLink('https://demo.example/ui/?nickname=private#session', 'card-001'), 'metamask://dapp/demo.example/ui/?cardId=card-001');
 });

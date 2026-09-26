@@ -30,9 +30,17 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     await page.goto(`${base}/?cardId=${cardId}`);
     const link = page.locator('[data-metamask-browser]');
     await link.waitFor();
-    assert.equal(await link.getAttribute('href'), `https://link.metamask.io/dapp/shomei-kun-integration.dptr.workers.dev/ui/?cardId=${cardId}`);
+    assert.equal(await link.getAttribute('href'), `metamask://dapp/shomei-kun-integration.dptr.workers.dev/ui/?cardId=${cardId}`);
     assert.equal(await page.locator('#nickname').count(), 0);
     assert.equal(await page.locator('[data-action="prepare-wallet"]').count(), 0);
+    await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async value => { window.copiedCardUrl = value; } } }));
+    await page.locator('details.network-settings').filter({ has: page.locator('[data-action="copy-card-url"]') }).locator('summary').click();
+    await page.locator('[data-action="copy-card-url"]').click();
+    screenshotActive = true;
+    try { await page.screenshot({ path: `${output}/${name}-copy-url.png`, fullPage: true }); }
+    finally { screenshotActive = false; }
+    assert.equal(await page.evaluate(() => window.copiedCardUrl), `https://shomei-kun-integration.dptr.workers.dev/ui/?cardId=${cardId}`);
+    await page.locator('details.network-settings').filter({ has: page.locator('[data-action="copy-card-url"]') }).locator('summary').click();
     let destination;
     await page.exposeFunction('captureDestination', value => { destination = value; });
     await page.evaluate(() => document.addEventListener('click', event => { const link = event.target.closest('[data-metamask-browser]'); if (link) { event.preventDefault(); window.captureDestination(link.href); } }));

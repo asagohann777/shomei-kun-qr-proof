@@ -1,4 +1,4 @@
-import { hasMetaMaskProvider, useMetaMaskBrowser, metaMaskBrowserLink } from '../src/wallet-navigation.js';
+import { hasMetaMaskProvider, useMetaMaskBrowser, metaMaskBrowserLink, cardPageUrl } from '../src/wallet-navigation.js';
 import { messages } from './messages.js';
 import { walletMessages } from './wallet-messages.js';
 import { liveMessages } from './live-messages.js';
@@ -193,7 +193,7 @@ function registeredView(completed = false) {
   return `<section class="page result-page"><div class="status-symbol success">${icon('check')}</div><h1 class="page-title">${t(completed ? 'successTitle' : 'registered')}</h1>${tradingCard()}<div class="info-panel">${detailTable()}<div id="evidence-status" role="status" aria-live="polite" aria-busy="${liveSnapshot?.refresh.kind === 'checking'}">${evidenceStatus()}</div><div class="result-actions"><button class="btn btn-outline" data-action="details">${t('detailsButton')}</button></div></div></section>`;
 }
 function metaMaskHandoff() {
-  return `<p class="process-copy">${t('inAppContinue')}</p><a class="btn btn-primary wallet-prepare-button" data-metamask-browser href="${escape(metaMaskBrowserLink(config.publicUrl, currentCardId))}">${t('openInMetaMask')}</a>`;
+  return `<p class="process-copy">${t('inAppContinue')}</p><a class="btn btn-primary wallet-prepare-button" data-metamask-browser href="${escape(metaMaskBrowserLink(config.publicUrl, currentCardId))}">${t('openInMetaMask')}</a><details class="network-settings"><summary>${t('browserNotOpened')}</summary><p>${t('pasteInMetaMask')}</p><input class="input input-bordered w-full" aria-label="${t('cardPageAddress')}" readonly value="${escape(cardPageUrl(config.publicUrl, currentCardId))}"><button class="btn btn-outline wallet-prepare-button" data-action="copy-card-url">${t('copyCardUrl')}</button><p id="card-url-copy-status" role="status"></p></details>`;
 }
 function cardView() {
   if (liveEnabled && (!liveSnapshot || liveSnapshot.read.kind === 'loading')) return `<section class="page"><h1 class="page-title" role="status">${t('loading')}</h1></section>`;
@@ -291,6 +291,11 @@ root.addEventListener('click', async (event) => {
   event.preventDefault();
   const action = button.dataset.action;
   if (cameraEnabled && await handleCameraAction(action)) return;
+  if (action === 'copy-card-url') {
+    try { await navigator.clipboard.writeText(cardPageUrl(config.publicUrl, currentCardId)); root.querySelector('#card-url-copy-status').textContent = t('copied'); }
+    catch { root.querySelector('#card-url-copy-status').textContent = t('copyCardManually'); }
+    return;
+  }
   if (action === 'wallet-help') { root.querySelector('#wallet-help-dialog').showModal(); return; }
   if (!liveEnabled && action === 'prepare-wallet') { if (walletSetup().kind === 'idle') root.querySelector('#wallet-dialog').showModal(); else update({ wallet: 'valid' }); return; }
   if (!liveEnabled && action === 'check-wallet') { update({ scenario: 'wallet-paused', wallet: 'wrong-chain' }); return; }

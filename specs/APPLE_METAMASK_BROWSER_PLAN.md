@@ -25,3 +25,20 @@ iPadはiPadのUser-Agentに加え、MacintoshのUser-Agentと複数タッチ点�
 integration Worker version `77d732e4-0ad2-424c-88ad-bd6466962351` に反映。公開JS/CSS/HTML24件がビルドと一致。実カメラとモックの切替は維持した。
 
 公開URLでも両ブラウザの同じ試験が成功した。[公開試験結果](assets/apple-metamask-browser/public-results.json)。アプリへのリンク移動は直前で抑止し、実機検証とは区別した。
+
+## 実機報告を受けた再調査
+
+ユーザーから、アプリは開くがブラウザは開かないと再報告があった。前提「正しいHTTPSリンクを生成できれば、アプリ側も行き先を処理する」は実機では成立していない。確認範囲を分ける。
+
+| 段階 | 確認できたこと | 未確認・失敗 |
+| --- | --- | --- |
+| アプリのWeb UI | iPhone/iPad判定とカードID付きリンクの生成 | なし |
+| SafariからOSへの移動 | ユーザー実機でMetaMask起動 | アプリへ届いたURL全体は取得できない |
+| MetaMaskのリンク処理 | 公式ソースはdappをブラウザへ渡す | ユーザー実機はホーム画面で停止 |
+| 自動ブラウザ試験 | hrefとクリックを検証 | 実アプリ起動前で抑止しており、この失敗を検出できない |
+
+MetaMask公式の `parseDeeplink.ts` は `metamask://` を `https://link.metamask.io/` に正規化し、`handleDappUrl.ts` がブラウザへ対象URLを渡す。この直接スキームを使う形へ変更する。ただし、アプリ内で止まる原因の特定・解消を断定しない。開かなかった場合は同じカードのHTTPS URLをコピーしてアプリ内ブラウザへ貼り付けられるようにする。コピーAPIが失敗しても読取り専用欄から手動コピーできる。
+
+参照: [公式リンク解析](https://github.com/MetaMask/metamask-mobile/blob/main/app/core/DeeplinkManager/utils/parseDeeplink.ts)、[公式dapp処理](https://github.com/MetaMask/metamask-mobile/blob/main/app/core/DeeplinkManager/handlers/intent/handleDappUrl.ts)。
+
+直接スキーム版をversion `f356b57a-c981-4ce6-975d-9d5e0d4f7a21` へ公開。単体76件成功、Chromium/WebKitで直接リンクのクリック、カードURLコピー、iPad判定、アプリ内接続を確認した。公開資産24件がビルドと一致。[直接リンク版の結果](assets/apple-metamask-browser/direct-link-results.json)。実機のブラウザ起動成功は未確認。

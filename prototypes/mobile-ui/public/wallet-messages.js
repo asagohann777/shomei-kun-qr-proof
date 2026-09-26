@@ -1,6 +1,7 @@
 export const walletMessages = {
   ja: {
     walletPreparationTitle: 'ウォレット',
+    browserNotOpened: 'ページが開かないとき', pasteInMetaMask: 'URLをコピーし、MetaMaskのブラウザのアドレス欄に貼り付けてください。', cardPageAddress: 'カードのURL', copyCardUrl: 'URLをコピー', copyCardManually: '上のURLを長押ししてコピーしてください。',
     prepareWallet: 'MetaMaskで準備する', continueWallet: 'MetaMaskで続ける', walletReady: '接続済み',
     preparationCopy: '接続とネットワークの準備をします。', returnToBrowser: 'MetaMaskで許可したら、この画面に戻ってください。',
     setupCheck: '接続状況を確認しています', setupConnect: 'MetaMaskで接続を許可してください',
@@ -17,6 +18,7 @@ export const walletMessages = {
   },
   en: {
     walletPreparationTitle: 'Wallet',
+    browserNotOpened: 'Page not opening?', pasteInMetaMask: 'Copy the URL and paste it into the address bar of the MetaMask browser.', cardPageAddress: 'Card URL', copyCardUrl: 'Copy URL', copyCardManually: 'Press and hold the URL above to copy it.',
     prepareWallet: 'Set up MetaMask', continueWallet: 'Continue in MetaMask', walletReady: 'Connected',
     preparationCopy: 'Connect and prepare the network.', returnToBrowser: 'Approve in MetaMask, then return to this page.',
     setupCheck: 'Checking your connection', setupConnect: 'Allow the connection in MetaMask',

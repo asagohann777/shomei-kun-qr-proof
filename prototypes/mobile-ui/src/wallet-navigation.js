@@ -7,9 +7,13 @@ export function useMetaMaskBrowser(config, userAgent = globalThis.navigator?.use
   return config.apiMode === 'live' && config.walletMode === 'metamask' && appleMobile && !hasMetaMaskProvider(ethereum);
 }
 
-export function metaMaskBrowserLink(publicUrl, cardId) {
+export function cardPageUrl(publicUrl, cardId) {
   const url = new URL(publicUrl);
   url.search = cardId ? new URLSearchParams({ cardId }).toString() : '';
   url.hash = '';
-  return `https://link.metamask.io/dapp/${url.href.replace(/^https?:\/\//, '')}`;
+  return url.href;
+}
+
+export function metaMaskBrowserLink(publicUrl, cardId) {
+  return `metamask://dapp/${cardPageUrl(publicUrl, cardId).replace(/^https?:\/\//, '')}`;
 }
