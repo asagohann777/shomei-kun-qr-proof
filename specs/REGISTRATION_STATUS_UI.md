@@ -59,3 +59,13 @@
 実APIで登録済みを確認したカードは、保存履歴から登録処理を再開しない。読込み中は「確認しています」、取得後は登録済みカードを表示する。証跡が未反映でも所有者を表示し、必要な再取得はステータス内で行う。未登録カードの送信済み取引は従来どおり照会して二重送信を防ぐ。
 
 UIテストは50件成功。登録済みカードの証跡あり・証跡待ちの両方で、保存履歴と画面復帰による取引照会が起きないこと、以前の登録照会の遅い応答が表示を上書きしないことを確認。
+
+## 最新UIとの合流
+
+main `e675119` の背景・ロゴ・カード画像を取り込んだ。競合は新しい画像・背景と実API用の動的QR、実接続時の操作制約を両方残して解消した。既定の `UI_API_MODE=mock` と `UI_WALLET_MODE=mock` を維持する。UI改善は `prototypes/mobile-ui` で設定なしの `npm run dev` を使える。実API閲覧専用とMetaMask接続は従来どおり明示設定する。
+
+マージ前にGitHub Actionsのworkflowが0件、repository rulesetが0件、mainのbranch protectionが404であることをAPIで確認。Cloudflare Workers Builds APIで `shomei-kun-ui-mock` と `shomei-kun-integration` のbuild triggerがともに空であることを確認した。マージと専用integration Workerへの手動デプロイは別操作。
+
+統合後、UIテスト50件、実接続fixtureと既定モックのChromium/WebKit操作試験、OpenNextビルド、秘匿情報検査、OpenSpec strictに成功。320px・390px・1365pxの画像を確認した。専用Workerのversion `d105e655-2dcd-456a-bb18-39dcf05285c1` にデプロイし、実APIの登録済みカードに保存履歴を用意して再読込した。登録中画面の出現と取引の再照会はいずれも0件。新しい登録取引は送っていない。
+
+[統合後のブラウザ結果](assets/registered-read-2026-09-26/results.json)、[モック結果](assets/registered-read-2026-09-26/mock-results.json)、[公開読込み結果](assets/registered-read-2026-09-26/public-check.json)。

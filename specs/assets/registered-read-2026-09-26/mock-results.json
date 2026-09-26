@@ -1,0 +1,36 @@
+{
+  "base": "http://127.0.0.1:4173",
+  "verifiedAt": "2026-09-26T02:44:17.845Z",
+  "results": [
+    {
+      "browser": "chromium",
+      "version": "149.0.7827.55",
+      "status": "passed",
+      "requests": 633,
+      "consoleErrors": [],
+      "playwrightScreenshotCspWarnings": 0
+    },
+    {
+      "browser": "webkit",
+      "version": "26.5",
+      "status": "passed",
+      "requests": 555,
+      "consoleErrors": [],
+      "playwrightScreenshotCspWarnings": 0
+    }
+  ],
+  "assetHashes": {
+    "index.html": "f9165c9f4eaf9fdd0b23bce97aacad7cccd984b1809bd6730bc177ddd79f594a",
+    "app.js": "46d827cd3d6ac1788694b88d552e55a3bbce257d3dfe02cd8d1a83a30c1a8f6f",
+    "messages.js": "15575c40c9c7c5798749e45540abe9b74e8b30e2169c8c4763ec1eaaa09f4444",
+    "style.css": "fa185fa363862e146c4e0b2a04c6c45bff815038d24f43707f774418aba7cfc4",
+    "player.svg": "aa03e96d73f0154f740133fdfda2cc41a01b52fde8b9f5481e2e42a30cf45acf",
+    "card-qr.svg": "b119694135df0a67a8ca3cf79d9309a955524fe660a8e02f3faa6d5a02b19d03",
+    "favicon.svg": "32c8afa370fd7e9dab50bbdd3e40d97b1a349bebae05f9b5c96bbd0c11c669ae",
+    "assets/home-background.jpg": "bf15dc97a56ae61ef63cac15bf133c2a58540dec0be72ed3d8fa60d6d103fc1c",
+    "assets/flow-background.jpg": "eabeb4bea7f6daed49fd387fafad4aee239177d92b350564636dc3632c400a75",
+    "assets/logo-ja.jpg": "21fdc83159b7de9459413dbb3c6f6aaf0001b322d4793d13443c3e50f749233d",
+    "assets/qr-scan.jpg": "4ff4deb862b792378d5a8d4ecbb584ac63747c32d14c85e3ba450148a3f1379d",
+    "assets/trading-card.jpg": "937c773c6eb826f2f6f2c9a610f403fd3b1cac6e3728e8c5da9c7c8ef0447fb5"
+  }
+}

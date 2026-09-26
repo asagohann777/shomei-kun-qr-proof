@@ -39,7 +39,7 @@ MOCK_BASE_URL=https://shomei-kun-ui-mock.dptr.workers.dev npm run verify
 
 Cloudflare認証を設定して `npm run deploy` を実行する。専用Worker `shomei-kun-ui-mock` に静的アセットを配信する。実接続アプリのデプロイではない。別URLで公開する場合は `MOCK_PUBLIC_URL` にそのURLを指定してビルドし、カードのQRも更新する。
 
-カードとアイコンはCodexが新規作成したSVG。依存関係のライセンスは各パッケージに従う。プロジェクト全体の公開ライセンスは未確定。
+アイコンはCodexが作成したSVG。背景・ロゴ・QRイラスト・カードはおじいちゃんコンビニから受領したJPEG。依存関係のライセンスは各パッケージに従う。プロジェクト全体の公開ライセンスは未確定。
 
 採用計画は [UI_MOCK_PLAN.md](../../specs/UI_MOCK_PLAN.md)、実測記録は [HACKATHON_CHANGES.md](../../specs/HACKATHON_CHANGES.md) を参照。
 
@@ -47,15 +47,21 @@ Cloudflare認証を設定して `npm run deploy` を実行する。専用Worker 
 
 [UI_WIREFRAME_PLAN.md](../../specs/UI_WIREFRAME_PLAN.md)に図案との対応を記録した。ローカル版は中央カード、入力、登録確認、模擬承認、処理、完了の順に操作できる。2026-09-26に今回のワイヤーを上記の公開URLへデプロイした。
 
-素材は次の箇所で差し替える。既存の図案JPEGは制作記録として保存し、画面の背景としてそのまま貼り付けていない。
+## 受領素材の組み込み
 
-| 素材 | 差し替え箇所 | 目安 |
+2026-09-26にローカルUIへ組み込んだ。原本と旧名の対応は[素材一覧](../../specs/assets/asagohann777/README.md)に保存。
+
+| 表示 | 配布用素材 | 原本 |
 | --- | --- | --- |
-| カード | `public/player.svg` または `public/app.js` の `tradingCard()` 内の画像パス | 縦横比5:7。カード単体、背景なし。画面の見出し・ボタンは含めない |
-| 共通背景 | `public/` に画像を置き、`styles/input.css` の `.phone` の `--scene-image` を `url('./background.webp')` に変更 | 縦長9:16。中央にカードとフォームを重ねるため、文字なし |
-| ロゴ | `public/app.js` の `.brand` 内 | 現在は日英テキスト。画像化する場合もホームへのリンク名を維持 |
+| 初期画面 | `public/assets/home-background.jpg` | `backgrounds/garden-mountains-02.jpg` |
+| その他の画面 | `public/assets/flow-background.jpg` | `backgrounds/waterfront-platform-04.jpg` |
+| 共通ロゴ | `public/assets/logo-ja.jpg` | `logos/shomeikun-qr-proof-ja.jpg` |
+| 初期画面のQRイラスト | `public/assets/qr-scan.jpg` | `illustrations/qr-scan.jpg` |
+| 共通カード | `public/assets/trading-card.jpg` | `cards/shomei-ichiro.jpg` |
 
-現在のカードは仮SVG、背景は空色の無地。QRは別のSVGを重ねているため、受領するカード素材にはQRを埋め込まない。QR付き素材を使う場合は `tradingCard()` の重ねるQRを調整する。素材差し替え後はビルドと日英・各幅での再確認が必要。
+JPEGは原本のままコピーした。ロゴの余白とカード周囲の市松模様はCSSの表示枠で隠している。日本語ロゴを両言語で使用し、代替テキストは切り替える。カード右下には既存のデモURLのQRを重ねる。初期画面のQRは受領イラストであり、操作は読み取りボタンから開始する。
+
+ビルドとChromium・WebKitの既存フロー検証を通過。初期画面の最終調整後にも320px・390pxの画像読み込みと横はみ出しを確認した。背景・ロゴ等の組み込みを2026-09-26に公開URLへデプロイした。
 
 ## 登録中の動きを確認する
 
@@ -63,11 +69,11 @@ Cloudflare認証を設定して `npm run deploy` を実行する。専用Worker 
 
 OSやブラウザで動きを減らす設定を有効にすると、これらのアニメーションは停止する。構図と登録状況は残る。カード素材は既存の `tradingCard()` を共有し、背景やカードの差し替え方法は上記と同じ。
 
-ボタンの質感と登録中のアニメーションの追加は、現時点ではローカルのみ。公開版の更新は別途行う。
+ボタンの質感と登録中のアニメーションも2026-09-26の公開版へ反映した。
 
 ## スキャン画面の質感と動き
 
-スキャン入口から進むと、半透明の状態表示と円形ボタン、風景・稲妻アイコン、発光する四隅、上下に往復する走査線を確認できる。動きを減らす設定では走査線を中央に止め、枠の明滅と読取り中リングの回転を停止する。写真・ライトの操作は従来どおり説明を開くモックで、端末機能は使用しない。この調整もローカルのみ。
+スキャン入口から進むと、半透明の状態表示と円形ボタン、風景・稲妻アイコン、発光する四隅、上下に往復する走査線を確認できる。動きを減らす設定では走査線を中央に止め、枠の明滅と読取り中リングの回転を停止する。写真・ライトの操作は従来どおり説明を開くモックで、端末機能は使用しない。この調整も2026-09-26の公開版へ反映した。
 
 ## API・ウォレットの切替
 

@@ -198,7 +198,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
   await browser.close();
 }
 const assetHashes = {};
-for (const asset of ['index.html', 'app.js', 'messages.js', 'style.css', 'player.svg', 'card-qr.svg', 'favicon.svg']) {
+for (const asset of ['index.html', 'app.js', 'messages.js', 'style.css', 'player.svg', 'card-qr.svg', 'favicon.svg', 'assets/home-background.jpg', 'assets/flow-background.jpg', 'assets/logo-ja.jpg', 'assets/qr-scan.jpg', 'assets/trading-card.jpg']) {
   const response = await fetch(`${base}/${asset}`);
   assert(response.ok, `${asset}: HTTP ${response.status}`);
   const served = Buffer.from(await response.arrayBuffer());

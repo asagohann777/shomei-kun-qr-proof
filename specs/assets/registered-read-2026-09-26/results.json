@@ -1,0 +1,44 @@
+{
+  "base": "http://127.0.0.1:4174",
+  "readonlyBase": "http://127.0.0.1:4175",
+  "api": "https://shomei-kun-integration.dptr.workers.dev",
+  "fixtureOnly": true,
+  "results": [
+    {
+      "browser": "chromium",
+      "assertions": [
+        "public read requires no wallet",
+        "approval and pending use injected provider result; reload checks same hash without resend",
+        "confirmed ownership and evidence survive fresh API read at 390, 320 and desktop",
+        "registered card with saved registration opens directly without registration loading, including pending evidence",
+        "initial confirmation waits for evidence; refresh updates only status, preserves DOM and owner on failure, recovers and updates details",
+        "503 remains unavailable; explicit retry recovers",
+        "gas shortage has an actionable message and never asks the wallet to send",
+        "wrong wallet stops before signing; diagnostic copy includes code, account and request ID"
+      ],
+      "readonly": "live/mock reads API fixture and offers no registration or wallet",
+      "screenshots": "artifacts/merged-ui",
+      "screenshotWarnings": [],
+      "walletSends": 1,
+      "errors": []
+    },
+    {
+      "browser": "webkit",
+      "assertions": [
+        "public read requires no wallet",
+        "approval and pending use injected provider result; reload checks same hash without resend",
+        "confirmed ownership and evidence survive fresh API read at 390, 320 and desktop",
+        "registered card with saved registration opens directly without registration loading, including pending evidence",
+        "initial confirmation waits for evidence; refresh updates only status, preserves DOM and owner on failure, recovers and updates details",
+        "503 remains unavailable; explicit retry recovers",
+        "gas shortage has an actionable message and never asks the wallet to send",
+        "wrong wallet stops before signing; diagnostic copy includes code, account and request ID"
+      ],
+      "readonly": "live/mock reads API fixture and offers no registration or wallet",
+      "screenshots": "artifacts/merged-ui",
+      "screenshotWarnings": [],
+      "walletSends": 1,
+      "errors": []
+    }
+  ]
+}
