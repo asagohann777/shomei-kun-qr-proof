@@ -185,7 +185,7 @@ export interface components {
             meta: components["schemas"]["Meta"];
             error: {
                 /** @enum {string} */
-                code: "INVALID_INPUT" | "INVALID_MOCK_SCENARIO" | "CARD_NOT_FOUND" | "ALREADY_REGISTERED" | "WALLET_NOT_ALLOWED" | "CHAIN_MISMATCH" | "MOCK_SAMPLE_UNSUPPORTED" | "UPSTREAM_UNAVAILABLE" | "INTERNAL_ERROR" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ORIGIN_NOT_ALLOWED" | "CONNECTION_MISMATCH" | "MULTIBAAS_AUTH_FAILED" | "UPSTREAM_TIMEOUT";
+                code: "INVALID_INPUT" | "INVALID_MOCK_SCENARIO" | "CARD_NOT_FOUND" | "ALREADY_REGISTERED" | "INSUFFICIENT_FUNDS" | "WALLET_NOT_ALLOWED" | "CHAIN_MISMATCH" | "MOCK_SAMPLE_UNSUPPORTED" | "UPSTREAM_UNAVAILABLE" | "INTERNAL_ERROR" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "ORIGIN_NOT_ALLOWED" | "CONNECTION_MISMATCH" | "MULTIBAAS_AUTH_FAILED" | "UPSTREAM_TIMEOUT";
                 message: string;
             } | {
                 /** @constant */
@@ -419,7 +419,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description CHAIN_MISMATCH, WALLET_NOT_ALLOWED, MOCK_SAMPLE_UNSUPPORTED */
+            /** @description CHAIN_MISMATCH, WALLET_NOT_ALLOWED, MOCK_SAMPLE_UNSUPPORTED, INSUFFICIENT_FUNDS */
             422: {
                 headers: {
                     "Cache-Control"?: string;

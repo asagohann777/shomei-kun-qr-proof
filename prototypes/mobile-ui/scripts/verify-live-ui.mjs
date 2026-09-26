@@ -24,7 +24,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     const page = await context.newPage();
     page.setDefaultTimeout(12000);
     const errors = [], screenshotWarnings = [], walletCalls = [], requests = [], assertions = [];
-    let screenshotActive = false, phase = 'unregistered', failRead = false, failPrepare = false, txReads = 0;
+    let screenshotActive = false, phase = 'unregistered', failRead = false, failPrepare = false, prepareError = 'WALLET_NOT_ALLOWED', txReads = 0;
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', message => {
       if (message.type() !== 'error') return;
@@ -61,7 +61,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
       }
       if (path === '/api/v1/connection') { data = connection; validate = ConnectionResponse; }
       else if (path === `/api/v1/cards/${cardId}/registration/prepare`) {
-        if (failPrepare) return route.fulfill({ status: 422, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'X-Request-ID', 'X-Request-ID': '11111111-1111-4111-8111-111111111111' }, body: JSON.stringify({ meta: { mode: 'live' }, error: { code: 'WALLET_NOT_ALLOWED', message: 'Wallet not allowed' } }) });
+        if (failPrepare) return route.fulfill({ status: 422, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'X-Request-ID', 'X-Request-ID': '11111111-1111-4111-8111-111111111111' }, body: JSON.stringify({ meta: { mode: 'live' }, error: { code: prepareError, message: 'Registration cannot be prepared' } }) });
         const input = route.request().postDataJSON();
         assert.deepEqual(input, { walletAddress: account, chainId, nickname });
         data = { cardId, nickname, transaction: { chainId, from: account, to: contract, value: '0', data: iface.encodeFunctionData('register', [cardId, nickname]) } };
@@ -170,7 +170,17 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     assert(report.errors.some(error => error.requestId === '11111111-1111-4111-8111-111111111111'));
     assert.equal(walletCalls.filter(method => method === 'eth_sendTransaction').length, 1);
     for (const width of [390, 320, 1365]) { await page.setViewportSize({ width, height: 844 }); await layout(`${width}-wallet-not-allowed`); }
+    prepareError = 'INSUFFICIENT_FUNDS';
+    await page.reload(); await action('start-register').click();
+    await page.locator('#nickname').fill(nickname);
+    await action('connect').click(); await action('confirm').click();
+    await page.locator('#consent').check(); await action('register-reviewed').click();
+    await action('copy-diagnostics').waitFor();
+    assert.match(await page.locator('[role="alert"]').innerText(), /ガス代が足りません/);
+    assert.equal(walletCalls.filter(method => method === 'eth_sendTransaction').length, 1);
+    await page.setViewportSize({ width: 320, height: 844 }); await layout('320-insufficient-funds');
     failPrepare = false;
+    assertions.push('gas shortage has an actionable message and never asks the wallet to send');
     assertions.push('wrong wallet stops before signing; diagnostic copy includes code, account and request ID');
     let readonly = 'not run; set LIVE_READONLY_UI_URL to a live/mock build';
     if (readonlyBase) {

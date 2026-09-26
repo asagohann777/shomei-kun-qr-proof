@@ -406,7 +406,7 @@
             }
           },
           "422": {
-            "description": "CHAIN_MISMATCH, WALLET_NOT_ALLOWED, MOCK_SAMPLE_UNSUPPORTED",
+            "description": "CHAIN_MISMATCH, WALLET_NOT_ALLOWED, MOCK_SAMPLE_UNSUPPORTED, INSUFFICIENT_FUNDS",
             "headers": {
               "Cache-Control": {
                 "schema": {
@@ -423,6 +423,9 @@
                 "examples": {
                   "CHAIN_MISMATCH": {
                     "$ref": "#/components/examples/CHAIN_MISMATCH"
+                  },
+                  "INSUFFICIENT_FUNDS": {
+                    "$ref": "#/components/examples/INSUFFICIENT_FUNDS"
                   },
                   "WALLET_NOT_ALLOWED": {
                     "$ref": "#/components/examples/WALLET_NOT_ALLOWED"
@@ -1426,6 +1429,7 @@
                       "INVALID_MOCK_SCENARIO",
                       "CARD_NOT_FOUND",
                       "ALREADY_REGISTERED",
+                      "INSUFFICIENT_FUNDS",
                       "WALLET_NOT_ALLOWED",
                       "CHAIN_MISMATCH",
                       "MOCK_SAMPLE_UNSUPPORTED",
@@ -1812,6 +1816,17 @@
           "error": {
             "code": "ALREADY_REGISTERED",
             "message": "Card is already registered."
+          }
+        }
+      },
+      "INSUFFICIENT_FUNDS": {
+        "value": {
+          "meta": {
+            "mode": "live"
+          },
+          "error": {
+            "code": "INSUFFICIENT_FUNDS",
+            "message": "Add test ETH to the connected wallet to pay for gas."
           }
         }
       },

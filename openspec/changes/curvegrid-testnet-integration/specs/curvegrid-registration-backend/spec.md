@@ -162,3 +162,11 @@ UIは環境変数でAPIとwalletを選択できなければならない（MUST�
 #### Scenario: 任意の参加者の初回登録
 - **WHEN** 任意の本人ウォレットが全員許可の未登録カードを登録する
 - **THEN** 送信者が所有者となり、別ウォレットを含めた後続の登録を拒否する
+
+### Requirement: 登録準備時の残高不足
+
+MultiBaasのregister準備が観測済みの残高不足を返す場合、APIは422 INSUFFICIENT_FUNDSとして案内しなければならない（MUST）。不明な上流エラーを残高不足と推測してはならない（MUST NOT）。
+
+#### Scenario: ガス不足で準備できない
+- **WHEN** 残高0の本人ウォレットで登録準備を行い、MultiBaasが400 insufficient funds for transferを返す
+- **THEN** 画面でテストETHの補充を案内し、署名要求・取引送信を行わない

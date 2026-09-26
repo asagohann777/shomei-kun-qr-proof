@@ -62,6 +62,12 @@ export class MultiBaasGateway implements RegistrationGateway {
       const response = await this.fetcher(url, { ...init, redirect: "manual", signal: controller.signal });
       if (response.status === 401 || response.status === 403) throw new ApiError(503, "MULTIBAAS_AUTH_FAILED", "Upstream authentication failed");
       if (!response.ok) {
+        if (response.status === 400 && url.endsWith("/methods/register") && url.startsWith(this.config.baseUrl + "/")) {
+          const failure: unknown = await response.json().catch(() => null);
+          if (failure !== null && typeof failure === "object" && "message" in failure && failure.message === "insufficient funds for transfer") {
+            throw new ApiError(422, "INSUFFICIENT_FUNDS", "Insufficient test ETH for gas");
+          }
+        }
         console.error("upstream_http_error", { service: url.startsWith(this.config.baseUrl + "/") ? "multibaas" : "rpc", status: response.status });
         throw unavailable();
       }

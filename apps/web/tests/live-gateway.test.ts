@@ -196,3 +196,11 @@ test("open card decoding preserves issued and registered states with zero permis
     assert.equal(result?.allowedWallet, zero);
   }
 });
+
+
+test('observed MultiBaas gas shortage becomes a user-actionable error only for register', async () => {
+  const { gateway } = syntheticGateway(path => path.endsWith('/methods/register') ? Response.json({ status: 400, message: 'insufficient funds for transfer' }, { status: 400 }) : undefined);
+  await assert.rejects(() => gateway.buildRegistrationTransaction({ cardId, walletAddress: wallet, nickname }), error => error instanceof ApiError && error.status === 422 && error.code === 'INSUFFICIENT_FUNDS');
+  const unrelated = syntheticGateway(path => path.endsWith('/methods/register') ? Response.json({ status: 400, message: 'another error' }, { status: 400 }) : undefined);
+  await assert.rejects(() => unrelated.gateway.buildRegistrationTransaction({ cardId, walletAddress: wallet, nickname }), error => error instanceof ApiError && error.status === 503 && error.code === 'UPSTREAM_UNAVAILABLE');
+});

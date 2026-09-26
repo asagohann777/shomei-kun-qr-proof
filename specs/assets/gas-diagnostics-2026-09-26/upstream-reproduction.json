@@ -1,0 +1,11 @@
+{
+  "reportedRequestId": "8a68ed80-3b6b-46f3-9c00-12a50dfb6952",
+  "walletAddress": "0xc22d961e56b70a73f6dcb1ec0a47b7da1fe38fdd",
+  "chainId": 2017072401,
+  "balanceWei": "0",
+  "upstreamHttpStatus": 400,
+  "upstreamMessage": "insufficient funds for transfer",
+  "method": "register",
+  "signAndSubmit": false,
+  "transactionSent": false
+}

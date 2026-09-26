@@ -27,3 +27,13 @@ ABIの `allowedWallet` がゼロアドレスなら全員を許可する。発行
 専用Worker version `c8456faa-b0d6-4e7b-a9c4-9d0862d8610b` を公開。以前の手動カード許可先とは別の試験アドレス `0xf12904Ef7aBfD79b68dcCdc7b30cFDE2D6BEeeb8` で `demo-open-check-2` を実登録した。取引 `0xf0b1133e12c01606a52783eb64179d8a2529f8fcd088f43ebd9f8cb3dc2b2362` がconfirmedになり、送信は1回、再読込・第三者の別ブラウザ表示も成功した。実スマホMetaMaskの操作とは区別する。
 
 [実登録結果](assets/open-registration-2026-09-26/chain-results.json)、[公開API検証](assets/open-registration-2026-09-26/api-verification.json)、[未登録カード3枚とエラー受付ID](assets/open-registration-2026-09-26/manual-cards.json)、[画面試験](assets/open-registration-2026-09-26/browser-results.json)を保存した。API70件・UI43件・コントラクトとCLI17件、型検査、OpenSpec strict、秘匿情報検査が成功。Chromium/WebKitの320・390・1365pxで診断コピーとエラー表示を確認した。
+
+## 残高0ウォレットの登録準備エラー
+
+ユーザーの受付ID `8a68ed80-3b6b-46f3-9c00-12a50dfb6952` の報告を受け、接続アドレス `0xc22d961e56b70a73f6dcb1ec0a47b7da1fe38fdd` の残高0と、MultiBaasのHTTP400 `insufficient funds for transfer` を再現した。旧APIは全ての上流400を503へ変換していた。registerの当該応答だけを422 `INSUFFICIENT_FUNDS` へ変換し、その他の400は上流障害として扱う。OpenAPI・生成validatorも更新した。
+
+[再現結果](assets/gas-diagnostics-2026-09-26/upstream-reproduction.json)、[画面試験](assets/gas-diagnostics-2026-09-26/browser-results.json)、[320pxの案内](assets/gas-diagnostics-2026-09-26/320-insufficient-funds.png)を保存した。残高不足の準備段階ではウォレットへの送信要求を出さず、取引も作らない。補充後は登録内容へ戻って再試行できる。API71件・UI43件、Chromium/WebKitと型検査・ビルドに成功。
+
+補充はMultiBaas管理画面の Blockchain → Faucet で対象の接続アドレスに Request 1 ETH を実行する。ETHはCurvegrid Testnet用であり、別チェーンの残高は使えない。今回の原因確認ではユーザーアドレスへの送金や所有者登録は行っていない。
+
+修正版Workerは `f129bacf-35e0-47a4-9c0c-9478aed0bf6a`。[公開APIの422応答](assets/gas-diagnostics-2026-09-26/public-api-result.json)を同じ残高0アドレスで確認した。
