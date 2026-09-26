@@ -45,7 +45,8 @@
   h1, h2, p, dd { overflow-wrap: anywhere; }
 }
 @layer utilities {
-  .phone { --scene-image: url("./assets/flow-background.jpg"); max-width: 480px; min-height: 100svh; margin: auto; background-color: #eaf4ff; background-image: linear-gradient(180deg, #ffffffed 0%, #ffffff99 25%, #ffffff14 55%, #ffffff8c 100%), var(--scene-image); background-size: 100% 100%, 100% max(100svh, 850px); background-repeat: no-repeat; background-position: center top; padding-top: env(safe-area-inset-top); padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+  .phone { --scene-image: url("./assets/flow-background.jpg"); max-width: 480px; min-height: 100svh; margin: auto; background-color: #eaf4ff; position: relative; isolation: isolate; padding-top: env(safe-area-inset-top); padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+  .phone::before { content: ""; position: fixed; z-index: -1; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%, 480px); pointer-events: none; background-color: #eaf4ff; background-image: linear-gradient(180deg, #ffffffed 0%, #ffffff99 25%, #ffffff14 55%, #ffffff8c 100%), var(--scene-image); background-size: cover; background-position: center; }
   .app-header { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 10px; padding: 22px 20px 8px; }
   .brand { display: grid; text-align: center; color: #080e48; line-height: 1.15; text-decoration: none; }
   .home-scene { --scene-image: url("./assets/home-background.jpg"); }
@@ -70,8 +71,8 @@
   .icon { width: 24px; height: 24px; flex-shrink: 0; display: inline-block; vertical-align: middle; }
   .trading-card { width: 56%; max-width: 205px; position: relative; margin: 24px auto; }
   .card-art { position: relative; aspect-ratio: 940 / 1290; overflow: hidden; border-radius: 16px; filter: drop-shadow(0 3px 7px #0056a829); }
-  .card-art img { position: absolute; width: 125.53%; max-width: none; height: 103.34%; left: -12.77%; top: -1.55%; }
-  .card-qr { position: absolute; width: 23%; right: 7%; bottom: 11%; border: 2px solid white; }
+  .card-art > img:first-child { position: absolute; width: calc(1180 / 940 * 100%); max-width: none; height: calc(1333 / 1290 * 100%); left: calc(-120 / 940 * 100%); top: calc(-20 / 1290 * 100%); }
+  .card-qr { position: absolute; width: calc(200 / 940 * 100%); left: calc(650 / 940 * 100%); top: calc(962 / 1290 * 100%); height: auto; border: 0; }
   .info-panel {
     border-radius: 20px;
     padding: 20px 16px;

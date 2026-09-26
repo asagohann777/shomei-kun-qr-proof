@@ -86,7 +86,7 @@ function walletLabel() { return liveEnabled ? (liveSnapshot?.wallet.address ?? '
 function cardLabel() { return liveEnabled ? currentCardId ?? '' : 'TC-001'; }
 
 function tradingCard() {
-  return `<div class="trading-card"><div class="card-art"><img src="./assets/trading-card.jpg" alt="${t('cardAlt')}" width="1180" height="1333"></div><img class="card-qr" src="${liveEnabled ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"></div>`;
+  return `<div class="trading-card"><div class="card-art"><img src="./assets/trading-card.jpg" alt="${t('cardAlt')}" width="1180" height="1333"><img class="card-qr" src="${liveEnabled ? (qrSource ?? 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E') : './card-qr.svg'}" alt="${t('qrAlt')}"></div></div>`;
 }
 function footer(action, label, extra = '', disabled = false, secondary = false) {
   return `<footer class="bottom-actions"><button type="button" class="btn ${secondary ? 'btn-outline' : 'btn-primary'}" data-action="${action}" ${disabled ? 'disabled' : ''}>${label}</button>${extra}</footer>`;
