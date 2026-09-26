@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { createWalletPreparation } from './wallet-preparation.js';
 import { Interface } from 'ethers';
 import artifact from '../../../contracts/abi/OwnershipRegistry.json' with { type: 'json' };

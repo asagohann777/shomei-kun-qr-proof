@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import type { NextConfig } from "next";
 
 if (process.env.BACKEND_MODE !== "mock" && process.env.BACKEND_MODE !== "live") {

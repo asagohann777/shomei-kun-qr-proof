@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFile, mkdir, cp, mkdtemp, rm, writeFile } from 'node:fs/promises';

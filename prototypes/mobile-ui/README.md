@@ -39,7 +39,7 @@ MOCK_BASE_URL=https://shomei-kun-ui-mock.dptr.workers.dev npm run verify
 
 Cloudflare認証を設定して `npm run deploy` を実行する。専用Worker `shomei-kun-ui-mock` に静的アセットを配信する。実接続アプリのデプロイではない。別URLで公開する場合は `MOCK_PUBLIC_URL` にそのURLを指定してビルドし、カードのQRも更新する。
 
-アイコンはCodexが作成したSVG。背景・ロゴ・QRイラスト・カードはおじいちゃんコンビニから受領したJPEG。依存関係のライセンスは各パッケージに従う。プロジェクト全体の公開ライセンスは未確定。
+アイコンはCodexが作成したSVG。背景・ロゴ・QRイラスト・カードはおじいちゃんコンビニから受領したJPEG。依存関係のライセンスは各パッケージに従う。ソースコードは[MIT License](../../LICENSE)。提供画像・ロゴなどの素材はこのライセンス付与の対象外。
 
 採用計画は [UI_MOCK_PLAN.md](../../specs/UI_MOCK_PLAN.md)、実測記録は [HACKATHON_CHANGES.md](../../specs/HACKATHON_CHANGES.md) を参照。
 

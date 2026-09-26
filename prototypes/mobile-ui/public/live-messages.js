@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 export const liveMessages = {
   ja: {
     checkingEvidence: '確認中', refreshFailed: '確認できませんでした', evidenceTitle: '取引情報の反映待ち', refreshEvidence: '再取得',

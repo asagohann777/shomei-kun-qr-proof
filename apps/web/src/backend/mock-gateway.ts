@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { sample, scenarios } from "../generated/fixtures";
 import {
   GatewayUnavailableError,

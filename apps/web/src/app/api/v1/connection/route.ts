@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { handleConnectionRequest } from "@/backend/http";
 
 export const GET = handleConnectionRequest;

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { handleCardRequest } from "@/backend/http";
 
 export async function GET(request: Request, context: { params: Promise<{ cardId: string }> }): Promise<Response> {

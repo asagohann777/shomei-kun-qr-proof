@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { Fragment, Interface, id } from "ethers";
 import registryArtifact from "../../../../contracts/abi/OwnershipRegistry.json";
 import { ApiError, sameHex, type Connection, type CardRecord, type ChainTransaction, type RegistrationEvent, type RegistrationGateway, type TransactionReceipt, type UnsignedTransaction } from "./domain";

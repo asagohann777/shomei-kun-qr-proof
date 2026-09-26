@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { ApiError, type CardRecord, type ChainTransaction, type RegistrationEvent, type RegistrationGateway, type TransactionReceipt } from "../src/backend/domain";

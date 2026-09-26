@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { CardResponse, ConnectionResponse, PrepareResponse, TransactionResponse, ErrorResponse } from '../../../apps/web/src/generated/validators.js';
 
 const failures = [];

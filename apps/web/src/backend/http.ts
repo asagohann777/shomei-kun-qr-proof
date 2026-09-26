@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import contract from "../generated/contract.json";
 import * as validate from "../generated/validators.js";
 import { ApiError, GatewayUnavailableError, type ApiErrorCode, type PrepareInput, type RegistrationGateway } from "./domain";

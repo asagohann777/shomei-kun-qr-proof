@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """Validate the API design and fixtures; does not exercise an API server."""
 
 from copy import deepcopy

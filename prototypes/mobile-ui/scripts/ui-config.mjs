@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 export function uiConfig(env) {
   const cameraMode = env.UI_CAMERA_MODE ?? 'mock';
   if (!['mock', 'live'].includes(cameraMode)) throw new Error('Invalid UI_CAMERA_MODE');

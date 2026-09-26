@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import openapiTS, { astToString } from "openapi-typescript";
@@ -9,7 +10,7 @@ const source = new URL("../../../specs/openapi.yaml", import.meta.url);
 const destination = new URL("../src/generated/", import.meta.url);
 const document = parse(await readFile(source, "utf8"));
 const checking = process.argv.includes("--check");
-const header = "// Generated from specs/openapi.yaml. Run npm run generate.\n";
+const header = "// SPDX-License-Identifier: MIT\n// Generated from specs/openapi.yaml. Run npm run generate.\n";
 
 function resolve(value) {
   if (Array.isArray(value)) return value.map(resolve);

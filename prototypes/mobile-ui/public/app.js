@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { hasMetaMaskProvider, useMetaMaskBrowser, metaMaskBrowserLink, cardPageUrl } from '../src/wallet-navigation.js';
 import { messages } from './messages.js';
 import { walletMessages } from './wallet-messages.js';

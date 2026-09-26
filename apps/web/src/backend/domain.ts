@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import type { components } from "../generated/api";
 
 export type CardId = components["schemas"]["CardId"];

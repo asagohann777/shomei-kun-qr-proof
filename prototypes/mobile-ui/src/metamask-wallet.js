@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 const addressPattern = /^0x[0-9a-f]{40}$/i;
 const hashPattern = /^0x[0-9a-f]{64}$/i;
 const sameAddress = (a, b) => typeof a === 'string' && typeof b === 'string' && a.toLowerCase() === b.toLowerCase();

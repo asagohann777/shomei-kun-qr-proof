@@ -23,5 +23,6 @@
   "overrides": {
     "undici": "6.28.0",
     "tmp": "0.2.6"
-  }
+  },
+  "license": "MIT"
 }

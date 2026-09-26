@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 const { subtask } = require('hardhat/config');
 const { TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD } = require('hardhat/builtin-tasks/task-names');
 subtask(TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD).setAction(async ({ solcVersion }) => {

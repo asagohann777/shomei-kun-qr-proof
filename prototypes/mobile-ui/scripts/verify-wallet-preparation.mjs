@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { chromium, webkit } from 'playwright';

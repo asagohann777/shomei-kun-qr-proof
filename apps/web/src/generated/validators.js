@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // Generated from specs/openapi.yaml. Run npm run generate.
 import ucs2lengthModule from "ajv/dist/runtime/ucs2length.js";
 "use strict";

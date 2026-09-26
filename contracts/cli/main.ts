@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { readFile } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
 import { JsonRpcProvider, Wallet, ZeroAddress, keccak256 } from 'ethers';

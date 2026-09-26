@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """Archive a Codex UserPromptSubmit event in this repository."""
 
 import json

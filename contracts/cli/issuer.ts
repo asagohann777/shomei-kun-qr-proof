@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { AbstractProvider, Interface, Signer, Transaction, TransactionRequest, ZeroAddress, getAddress, getCreateAddress, keccak256 } from 'ethers';
 import artifact from '../abi/OwnershipRegistry.json';
 import { Operation, State, loadState, saveState, withStateLock } from './state';

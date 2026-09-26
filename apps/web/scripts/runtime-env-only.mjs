@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
