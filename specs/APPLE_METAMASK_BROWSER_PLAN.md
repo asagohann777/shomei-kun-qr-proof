@@ -42,3 +42,7 @@ MetaMask公式の `parseDeeplink.ts` は `metamask://` を `https://link.metamas
 参照: [公式リンク解析](https://github.com/MetaMask/metamask-mobile/blob/main/app/core/DeeplinkManager/utils/parseDeeplink.ts)、[公式dapp処理](https://github.com/MetaMask/metamask-mobile/blob/main/app/core/DeeplinkManager/handlers/intent/handleDappUrl.ts)。
 
 直接スキーム版をversion `f356b57a-c981-4ce6-975d-9d5e0d4f7a21` へ公開。単体76件成功、Chromium/WebKitで直接リンクのクリック、カードURLコピー、iPad判定、アプリ内接続を確認した。公開資産24件がビルドと一致。[直接リンク版の結果](assets/apple-metamask-browser/direct-link-results.json)。実機のブラウザ起動成功は未確認。
+
+## ユーザー実機での確認
+
+直接リンク版の公開後、ユーザーから「開いたわ」と報告があり、MetaMask内ブラウザが開いたことを確認した。端末種別はこの報告では未指定。iPhone・iPad両方の実機成功や、登録完了までを確認したとは扱わない。
