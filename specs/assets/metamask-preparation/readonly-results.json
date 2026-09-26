@@ -1,0 +1,14 @@
+[
+  {
+    "browser": "chromium",
+    "savedLiveDraftIgnored": true,
+    "walletInitialized": false,
+    "errors": []
+  },
+  {
+    "browser": "webkit",
+    "savedLiveDraftIgnored": true,
+    "walletInitialized": false,
+    "errors": []
+  }
+]

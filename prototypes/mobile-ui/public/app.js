@@ -1,4 +1,6 @@
+import { hasMetaMaskProvider, useMetaMaskBrowser, metaMaskBrowserLink, cardPageUrl } from '../src/wallet-navigation.js';
 import { messages } from './messages.js';
+import { walletMessages } from './wallet-messages.js';
 import { liveMessages } from './live-messages.js';
 import QRCode from 'qrcode';
 import QrScanner from 'qr-scanner';
@@ -14,12 +16,13 @@ let currentCardId = new URL(location.href).searchParams.get('cardId');
 let qrSource = './card-qr.svg';
 let qrIdentity = null;
 let liveError = null;
+let preparingWallet = false;
 
 const root = document.querySelector('#app');
 const sessionKey = 'shomei.mobile-mock.v1';
 const localeKey = 'shomei.mobile-mock.locale';
-const scenarios = ['registered', 'unregistered', 'not-found', 'wrong-wallet', 'wrong-chain', 'rejected', 'failed', 'unknown', 'evidence-pending', 'unavailable', 'registering'];
-const scenarioKeys = ['registered', 'unregistered', 'notFound', 'wrongWallet', 'wrongChain', 'rejected', 'failed', 'unknown', 'evidencePending', 'unavailable', 'registering'];
+const scenarios = ['registered', 'unregistered', 'not-found', 'wrong-wallet', 'wrong-chain', 'rejected', 'failed', 'unknown', 'evidence-pending', 'unavailable', 'registering', 'wallet-connect', 'wallet-add', 'wallet-switch', 'wallet-paused', 'wallet-rejected', 'wallet-ready'];
+const scenarioKeys = ['registered', 'unregistered', 'notFound', 'wrongWallet', 'wrongChain', 'rejected', 'failed', 'unknown', 'evidencePending', 'unavailable', 'registering', 'walletConnectScenario', 'walletAddScenario', 'walletSwitchScenario', 'walletPausedScenario', 'walletRejectedScenario', 'walletReadyScenario'];
 const views = ['scan', 'card', 'register', 'review', 'approval', 'sent', 'confirming', 'success', 'rejected', 'failed', 'unknown', 'processing-preview'];
 const cardStates = ['registered', 'unregistered', 'not-found', 'evidence-pending', 'unavailable'];
 const walletStates = ['disconnected', 'valid', 'wrong-wallet', 'wrong-chain'];
@@ -47,7 +50,7 @@ const read = (storage, key) => { try { return window[storage].getItem(key); } ca
 const write = (storage, key, value) => { try { window[storage].setItem(key, value); } catch { return; } };
 const savedLocale = read('localStorage', localeKey);
 let locale = ['ja', 'en'].includes(savedLocale) ? savedLocale : navigator.languages.map((item) => item.split('-')[0]).find((item) => ['ja', 'en'].includes(item)) || 'en';
-const t = (key) => cameraMessages[locale][key] ?? (liveEnabled ? liveMessages[locale][key] : undefined) ?? messages[locale][key];
+const t = (key) => walletMessages[locale][key] ?? cameraMessages[locale][key] ?? (liveEnabled ? liveMessages[locale][key] : undefined) ?? messages[locale][key];
 const lines = (key) => escape(t(key)).replace(/\n/g, '<br>');
 let timer;
 let scanning = false;
@@ -116,8 +119,8 @@ async function handleCameraAction(action) {
 
 function fixture(scenario = 'registered', entry = null) {
   const card = cardStates.includes(scenario) ? scenario : 'unregistered';
-  const view = scenario === 'registering' ? 'processing-preview' : ['wrong-wallet', 'wrong-chain'].includes(scenario) ? 'register' : ['rejected', 'failed', 'unknown'].includes(scenario) ? scenario : 'card';
-  return { version: 1, entry, scenario, view, card, wallet: ['wrong-wallet', 'wrong-chain'].includes(scenario) ? scenario : 'disconnected', nickname: 'おじいちゃんコンビニ', consent: false, attempt: ['failed', 'unknown'].includes(scenario) ? 'sample-attempt' : null, submittedAt: null };
+  const view = scenario.startsWith('wallet-') ? 'register' : scenario === 'registering' ? 'processing-preview' : ['wrong-wallet', 'wrong-chain'].includes(scenario) ? 'register' : ['rejected', 'failed', 'unknown'].includes(scenario) ? scenario : 'card';
+  return { version: 1, entry, scenario, view, card, wallet: scenario === 'wallet-ready' ? 'valid' : ['wallet-add', 'wallet-switch', 'wallet-paused'].includes(scenario) ? 'wrong-chain' : ['wrong-wallet', 'wrong-chain'].includes(scenario) ? scenario : 'disconnected', nickname: 'おじいちゃんコンビニ', consent: false, attempt: ['failed', 'unknown'].includes(scenario) ? 'sample-attempt' : null, submittedAt: null };
 }
 
 function restore() {
@@ -137,7 +140,11 @@ function restore() {
   return entry ? fixture(entry, entry) : { ...fixture('unregistered'), view: 'scan' };
 }
 
-function persist() { if (!liveEnabled) write('sessionStorage', sessionKey, JSON.stringify(state)); }
+function liveDraftKey() { return `shomei.wallet-draft:${config.apiBaseUrl}:${currentCardId}`; }
+function persist() {
+  if (!liveEnabled) write('sessionStorage', sessionKey, JSON.stringify(state));
+  else if (currentCardId) write('sessionStorage', liveDraftKey(), JSON.stringify({ nickname: state.nickname, preparingWallet, view: state.view }));
+}
 function update(next, preserveDialog = false) { state = { ...state, ...next }; persist(); render(preserveDialog); }
 function choose(scenario) {
   currentCardId = null; qrIdentity = null; qrSource = './card-qr.svg';
@@ -185,6 +192,9 @@ function evidenceStatus() {
 function registeredView(completed = false) {
   return `<section class="page result-page"><div class="status-symbol success">${icon('check')}</div><h1 class="page-title">${t(completed ? 'successTitle' : 'registered')}</h1>${tradingCard()}<div class="info-panel">${detailTable()}<div id="evidence-status" role="status" aria-live="polite" aria-busy="${liveSnapshot?.refresh.kind === 'checking'}">${evidenceStatus()}</div><div class="result-actions"><button class="btn btn-outline" data-action="details">${t('detailsButton')}</button></div></div></section>`;
 }
+function metaMaskHandoff() {
+  return `<p class="process-copy">${t('inAppContinue')}</p><a class="btn btn-primary wallet-prepare-button" data-metamask-browser href="${escape(metaMaskBrowserLink(config.publicUrl, currentCardId))}">${t('openInMetaMask')}</a><details class="network-settings"><summary>${t('browserNotOpened')}</summary><p>${t('pasteInMetaMask')}</p><input class="input input-bordered w-full" aria-label="${t('cardPageAddress')}" readonly value="${escape(cardPageUrl(config.publicUrl, currentCardId))}"><button class="btn btn-outline wallet-prepare-button" data-action="copy-card-url">${t('copyCardUrl')}</button><p id="card-url-copy-status" role="status"></p></details>`;
+}
 function cardView() {
   if (liveEnabled && (!liveSnapshot || liveSnapshot.read.kind === 'loading')) return `<section class="page"><h1 class="page-title" role="status">${t('loading')}</h1></section>`;
   if (['not-found', 'unavailable'].includes(state.card)) {
@@ -192,12 +202,33 @@ function cardView() {
     return `<section class="page"><div class="status-symbol warning">${icon('info')}</div><h1 class="page-title">${t(absent ? 'notFoundTitle' : 'unavailableTitle')}</h1><p class="process-copy">${lines(absent ? 'notFoundCopy' : 'unavailableCopy')}</p></section>${footer(absent ? 'scan-again' : 'retry-read', t(absent ? 'scanAnother' : 'retry'))}`;
   }
   if (['registered', 'evidence-pending'].includes(state.card)) return registeredView();
-  return `<section class="page read-page"><div class="status-symbol">${icon('check')}</div><h1 class="page-title">${t('readTitle')}</h1>${tradingCard()}<div class="info-panel card-summary"><h2>${t('player')}</h2><p>${t('cardType')}</p><p>ID: ${escape(cardLabel())}</p><span class="registration-badge">${t('unregistered')}</span></div></section>${(liveEnabled && config.walletMode === 'mock' ? '' : footer('start-register', `${t('next')}${icon('arrow')}`))}`;
+  return `<section class="page read-page"><div class="status-symbol">${icon('check')}</div><h1 class="page-title">${t('readTitle')}</h1>${tradingCard()}<div class="info-panel card-summary"><h2>${t('player')}</h2><p>${t('cardType')}</p><p>ID: ${escape(cardLabel())}</p><span class="registration-badge">${t('unregistered')}</span></div></section>${(liveEnabled && config.walletMode === 'mock' ? '' : useMetaMaskBrowser(config) ? `<footer class="bottom-actions">${metaMaskHandoff()}</footer>` : footer('start-register', `${t('next')}${icon('arrow')}`))}`;
+}
+function walletSetup() {
+  if (liveEnabled) return liveSnapshot?.preparation ?? { kind: 'idle' };
+  if (state.wallet === 'valid') return { kind: 'ready' };
+  const step = state.scenario.slice('wallet-'.length);
+  if (['connect', 'add', 'switch'].includes(step)) return { kind: 'pending', step };
+  if (['paused', 'rejected'].includes(step)) return { kind: step, step: 'switch' };
+  return { kind: state.wallet === 'wrong-chain' ? 'paused' : 'idle', step: 'switch' };
+}
+function walletPreparationView() {
+  const setup = walletSetup();
+  const network = liveSnapshot?.read.connection?.network;
+  const name = network?.name ?? 'Curvegrid Testnet';
+  const pending = setup.kind === 'pending';
+  const status = setup.kind === 'ready' ? 'walletReady' : setup.kind === 'idle' ? 'preparationCopy' : pending ? setup.slow ? 'setupSlow' : { check: 'setupCheck', connect: 'setupConnect', add: 'setupAdd', switch: 'setupSwitch' }[setup.step] : { paused: 'setupPaused', rejected: 'setupRejected', failed: 'setupFailed', blocked: 'setupBlocked' }[setup.kind];
+  const action = pending || setup.kind === 'blocked' ? 'check-wallet' : 'prepare-wallet';
+  return `<div class="wallet-preparation" id="wallet-preparation"><p class="form-label">${t('walletPreparationTitle')}</p><p class="wallet-network">${escape(name)}</p><div class="wallet-status ${setup.kind === 'ready' ? 'wallet-ready' : ''}" role="status" aria-live="polite">${pending && !setup.slow ? '<span class="loading loading-spinner loading-xs" aria-hidden="true"></span>' : setup.kind === 'ready' ? icon('check') : ''}<span>${t(status)}</span></div>${state.wallet !== 'disconnected' ? `<p class="wallet-address">${escape(walletLabel())}</p>` : ''}${setup.kind !== 'ready' ? `<p class="wallet-return">${t(hasMetaMaskProvider() ? 'approveInApp' : 'returnToBrowser')}</p><button class="btn btn-primary wallet-prepare-button" data-action="${action}">${t(pending || setup.kind === 'blocked' ? 'checkWallet' : setup.kind === 'idle' ? 'prepareWallet' : 'continueWallet')}</button>` : ''}<button class="btn btn-ghost wallet-help-button" data-action="wallet-help">${t('walletHelp')}</button>${['failed', 'blocked'].includes(setup.kind) || setup.slow ? diagnosticControls() : ''}</div>`;
 }
 function registerView() {
-  const wrong = ['wrong-wallet', 'wrong-chain'].includes(state.wallet);
-  const walletKey = state.wallet === 'wrong-wallet' ? 'wrongWallet' : 'wrongChain';
-  return `<section class="page register-page">${tradingCard()}<div class="info-panel"><h1 class="page-title">${t('registerTitle')}</h1><div class="form-field"><label class="form-label" for="nickname">${t('nickname')}</label><div class="nickname-input"><input class="input input-bordered" id="nickname" name="nickname" autocomplete="off" value="${escape(state.nickname)}"><button type="button" data-action="clear-nickname" aria-label="${t('clearNickname')}">${icon('close')}</button></div></div><div class="form-field"><p class="form-label">${t('wallet')}</p>${state.wallet === 'disconnected' ? `<button class="btn btn-outline connect-button" data-action="connect" ${liveEnabled && liveSnapshot?.wallet.kind === 'connecting' ? 'disabled' : ''}>${icon('wallet')}${t(liveEnabled && liveSnapshot?.wallet.kind === 'connecting' ? 'connectingWallet' : 'connect')}</button>` : `<div class="wallet-value">${escape(walletLabel())}${icon('wallet')}</div>`}</div>${liveEnabled && liveError ? `<div class="alert alert-error" role="alert">${escape(t(liveError))}</div>` : ''}${wrong ? `<div class="alert alert-error"><div><p>${t(walletKey + 'Title')}</p><button class="btn btn-ghost" data-action="fix-wallet">${t(state.wallet === 'wrong-wallet' ? 'switchWallet' : 'switchChain')}</button></div></div>` : ''}</div></section>${footer('confirm', `${t('next')}${icon('arrow')}`, '', !ready())}`;
+  if (useMetaMaskBrowser(config)) return `<section class="page register-page">${tradingCard()}<div class="info-panel"><h1 class="page-title">${t('registerTitle')}</h1>${metaMaskHandoff()}</div></section>`;
+  return `<section class="page register-page">${tradingCard()}<div class="info-panel"><h1 class="page-title">${t('registerTitle')}</h1><div class="form-field"><label class="form-label" for="nickname">${t('nickname')}</label><div class="nickname-input"><input class="input input-bordered" id="nickname" name="nickname" autocomplete="off" value="${escape(state.nickname)}"><button type="button" data-action="clear-nickname" aria-label="${t('clearNickname')}">${icon('close')}</button></div></div>${walletPreparationView()}${state.wallet === 'wrong-wallet' ? `<p role="alert">${t('wrongWalletTitle')}</p><button class="btn btn-outline" data-action="fix-wallet">${t('switchWallet')}</button>` : ''}</div></section>${footer('confirm', `${t('next')}${icon('arrow')}`, '', !ready())}`;
+}
+function walletHelpDialog() {
+  const network = liveSnapshot?.read.connection?.network;
+  const link = metaMaskBrowserLink(config.publicUrl, currentCardId);
+  return `<dialog id="wallet-help-dialog" class="modal modal-bottom" aria-labelledby="wallet-help-title"><div class="modal-box"><h2 id="wallet-help-title">${t('walletHelp')}</h2><p class="wallet-return">${t('walletHelpCopy')}</p>${liveEnabled ? `<a class="btn btn-primary wallet-prepare-button" href="${escape(link)}">${t('openInMetaMask')}</a>` : ''}${network ? `<details class="network-settings"><summary>${t('manualNetwork')}</summary><p>${t('manualNetworkCopy')}</p><dl class="data-list">${[['networkName', network.name], ['chainIdLabel', network.chainId], ['currencyLabel', network.nativeCurrency.symbol], ['rpcLabel', network.rpcUrls[0]]].map(([label, value]) => `<div><dt>${t(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl><button class="btn btn-outline wallet-prepare-button" data-action="copy-network">${t('networkSettings')}</button><p id="network-copy-status" role="status"></p></details>` : ''}<form method="dialog"><button class="btn btn-outline wallet-prepare-button">${t('close')}</button></form></div></dialog>`;
 }
 function reviewView() {
   return `<section class="page review-page"><h1 class="page-title">${t('confirmTitle')}</h1>${tradingCard()}<div class="info-panel"><h2 class="panel-title">${t('confirmHeading')}</h2>${detailTable(false, true)}<label class="consent-label"><input type="checkbox" class="consent-checkbox" id="consent" ${state.consent ? 'checked' : ''}><span><strong>${t('consent')}</strong><small>${t('consentNote')}</small></span></label><button class="btn btn-primary panel-primary" data-action="register-reviewed" ${state.consent && ready() ? '' : 'disabled'}>${t('registerNow')}${icon('arrow')}</button><button class="btn btn-outline edit-button" data-action="edit-review">${icon('back')}${t('edit')}</button></div></section>`;
@@ -230,7 +261,7 @@ function render(preserveDialog = false) {
   document.documentElement.lang = locale;
   document.title = t('title');
   const content = state.view === 'scan' ? scanView() : state.view === 'card' ? cardView() : state.view === 'register' ? registerView() : state.view === 'review' ? reviewView() : processView();
-  root.innerHTML = `<div class="phone ${state.view === 'scan' && !cameraOpen ? 'home-scene' : 'flow-scene'}"><header class="app-header"><button class="round-button" data-action="${state.view === 'scan' && cameraOpen ? 'close-camera' : 'back-screen'}" aria-label="${t('backScreen')}" ${(['sent', 'confirming', 'unknown'].includes(state.view) || (liveEnabled && state.view === 'approval')) ? 'disabled' : ''}>${icon('back')}</button><a class="brand" href="./" data-action="home"><span class="brand-art"><img src="./assets/logo-ja.jpg" alt="${t('brand')} QR Proof" width="1236" height="1272"></span></a><button class="round-button" data-action="scenarios" aria-label="${t('menu')}"><span aria-hidden="true">•••</span></button></header><p class="demo-label">${t('demo')} · ${t(liveEnabled && config.walletMode === 'mock' ? 'readonly' : 'noTransaction')}</p><main>${content}</main></div>${dialogs()}`;
+  root.innerHTML = walletHelpDialog() + `<div class="phone ${state.view === 'scan' && !cameraOpen ? 'home-scene' : 'flow-scene'}"><header class="app-header"><button class="round-button" data-action="${state.view === 'scan' && cameraOpen ? 'close-camera' : 'back-screen'}" aria-label="${t('backScreen')}" ${(['sent', 'confirming', 'unknown'].includes(state.view) || (liveEnabled && state.view === 'approval')) ? 'disabled' : ''}>${icon('back')}</button><a class="brand" href="./" data-action="home"><span class="brand-art"><img src="./assets/logo-ja.jpg" alt="${t('brand')} QR Proof" width="1236" height="1272"></span></a><button class="round-button" data-action="scenarios" aria-label="${t('menu')}"><span aria-hidden="true">•••</span></button></header><p class="demo-label">${liveEnabled ? t(config.walletMode === 'mock' ? 'readonly' : 'demo') : `${t('demo')} · ${t('noTransaction')}`}</p><main>${content}</main></div>${dialogs()}`;
   if (cameraEnabled && cameraOpen && state.view === 'scan') root.querySelector('#camera-slot').replaceWith(camera.getVideo());
   if (openDialog) document.getElementById(openDialog)?.showModal();
   if (!liveEnabled && ['sent', 'confirming'].includes(state.view)) {
@@ -260,6 +291,14 @@ root.addEventListener('click', async (event) => {
   event.preventDefault();
   const action = button.dataset.action;
   if (cameraEnabled && await handleCameraAction(action)) return;
+  if (action === 'copy-card-url') {
+    try { await navigator.clipboard.writeText(cardPageUrl(config.publicUrl, currentCardId)); root.querySelector('#card-url-copy-status').textContent = t('copied'); }
+    catch { root.querySelector('#card-url-copy-status').textContent = t('copyCardManually'); }
+    return;
+  }
+  if (action === 'wallet-help') { root.querySelector('#wallet-help-dialog').showModal(); return; }
+  if (!liveEnabled && action === 'prepare-wallet') { if (walletSetup().kind === 'idle') root.querySelector('#wallet-dialog').showModal(); else update({ wallet: 'valid' }); return; }
+  if (!liveEnabled && action === 'check-wallet') { update({ scenario: 'wallet-paused', wallet: 'wrong-chain' }); return; }
   if (liveEnabled && await handleLiveAction(action)) return;
   if (action === 'clear-nickname') { state.nickname = ''; persist(); render(); document.querySelector('#nickname').focus(); return; }
   if (['help', 'photos', 'flash'].includes(action)) { document.querySelector('#help-copy').textContent = t(action === 'photos' ? 'photoHelp' : action === 'flash' ? 'flashHelp' : 'helpCopy'); document.querySelector('#help-dialog').showModal(); return; }
@@ -305,7 +344,7 @@ root.addEventListener('click', async (event) => {
   if (action === 'retry-read') { update({ card: 'registered', scenario: 'registered' }); return; }
 });
 window.addEventListener('popstate', () => { if (liveEnabled) { openLiveCard(new URL(location.href).searchParams.get('cardId')); return; } state = restore(); scanning = false; cameraOpen = false; if (state.scannedCardId) setCardQr(state.scannedCardId); render(); });
-persist();
+if (!liveEnabled) persist();
 render();
 if (liveEnabled && currentCardId) void openLiveCard(currentCardId);
 if (!liveEnabled && state.scannedCardId) setCardQr(state.scannedCardId);
@@ -337,13 +376,17 @@ function liveNotice(code) {
 }
 function receiveLive(snapshot) {
   const statusOnly = liveSnapshot && (snapshot.refresh.kind === 'checking' || liveSnapshot.refresh.kind === 'checking') && root.querySelector('#evidence-status');
+  const walletOnly = state.view === 'register' && liveSnapshot && snapshot.registration.kind === 'idle' && liveSnapshot.registration.kind === 'idle' && JSON.stringify(snapshot.read) === JSON.stringify(liveSnapshot.read) && root.querySelector('#wallet-preparation');
   const changedWallet = liveSnapshot && snapshot.walletRevision !== liveSnapshot.walletRevision;
   liveSnapshot = snapshot;
   if (changedWallet) { state.consent = false; if (state.view === 'review') state.view = 'register'; }
   const readState = snapshot.read;
   if (readState.kind === 'ready') {
     state.card = readState.card.status === 'registered' ? (readState.card.evidence.status === 'pending' ? 'evidence-pending' : 'registered') : 'unregistered';
-    if (readState.card.owner) state.nickname = readState.card.owner.nickname;
+    if (readState.card.owner) {
+      state.nickname = readState.card.owner.nickname;
+      if (snapshot.registration.kind === 'idle' && ['register', 'review'].includes(state.view)) state.view = 'card';
+    }
   } else if (readState.kind === 'not-found') state.card = 'not-found';
   else if (readState.kind === 'unavailable') state.card = 'unavailable';
   state.wallet = snapshot.wallet.kind !== 'connected' ? 'disconnected' : snapshot.wallet.chainId !== readState.connection?.network.chainId ? 'wrong-chain' : 'valid';
@@ -354,12 +397,24 @@ function receiveLive(snapshot) {
   if (statusOnly) {
     statusOnly.setAttribute('aria-busy', String(snapshot.refresh.kind === 'checking'));
     statusOnly.innerHTML = evidenceStatus();
+  } else if (walletOnly) {
+    walletOnly.outerHTML = walletPreparationView();
+    const next = root.querySelector('[data-action="confirm"]');
+    if (next) next.disabled = !ready();
   } else render(true);
 }
 async function openLiveCard(cardId) {
   currentCardId = cardId;
   liveError = null;
   state = { ...fixture('unregistered'), nickname: '', view: cardId ? 'card' : 'scan' };
+  preparingWallet = false;
+  let restoreForm = false;
+  try {
+    const draft = JSON.parse(read('sessionStorage', liveDraftKey()));
+    if (typeof draft?.nickname === 'string') state.nickname = draft.nickname;
+    preparingWallet = config.walletMode === 'metamask' && !useMetaMaskBrowser(config) && draft?.preparingWallet === true;
+    restoreForm = preparingWallet && ['register', 'review'].includes(draft.view);
+  } catch {}
   cameraOpen = false;
   scanning = false;
   if (cardId) {
@@ -367,13 +422,19 @@ async function openLiveCard(cardId) {
     qrIdentity = cardId; qrSource = null;
     QRCode.toDataURL(url.href, { margin: 1, color: { dark: '#172b4d', light: '#ffffff' } }).then(source => { if (qrIdentity === cardId) { qrSource = source; const img = root.querySelector('.card-qr'); if (img) img.src = source; } });
     render();
-    if (live) await live.open(cardId);
+    if (live) {
+      await live.open(cardId);
+      if (preparingWallet && state.card === 'unregistered' && liveSnapshot?.registration.kind === 'idle') {
+        if (restoreForm) { state.view = 'register'; render(); }
+        await live.resumeSetup();
+      }
+    }
   } else { qrIdentity = null; qrSource = './card-qr.svg'; render(); }
 }
 async function handleLiveAction(action) {
   if (action === 'copy-diagnostics') {
     const { diagnostics } = await import('../src/live-api.js');
-    const report = JSON.stringify({ cardId: currentCardId, walletAddress: liveSnapshot?.wallet.address ?? null, chainId: liveSnapshot?.wallet.chainId ?? null, code: liveSnapshot?.registration.errorCode ?? null, errors: diagnostics() }, null, 2);
+    const report = JSON.stringify({ cardId: currentCardId, walletAddress: liveSnapshot?.wallet.address ?? null, chainId: liveSnapshot?.wallet.chainId ?? null, preparation: liveSnapshot?.preparation, code: liveSnapshot?.preparation.errorCode ?? liveSnapshot?.registration.errorCode ?? null, errors: diagnostics() }, null, 2);
     const output = root.querySelector('#diagnostic-output');
     try { await navigator.clipboard.writeText(report); output.textContent = t('diagnosticsCopied'); }
     catch { output.textContent = report; }
@@ -397,13 +458,23 @@ async function handleLiveAction(action) {
     catch { document.querySelector('#share-status').textContent = url.href; }
     return true;
   }
-  if (action === 'connect' || action === 'fix-wallet') {
+  if (action === 'copy-network') {
+    const network = liveSnapshot.read.connection.network;
+    const text = `${network.name}\nChain ID: ${network.chainId}\n${network.nativeCurrency.symbol}\n${network.rpcUrls[0]}`;
+    const output = root.querySelector('#network-copy-status');
+    try { await navigator.clipboard.writeText(text); output.textContent = t('copied'); }
+    catch { output.textContent = text; }
+    return true;
+  }
+  if (action === 'check-wallet') { await live?.resumeSetup(); return true; }
+  if (action === 'prepare-wallet' || action === 'connect' || action === 'fix-wallet') {
     if (!live || config.walletMode !== 'metamask') return true;
-    try { if (action === 'fix-wallet' && state.wallet === 'wrong-chain') await live.switchChain(); else await live.connect(); }
+    preparingWallet = true; persist();
+    try { await live.connect(); }
     catch { liveError = 'connectFailed'; render(); }
     return true;
   }
-  if (action === 'disconnect') { await live?.disconnect(); state.consent = false; render(); return true; }
+  if (action === 'disconnect') { preparingWallet = false; persist(); await live?.disconnect(); state.consent = false; render(); return true; }
   if (action === 'start-register' && config.walletMode !== 'metamask') return true;
   if (action === 'confirm') { if (ready()) update({ view: 'review', consent: false }); return true; }
   if (action === 'register-reviewed') {
@@ -423,9 +494,15 @@ async function handleLiveAction(action) {
 if (liveEnabled) {
   import('../src/live-registration.js').then(({ createLiveRegistration }) => {
     live = createLiveRegistration(config, receiveLive);
-    if (currentCardId) return live.open(currentCardId);
+    if (currentCardId) return openLiveCard(currentCardId);
   }).catch(() => { liveSnapshot = { read: { kind: 'unavailable' }, wallet: { kind: 'disconnected' }, registration: { kind: 'idle' } }; state.card = 'unavailable'; render(); });
-  const resume = () => { if (!document.hidden && live && currentCardId) live.recheck().catch(() => {}); };
+  const resume = () => {
+    live?.setVisible(!document.hidden);
+    if (!document.hidden && live && currentCardId) {
+      if (preparingWallet) live.resumeSetup().catch(() => {});
+      live.recheck().catch(() => {});
+    }
+  };
   document.addEventListener('visibilitychange', resume);
   window.addEventListener('pageshow', resume);
 }

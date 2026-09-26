@@ -1,7 +1,8 @@
+import { createWalletPreparation } from './wallet-preparation.js';
 import { Interface } from 'ethers';
 import artifact from '../../../contracts/abi/OwnershipRegistry.json' with { type: 'json' };
 import { CardId, Address, TransactionHash } from '../../../apps/web/src/generated/validators.js';
-import { createLiveApi, LiveError, recordFailure } from './live-api.js';
+import { createLiveApi, LiveError, recordFailure, recordWalletEvent } from './live-api.js';
 
 const contract = new Interface(artifact.abi);
 const same = (a, b) => typeof a === 'string' && typeof b === 'string' && a.toLowerCase() === b.toLowerCase();
@@ -19,11 +20,12 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
   const now = dependencies.now ?? Date.now;
   const clearTimer = dependencies.clearTimeout ?? globalThis.clearTimeout;
   const walletFactory = dependencies.walletFactory ?? (async options => (await import('./metamask-wallet.js')).createMetaMaskWallet(options));
-  let state = { read: { kind: 'loading' }, wallet: { kind: 'disconnected' }, registration: { kind: 'idle' }, refresh: { kind: 'idle' }, walletRevision: 0, canRegister: false };
+  let state = { read: { kind: 'loading' }, wallet: { kind: 'disconnected' }, preparation: { kind: 'idle' }, registration: { kind: 'idle' }, refresh: { kind: 'idle' }, walletRevision: 0, canRegister: false };
+  let preparation, walletInitialization;
   let wallet, cardId, generation = 0, disposed = false, timer, attempt, deadline = 0, verified = false, checking = null, submitting = false;
   const snapshot = () => structuredClone(state);
   function emit() {
-    state.canRegister = config.walletMode === 'metamask' && state.read.kind === 'ready' && state.read.card.status === 'unregistered' && state.wallet.kind === 'connected' && state.wallet.chainId === state.read.connection.registry.chainId && !busy.has(state.registration.kind) && !submitting;
+    state.canRegister = config.walletMode === 'metamask' && state.read.kind === 'ready' && state.read.card.status === 'unregistered' && state.wallet.kind === 'connected' && state.wallet.chainId === state.read.connection.registry.chainId && state.preparation.kind === 'ready' && !busy.has(state.registration.kind) && !submitting;
     if (!disposed) changed(snapshot());
   }
   function registration(next) {
@@ -33,7 +35,7 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
   function setWallet(value) {
     const next = value ? { kind: 'connected', address: value.address, chainId: value.chainId } : { kind: 'disconnected' };
     if (JSON.stringify(next) !== JSON.stringify(state.wallet)) state.walletRevision++;
-    state.wallet = next; emit();
+    state.wallet = next; preparation?.walletChanged(value); emit();
   }
   function identity(card, connection) {
     if (connection.status !== 'ready' || card.cardId !== cardId || connection.network.chainId !== connection.registry.chainId || card.registry.chainId !== connection.registry.chainId || !same(card.registry.contractAddress, connection.registry.contractAddress) || !same(card.registry.issuer, connection.registry.issuer)) throw new LiveError('CONNECTION_MISMATCH');
@@ -94,21 +96,29 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
     }
     emit();
   }
+  function setup() {
+    if (!preparation) preparation = createWalletPreparation({
+      chainId: state.read.connection.network.chainId,
+      getWallet: async () => {
+        walletInitialization ??= walletFactory({ network: state.read.connection.network, dappUrl: globalThis.location?.href ?? 'https://localhost/', onChange: setWallet }).then(value => { wallet = value; return value; }).catch(error => { walletInitialization = undefined; throw error; });
+        return walletInitialization;
+      },
+      changed: next => { state.preparation = next; emit(); },
+      log: recordWalletEvent, now, setTimer, clearTimer,
+    });
+    return preparation;
+  }
   async function connect() {
-    if (config.walletMode !== 'metamask' || state.read.kind !== 'ready' || state.wallet.kind === 'connecting' || busy.has(state.registration.kind)) return;
-    state.wallet = { kind: 'connecting' }; emit();
-    try {
-      wallet ??= await walletFactory({ network: state.read.connection.network, dappUrl: globalThis.location?.href ?? 'https://localhost/', onChange: setWallet });
-      setWallet(await wallet.connect());
-    } catch (error) { setWallet(null); registration({ kind: error?.code === 4001 ? 'rejected' : 'failed', errorCode: code(error) }); }
+    if (config.walletMode !== 'metamask' || state.read.kind !== 'ready' || state.read.card.status !== 'unregistered' || busy.has(state.registration.kind)) return;
+    await setup().prepare();
   }
-  async function switchChain() {
-    if (!wallet || state.read.kind !== 'ready' || busy.has(state.registration.kind)) return;
-    try { await wallet.switchChain(); setWallet(await wallet.snapshot()); }
-    catch (error) { registration({ kind: error?.code === 4001 ? 'rejected' : 'failed', errorCode: code(error) }); }
+  async function resumeSetup() {
+    if (config.walletMode !== 'metamask' || state.read.kind !== 'ready' || state.read.card.status !== 'unregistered' || busy.has(state.registration.kind)) return;
+    await setup().resume();
   }
+  function setVisible(visible) { preparation?.setVisible(visible); }
   async function register(nickname) {
-    if (submitting || busy.has(state.registration.kind) || config.walletMode !== 'metamask') return;
+    if (submitting || busy.has(state.registration.kind) || ['pending', 'blocked'].includes(state.preparation.kind) || config.walletMode !== 'metamask') return;
     if (!validNickname(nickname)) { registration({ kind: 'failed', errorCode: 'INVALID_INPUT' }); return; }
     if (!wallet || state.read.kind !== 'ready' || state.read.card.status !== 'unregistered') return;
     if (!locks?.request) { registration({ kind: 'failed', errorCode: 'LOCKS_UNAVAILABLE' }); return; }
@@ -200,7 +210,7 @@ export function createLiveRegistration(config, changed, dependencies = {}) {
     }
     finally { if (checking === current) checking = null; }
   }
-  async function disconnect() { if (wallet) await wallet.disconnect(); setWallet(null); }
-  function dispose() { disposed = true; generation++; clearTimer(timer); wallet?.dispose(); }
-  return { open, refresh, connect, switchChain, register, recheck, disconnect, dispose, getSnapshot: snapshot };
+  async function disconnect() { preparation?.dispose(); preparation = undefined; state.preparation = { kind: 'idle' }; if (wallet) await wallet.disconnect(); setWallet(null); }
+  function dispose() { disposed = true; generation++; clearTimer(timer); preparation?.dispose(); wallet?.dispose(); }
+  return { open, refresh, connect, resumeSetup, setVisible, register, recheck, disconnect, dispose, getSnapshot: snapshot };
 }

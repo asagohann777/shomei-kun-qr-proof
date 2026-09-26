@@ -11,7 +11,7 @@ await mkdir(output, { recursive: true });
 for (const [name, engine] of Object.entries({ chromium, webkit })) {
   const browser = await engine.launch({ headless: true });
   try {
-    const context = await browser.newContext({ ...devices['iPhone 13'], locale: 'ja-JP' });
+    const context = await browser.newContext({ ...devices['Pixel 5'], locale: 'ja-JP' });
     const page = await context.newPage();
     page.setDefaultTimeout(15000);
     const errors = [];
@@ -42,10 +42,19 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         return originalClick.call(this);
       };
     });
+    if (process.env.SDK_PROXY_API) await page.route(`${process.env.SDK_PROXY_API}/api/v1/**`, async route => {
+      assert.equal(route.request().method(), 'GET');
+      const response = await fetch(route.request().url());
+      await route.fulfill({ status: response.status, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: await response.text() });
+    });
     await page.goto(target);
     assert.equal(await page.evaluate(() => Boolean(window.ethereum)), false, 'SDK smoke must not use an injected wallet');
-    await page.locator('[data-action="start-register"]').click();
-    await page.locator('[data-action="connect"]').click();
+    try { await page.locator('[data-action="start-register"]').click(); }
+    catch (error) {
+      const pageText = (await page.locator('body').innerText()).replace(/https?:\/\/\S+/g, '[URL]');
+      throw new Error(JSON.stringify({ browser: name, pageText, errors }), { cause: error });
+    }
+    await page.locator('[data-action="prepare-wallet"]').click();
     const deadline = Date.now() + 20000;
     while ((!observed.relayOrigin || !observed.universalLinkOrigin) && Date.now() < deadline && errors.length === 0) await page.waitForTimeout(100);
     assert.deepEqual(errors, [], `${name}: SDK browser errors`);

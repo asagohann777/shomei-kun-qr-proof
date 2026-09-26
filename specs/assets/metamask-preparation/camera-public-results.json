@@ -1,0 +1,18 @@
+[
+  {
+    "browser": "chromium",
+    "passed": true,
+    "mode": "video QR decoded; tracks stopped",
+    "apiCardId": "camera-public-fixture",
+    "registrationRequests": 0,
+    "realDevice": false
+  },
+  {
+    "browser": "webkit",
+    "passed": true,
+    "mode": "permission denied; photo QR decoded",
+    "apiCardId": "camera-public-fixture",
+    "registrationRequests": 0,
+    "realDevice": false
+  }
+]

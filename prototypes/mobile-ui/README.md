@@ -136,3 +136,10 @@ npm run verify:camera
 ```
 
 ブラウザ検証では実QR画像・仮想カメラ映像を使う。iPhone/Androidの実カメラとライトは実機で別途確認する。
+## MetaMaskの接続準備
+
+実接続では「MetaMaskで準備する」から接続、必要なネットワーク追加・切替へ進む。外部アプリに移動した後はこの画面に戻り、「MetaMaskで続ける」で次の承認へ進む。保留中の要求は重ねず「接続状況を確認」で読み直す。日英の手動設定案内も用意している。
+
+通常のmock/mockで `?scenario=wallet-connect`、`wallet-add`、`wallet-switch`、`wallet-paused`、`wallet-rejected`、`wallet-ready` を確認できる。準備処理は実行しない。live/mockは閲覧専用のまま。
+
+`node scripts/verify-wallet-preparation.mjs` は4273のmock、4274のlive UIを合成ウォレット/APIで操作する。URLは `MOCK_BASE_URL` と `LIVE_UI_URL` で変更できる。アプリ移動を模擬した試験であり、iPhone実機のMetaMask往復を検証したものではない。詳しくは [接続準備計画](../../specs/METAMASK_PREPARATION_PLAN.md)。

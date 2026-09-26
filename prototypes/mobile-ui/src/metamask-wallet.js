@@ -41,6 +41,7 @@ export async function createMetaMaskWallet({ network, dappUrl, onChange = () => 
     ]);
     ensureActive();
     if (epoch !== revision || !connected) throw failure('WALLET_CHANGED');
+    if (Array.isArray(accounts) && accounts.length === 0) return null;
     if (!Array.isArray(accounts) || accounts.some((account) => !addressPattern.test(account)) || typeof chain !== 'string' || !/^0x[0-9a-f]+$/i.test(chain)) throw failure('INVALID_WALLET_RESPONSE');
     const chainId = Number(BigInt(chain));
     if (!Number.isSafeInteger(chainId) || chainId <= 0) throw failure('INVALID_WALLET_RESPONSE');
@@ -101,10 +102,11 @@ export async function createMetaMaskWallet({ network, dappUrl, onChange = () => 
     if (!connecting) connecting = (async () => {
       const generation = session;
       await initialize();
-      if (client) await client.connect({ chainIds: [targetChain] });
+      if (client) await client.connect();
       else await provider.request({ method: 'eth_requestAccounts' });
       ensureActive();
       if (generation !== session) throw failure('WALLET_CHANGED');
+      revision += 1;
       connected = true;
       const value = await snapshot();
       onChange(value);
@@ -113,21 +115,43 @@ export async function createMetaMaskWallet({ network, dappUrl, onChange = () => 
     return connecting;
   }
 
+  async function restore() {
+    ensureActive();
+    const generation = session;
+    await initialize();
+    if (generation !== session) throw failure('WALLET_CHANGED');
+    const epoch = revision;
+    connected = true;
+    try {
+      const value = await snapshot();
+      connected = Boolean(value);
+      onChange(value);
+      return value;
+    } catch (error) {
+      if (epoch === revision) connected = false;
+      throw error;
+    }
+  }
+
   async function switchChain() {
     ensureActive();
     if (!provider || !connected) throw failure('WALLET_NOT_CONNECTED');
-    try {
-      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: targetChain }] });
-    } catch (error) {
-      if (error?.code !== 4902) throw error;
-      await provider.request({ method: 'wallet_addEthereumChain', params: [{
-        chainId: targetChain, chainName: network.name,
-        nativeCurrency: network.nativeCurrency, rpcUrls: network.rpcUrls,
-      }] });
-      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: targetChain }] });
-    }
+    await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: targetChain }] });
     const value = await snapshot();
     if (!value || value.chainId !== network.chainId) throw failure('CHAIN_MISMATCH');
+    onChange(value);
+    return value;
+  }
+
+  async function addChain() {
+    ensureActive();
+    if (!provider || !connected) throw failure('WALLET_NOT_CONNECTED');
+    await provider.request({ method: 'wallet_addEthereumChain', params: [{
+      chainId: targetChain, chainName: network.name,
+      nativeCurrency: network.nativeCurrency, rpcUrls: network.rpcUrls,
+    }] });
+    const value = await snapshot();
+    onChange(value);
     return value;
   }
 
@@ -165,5 +189,5 @@ export async function createMetaMaskWallet({ network, dappUrl, onChange = () => 
     detach();
   }
 
-  return { connect, snapshot, switchChain, send, disconnect, dispose };
+  return { connect, restore, snapshot, switchChain, addChain, send, disconnect, dispose };
 }

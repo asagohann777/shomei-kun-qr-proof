@@ -1,0 +1,116 @@
+{
+  "verifiedAt": "2026-09-26T04:24:53.120Z",
+  "version": "caadbc80-87ac-414f-9024-ed63342b7344",
+  "assets": [
+    {
+      "name": "app.js",
+      "sha256": "d43aea8de13644ea5ca93c55caea7888a6703a074c9ae61fa4238fe270af5cb5"
+    },
+    {
+      "name": "browser-NMUK3GQS.js",
+      "sha256": "ba0134b2237262d5a69819d6c45cf15bc23697692ac7cb21d56c19f9e0424adf"
+    },
+    {
+      "name": "camera-messages.js",
+      "sha256": "6624cb7664cb9c49f0f26ecf722a1340acc13b06324c6d151438c2aa2f89f391"
+    },
+    {
+      "name": "chunk-4Y7OPXAS.js",
+      "sha256": "ed8f91f2bec8d2ac20ae22dc387da9e3ff4d833fdef5f20c3d07f6897c64d695"
+    },
+    {
+      "name": "chunk-5DXWNKIO.js",
+      "sha256": "bf4054bb25df49930d2e1c28d2768aa84c9fa9d3b5b0deafb83490dbe5033441"
+    },
+    {
+      "name": "chunk-5SR2PWDO.js",
+      "sha256": "51464db9fd932781e0511a11cd35aa71b2ee5055d132f4a859f82bcf86fc943c"
+    },
+    {
+      "name": "chunk-AA5IPAUG.js",
+      "sha256": "25374841770d0465370496bfd2491f073b253bc714bf07f8d798635698c7bbd6"
+    },
+    {
+      "name": "chunk-AQDV2KRC.js",
+      "sha256": "34f1adbb73b6a4ed0ac447975f928882e7bc772d7731f3df2029b82f87ec2b16"
+    },
+    {
+      "name": "chunk-ZEREMZOK.js",
+      "sha256": "fd679f4310ebbeef0cbe481c0f4dda0ca00db17426fa0207a86590819b2e75ce"
+    },
+    {
+      "name": "connect-evm-LWXFLP2J.js",
+      "sha256": "7b8c3c9191deb9948a88ccbf9c77d9f8c55b1686ef43557f915fa1e959110ee0"
+    },
+    {
+      "name": "dist-LONI3FUE.js",
+      "sha256": "71eb09446ddb53001bec62b216a86fc681a44793d76fbc75159948e480a91b05"
+    },
+    {
+      "name": "dist-U47XN42P.js",
+      "sha256": "3316d3d1ec8dd9b317d83fcb4fe48dda3ae1d954f94d56eb233acbf2c788692c"
+    },
+    {
+      "name": "index.html",
+      "sha256": "5e6298cafb79160438a42dee524523d71ec2726c4c1796abbebc259ce95a2c27"
+    },
+    {
+      "name": "live-api-O6S4JODH.js",
+      "sha256": "e343a10b22e97e5091bb16987b8848ffbf48e7c3852cbacb1ea1c497cd914277"
+    },
+    {
+      "name": "live-messages.js",
+      "sha256": "5dcfe0f836ec9f445ebe5c27fb6d3ff611722f4c00f3b4d7bfc5655a44fc11a0"
+    },
+    {
+      "name": "live-registration-C55Q6AWB.js",
+      "sha256": "76fa38d6238ade337c55b4c83c477f41f7ae8a04fa44a15694323485ba2cb25d"
+    },
+    {
+      "name": "loader-XJK26MJS.js",
+      "sha256": "489915b846aa1f6c465c4e6171e878ff2908861e3b584603425b7715efba1ee2"
+    },
+    {
+      "name": "messages.js",
+      "sha256": "d9eac4bfb1f74ae06d7d3ff2ef29a866406997a275274dce20c7d5448244ad65"
+    },
+    {
+      "name": "metamask-ecies-EXB3E4R3.js",
+      "sha256": "57ef7ec9fd1fa9ce864d4caf9cb3dcdd1c3d0da36fe77d3e63643b75151617f1"
+    },
+    {
+      "name": "metamask-wallet-STMXXVGV.js",
+      "sha256": "c780d14af674ae96331cbd6cde141e43cac4149096eb83fb288a8118d67620ee"
+    },
+    {
+      "name": "mm-install-modal_2.entry-L4H7XRZS.js",
+      "sha256": "442f67cbad5d67292934e1abaec976737b87097be9c717d03d73000426e9a562"
+    },
+    {
+      "name": "qr-scanner-worker.min-N4LT4H4Z.js",
+      "sha256": "721c98975711227f381bd1ee68c70e719ae28d90a01ac1387e990e48442cbc7d"
+    },
+    {
+      "name": "style.css",
+      "sha256": "2b3c9940b8e3c25a2defc61c7582842401de9b3f48e7b4241940446b9f85bdd7"
+    },
+    {
+      "name": "wallet-messages.js",
+      "sha256": "9b1c7b0f0e5b6b78d5c7e43a999e116b004e3604f19685a76ec93b4ff7e1e61a"
+    }
+  ],
+  "removed": [
+    {
+      "name": "test-cards.html",
+      "status": 404
+    },
+    {
+      "name": "test-card-urls.txt",
+      "status": 404
+    }
+  ],
+  "connection": {
+    "status": "ready",
+    "chainId": 2017072401
+  }
+}

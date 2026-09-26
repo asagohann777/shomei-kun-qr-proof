@@ -1,0 +1,7 @@
+[
+  "chromium: mock requests zero; denied camera/photo recovery; worker QR decode; displayed/generated identity; reload; ja/en 320/390",
+  "webkit: mock requests zero; denied camera/photo recovery; worker QR decode; displayed/generated identity; reload; ja/en 320/390",
+  "chromium API live: delayed initialization preserves camera; decoded ID reaches card API; unavailable response stays an error",
+  "chromium: language keeps video/stream; background stops tracks; explicit resume; close stops resumed tracks",
+  "chromium: actual video QR decode via generated Y4M input; automatic transition; all tracks ended"
+]

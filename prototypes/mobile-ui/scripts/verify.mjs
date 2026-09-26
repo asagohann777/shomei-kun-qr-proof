@@ -111,7 +111,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
   assert.equal(await page.locator('#nickname').inputValue(), '');
   assert(await action('confirm').isDisabled());
   await page.locator('#nickname').fill('相談用 <テスト>');
-  await action('connect').click();
+  await action('prepare-wallet').click();
   await action('connect-sample').click();
   await layout('390-registration');
   await action('confirm').click();
@@ -153,7 +153,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
     await goto('wrong-chain');
     await layout(`${width}-english-register`);
     assert(await action('confirm').isDisabled());
-    await action('fix-wallet').click();
+    await action('prepare-wallet').click();
     await action('confirm').click();
     await layout(`${width}-english-review`);
     await page.reload();

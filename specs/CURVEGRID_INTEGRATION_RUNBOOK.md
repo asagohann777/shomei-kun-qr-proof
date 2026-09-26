@@ -61,7 +61,7 @@ Content-Type: application/json
 ビルドとローカル検証は公開せずに実行できる。
 
 ```sh
-BACKEND_MODE=live npm run build:integration
+UI_CAMERA_MODE=live BACKEND_MODE=live npm run build:integration
 npm run test:worker:live
 ```
 
@@ -85,7 +85,7 @@ npm run test:http
 npm run test:http:live
 BACKEND_MODE=mock npm run build:worker
 npm run test:worker
-BACKEND_MODE=live npm run build:integration
+UI_CAMERA_MODE=live BACKEND_MODE=live npm run build:integration
 npm run test:worker:live
 ```
 
@@ -98,3 +98,11 @@ npm run test:worker:live
 Workerに設定するのは `MULTIBAAS_BASE_URL`、アプリ用 `MULTIBAAS_API_KEY`、`CHAIN_ID`、`REGISTRY_ADDRESS`、`REGISTRY_CONTRACT_LABEL`、`REGISTRY_CONTRACT_VERSION`、`REGISTRY_DEPLOYMENT_BLOCK`、`REGISTRY_ISSUER`、`CURVEGRID_PUBLIC_WEB3_RPC_URL`、`PUBLIC_API_ORIGIN`、`ALLOWED_UI_ORIGINS`。`.env.local` 全体をbulk登録しない。`MULTIBAAS_ADMIN_API_KEY`、キーストア、パスワードはCLI側だけで使用する。
 
 実測カードと再現コマンド、残る確認は [疎通試験記録](CURVEGRID_CONNECTIVITY_REPORT.md) を参照。
+
+### integrationでのカメラ試験
+
+専用integrationは `UI_CAMERA_MODE=live` でビルドする。`apps/web/.env.local` にも同じ設定を保存できる。既定値はmockのままなので、UI検討用ビルドではカメラ権限を要求しない。
+
+公開 `/ui/` の「QRコードをスキャン」からカメラを許可し、既存カードのQRを読み取る。写真からの読取りも利用できる。登録するまでは取引を送信しない。
+
+公開ビルドの確認は `prototypes/mobile-ui` で `node scripts/verify-camera-public.mjs` を実行する。Chromiumで動画のQRを読み取り、WebKitでカメラ拒否後に写真を読む。API応答は試験内で503に置き換え、読取りIDの引渡しと通信失敗表示を確認する。実カードの発行・登録は行わない。
