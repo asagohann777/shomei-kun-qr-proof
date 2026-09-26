@@ -1,36 +1,38 @@
-# このリポジトリでの作業ルール
+English | [日本語](AGENTS.ja.md)
 
-## 目的
+# Working rules for this repository
 
-天地愛プロジェクトの既存「証明くん」をもとに、機能の参照実装とデモアプリを新たにOSSとして作る。既存プロジェクトと本リポジトリの成果を区別する。対象機能、技術構成、公開ライセンスはこれから決める。
+## Purpose
 
-## 作業場所
+Build a new open-source reference implementation and demo app based on the existing Shomei-kun from the Tennchiai Project. Distinguish the existing project from work in this repository. The target features, technology stack, and public license remain to be decided.
 
-- このリポジトリでは、グローバルのworktree必須ルールの例外として、現在のチェックアウトで直接作業してよい。worktreeを新規作成する必要はない。
-- 作業開始時に現在地とGitルートを確認する。既存「証明くん」や他リポジトリを変更しない。
-- 未確定事項を推測で仕様として確定しない。
+## Working directory
 
-## 仕様と開発記録
+- This repository is an exception to the global worktree requirement. You may work directly in the current checkout without creating a worktree.
+- At the start of work, check the current directory and Git root. Do not change the existing Shomei-kun project or other repositories.
+- Do not turn assumptions about unresolved matters into confirmed specifications.
 
-- `specs/SPEC.md` に目的、対象機能、要件、受け入れ条件を保存する。
-- `specs/ARCHITECTURE.md` に構成、データの流れ、技術選定と理由を保存する。
-- `specs/PRE_EXISTING_WORK.md` に大会前の成果、参照元、流用範囲、ライセンスを記録する。
-- `specs/HACKATHON_CHANGES.md` に大会中の変更、検証結果、人間の貢献、AIの使用箇所を記録する。大会期間との対応が未確認の作業は、その旨を明記する。
-- 追加の計画・設計資料も `specs/` に保存する。会話やローカルの一時ファイルだけに決定事項を残さない。
+## Specifications and development records
 
-## プロンプトの保存
+- Save the purpose, target features, requirements, and acceptance criteria in `specs/SPEC.md`.
+- Save the architecture, data flow, technology choices, and reasons in `specs/ARCHITECTURE.md`.
+- Record pre-hackathon work, sources, reuse scope, and licenses in `specs/PRE_EXISTING_WORK.md`.
+- Record hackathon changes, verification results, human contributions, and AI use in `specs/HACKATHON_CHANGES.md`. Identify work whose timing relative to the hackathon has not been verified.
+- Save additional plans and design documents in `specs/`. Do not leave decisions only in conversations or local temporary files.
 
-- `.codex/hooks.json` の `UserPromptSubmit` hookで、ユーザー入力を `docs/prompts/` に保存する。セットアップと保存範囲は `docs/prompts/README.md` を参照する。
-- プロンプト記録をGitの管理対象から除外しない。変更に対応する仕様・計画・プロンプトを提出リポジトリに含める。
-- hook導入前や別のAIツールで使用したプロンプト、添付資料、再利用する指示・テンプレートは、出典と保存方法を明記して手動で補う。自動保存したと偽らない。
-- AIの回答に含まれる採用済みの計画は `specs/` に保存する。hookは回答・内部推論・添付ファイルを収集しない。
-- 秘密鍵、認証情報、実顧客データをプロンプトに含めない。公開前に記録を確認し、秘匿化が必要なら理由を残す。
+## Prompt preservation
 
-## 大会への提出
+- The `UserPromptSubmit` hook in `.codex/hooks.json` saves user input in `docs/prompts/`. See `docs/prompts/README.md` for setup and collection scope.
+- Do not exclude prompt records from Git. Include specifications, plans, and prompts associated with changes in the submission repository.
+- Manually add prompts used before the hook or in other AI tools, attachments, and reusable instructions or templates. State their source and preservation method. Do not claim that they were saved automatically.
+- Save adopted plans from AI responses in `specs/`. The hook does not collect responses, internal reasoning, or attachments.
+- Do not include private keys, credentials, or real customer data in prompts. Review records before publication and document the reason for any redaction.
 
-[ETHGlobal Tokyo 2026のルール](https://ethglobal.com/events/tokyo2026/info/details)を2026-09-25に確認した。
+## Hackathon submission
 
-- 仕様駆動開発で使った仕様、プロンプト、計画資料を提出リポジトリに含める。
-- 既存成果と新規成果を区別し、AIを使用したファイル・用途を明記する。
-- 参加トラックは未確定。新しいOSSリポジトリを作ることだけでClassicの参加条件を満たすと判断しない。既存成果を使う場合はContinuityの条件と応募先の条件を確認する。
-- 開発経緯が分かる粒度で履歴を残す。commit・push・提出・デプロイはユーザーの指示に従う。
+The [ETHGlobal Tokyo 2026 rules](https://ethglobal.com/events/tokyo2026/info/details) were checked on 2026-09-25.
+
+- Include specifications, prompts, and plans used in spec-driven development in the submission repository.
+- Distinguish existing work from new work and identify files and purposes involving AI.
+- The participation track is not yet decided. Do not assume that creating a new OSS repository alone satisfies Classic eligibility. When using existing work, check the Continuity requirements and the requirements of the intended prize.
+- Keep history detailed enough to explain development. Follow the user's instructions for commits, pushes, submissions, and deployments.

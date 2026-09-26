@@ -1,10 +1,12 @@
-# 証明くんAPIを動かす
+English | [日本語](README.ja.md)
 
-Next.js・TypeScriptによる、カード取得・登録準備・登録確認のAPIです。`mock` は固定応答、`live` はMultiBaas経由でCurvegrid Testnetの記録を扱います。署名・送信は本人のウォレットで行います。以下の起動例はmock用です。[共通UI](../../prototypes/mobile-ui/README.md)は通常mockで、専用integrationビルドでは実APIとMetaMaskへ接続します。
+# Run the Shomei-kun API
 
-## 起動
+This Next.js and TypeScript API retrieves cards, prepares registration, and checks registration results. `mock` returns fixed responses. `live` reads Curvegrid Testnet records through MultiBaas. The user's wallet signs and sends transactions. The startup example below uses mock mode. The [shared UI](../../prototypes/mobile-ui/README.md) normally uses mocks; its integration build connects to the real API and MetaMask.
 
-Node.js 22を使います。リポジトリのルートから実行してください。
+## Start the server
+
+Use Node.js 22. Run these commands from the repository root.
 
 ```sh
 cd apps/web
@@ -13,9 +15,9 @@ cp .env.example .env.local
 npm run dev
 ```
 
-`BACKEND_MODE=mock` を指定します。未指定・未知の値では起動しません。mockにはAPIキーや秘密鍵は不要です。liveの設定手順は末尾のリンクを参照してください。ルート `/` は `/ui/` に遷移します。画面は専用integrationビルドで同梱します。
+Set `BACKEND_MODE=mock`. The server does not start if the value is missing or unknown. Mock mode needs no API key or private key. See the live setup link below for real connections. The root `/` redirects to `/ui/`. The integration build bundles the UI.
 
-## カード取得
+## Retrieve a card
 
 ```sh
 curl -i http://localhost:3000/api/v1/cards/SK-2026-001
@@ -23,9 +25,9 @@ curl -i -H 'X-Mock-Scenario: unregistered' \
   http://localhost:3000/api/v1/cards/SK-2026-001
 ```
 
-先頭は登録済み、後者は未登録のサンプルを返します。応答の `meta.mode` は `mock` です。
+The first request returns a registered sample; the second returns an unregistered sample. The response has `meta.mode: mock`.
 
-## 登録準備と確認
+## Prepare and check registration
 
 ```sh
 curl -i -X POST \
@@ -41,13 +43,13 @@ curl -i -H 'X-Mock-Scenario: registered' \
   http://localhost:3000/api/v1/cards/SK-2026-001/transactions/0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 ```
 
-`data: "0x"` は模擬値です。実ウォレットへ送信しないでください。Mock Walletは `src/backend/mock-wallet.ts` にあります。拒否後は確認を呼ばず、結果不明でも再送しません。実UIはliveの取引だけをウォレットへ渡します。
+`data: "0x"` is a mock value. Do not send it to a real wallet. The Mock Wallet is in `src/backend/mock-wallet.ts`. After rejection, do not call confirmation. Do not resend when the outcome is unknown. The real UI passes only live transactions to the wallet.
 
-シナリオは要求ごとに指定します。準備の成功でカード取得結果が変わることはありません。省略時の `default` は各API単体の成功例です。利用できる組合せは[詳細設計のシナリオ表](../../specs/BACKEND_DESIGN.md#固定サンプルとシナリオ)を参照してください。
+Specify the scenario for each request. A successful preparation request does not change the card lookup response. The omitted scenario, `default`, is a standalone success example for each API. See the [scenario table in the detailed design](../../specs/BACKEND_DESIGN.md#固定サンプルとシナリオ) for supported combinations.
 
-## 検証
+## Verify the API
 
-`apps/web/` で実行します。
+Run these commands in `apps/web/`.
 
 ```sh
 npm run generate:check
@@ -59,13 +61,13 @@ BACKEND_MODE=mock npm run build:worker
 npm run test:worker
 ```
 
-`test:http` はNext.jsをポート3107、`test:worker` はWranglerのローカルWorkersをポート8789で起動し、検証後に終了します。ネットワーク接続を制限した実行環境では、ローカルポートと子プロセスを許可して実行してください。公開先へのデプロイは行いません。
+`test:http` starts Next.js on port 3107. `test:worker` starts a local Wrangler Worker on port 8789. Both stop their server after testing. In restricted environments, allow local ports and child processes. These commands do not deploy to a public environment.
 
-Workersを手動で操作する場合は `npm run build:worker` の後に `npm run preview` を実行します。`wrangler.jsonc` のモック設定を使います。R2・D1・MultiBaasへの接続は不要です。
+To operate the local Worker manually, run `npm run build:worker`, then `npm run preview`. This uses the mock settings in `wrangler.jsonc`. It requires no R2, D1, or MultiBaas connection.
 
-## API定義を変更する
+## Change the API contract
 
-[OpenAPI](../../specs/openapi.yaml)を編集した後、生成物を更新してください。
+After editing [OpenAPI](../../specs/openapi.yaml), update the generated files.
 
 ```sh
 npm run generate
@@ -73,14 +75,14 @@ npm run typecheck
 npm test
 ```
 
-生成先は `src/generated/` です。型、サンプル・シナリオ、スキーマ検証関数をGitへ含めます。ビルドは生成物が古い場合に失敗します。検証関数はAjvで事前生成し、Workers上で `eval` や `new Function` を呼びません。
+Output goes to `src/generated/`. Commit the types, samples, scenarios, and schema validators. The build fails if generated files are stale. Ajv generates validators ahead of time, so Workers do not call `eval` or `new Function`.
 
-[実装と検証の記録](../../specs/BACKEND_IMPLEMENTATION.md)に試験の対応を記載します。実際の署名・Amoy・MultiBaasの試験とは区別してください。
+The [implementation and verification record](../../specs/BACKEND_IMPLEMENTATION.md) maps tests to requirements. Distinguish these tests from real signing, Amoy, and MultiBaas tests.
 
-## Curvegrid Testnetの実接続
+## Connect to Curvegrid Testnet
 
-`BACKEND_MODE=live`、接続確認API、MultiBaas Gateway、専用Worker構成を追加した。設定・UI接続・検証の手順は [Curvegrid連携の起動手順](../../specs/CURVEGRID_INTEGRATION_RUNBOOK.md) を参照。既存mockの固定応答は維持する。実環境のキーと配置先を設定するまでは接続成功にならない。
+The implementation adds `BACKEND_MODE=live`, a connectivity-check API, a MultiBaas Gateway, and a dedicated Worker configuration. See the [Curvegrid integration runbook](../../specs/CURVEGRID_INTEGRATION_RUNBOOK.md) for configuration, UI connection, and verification steps. Existing fixed mock responses remain available. A successful connection requires real environment keys and deployment settings.
 
-## ENS wallet card lookup
+## Find wallet cards through ENS or an address
 
-`GET /api/v1/ens/cards?name=NAME&cursor=OPTIONAL_CURSOR` resolves Sepolia ENS and returns verified Curvegrid registration records. Set the optional server-only `ENS_SEPOLIA_RPC_URL` to enable it. Existing endpoints do not require ENS configuration. See [ENS integration](../../specs/ENS_INTEGRATION.md) and the OpenAPI contract for response fields and restart/error semantics.
+`GET /api/v1/ens/cards?name=NAME&cursor=OPTIONAL_CURSOR` resolves Sepolia ENS names and returns verified Curvegrid registration records. The `name` parameter also accepts a wallet address, which skips ENS resolution. Set the optional server-only `ENS_SEPOLIA_RPC_URL` to enable ENS. Other endpoints and direct address search do not require ENS configuration. See [ENS integration](../../specs/ENS_INTEGRATION.md) and the OpenAPI contract for response fields, restart behavior, and errors.

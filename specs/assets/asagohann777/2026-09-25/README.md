@@ -1,10 +1,12 @@
-# おじいちゃんコンビニのデザイン制作途中の成果物
+English | [日本語](README.ja.md)
 
-2026-09-25にユーザーの依頼で保存した。制作者名はおじいちゃんコンビニ、GitHub IDは `asagohann777`。作者情報と制作途中という位置付けはユーザーの申告による。
+# Work-in-progress designs by Ojiichan Konbini
 
-画像9点はDownloadsから元のファイル名・内容のままコピーした。並び順は依頼に記載された順であり、制作順や採用順を示さない。完成版・採用済みデザインとしては扱わない。制作日時、大会期間との対応、各画像でのAI使用範囲、公開ライセンスは未確認。
+These files were saved at the user's request on 2026-09-25. The creator is Ojiichan Konbini, GitHub ID `asagohann777`. The attribution and work-in-progress status are based on the user's statement.
 
-## 画像
+Nine images were copied from Downloads with their original filenames and contents. Their order follows the request, not creation or selection order. Do not treat them as completed or adopted designs. Creation dates, timing relative to the hackathon, AI use for each image, and public licensing have not been verified.
+
+## Images
 
 - [S__32833552.jpg](../screens/qr-result-ja.jpg)
 - [S__32833551.jpg](../screens/qr-result-en.jpg)
@@ -16,14 +18,14 @@
 - [S__32833539.jpg](../screens/splash-ja-01.jpg)
 - [S__32833538.jpg](../screens/splash-en-01.jpg)
 
-## プロンプトと出典
+## Prompts and sources
 
-[共有会話の保存記録](../../../../docs/prompts/asagohann777-design-2026-09-25.md)に出典URLと取得状況を保存した。共有会話は読み込めなかった。その後ユーザーが貼り付けた会話抜粋を原文のまま保存した。共有会話全体との一致と画像ごとの対応は未確認。
+The [preserved shared-conversation record](../../../../docs/prompts/asagohann777-design-2026-09-25.md) records the source URL and retrieval status. The shared conversation could not be loaded. The user later pasted an excerpt, which was preserved verbatim. Its correspondence with the full conversation and each image has not been verified.
 
-## 保存内容の検証
+## Preservation checks
 
-[manifest.json](manifest.json)にファイル名、バイト数、SHA-256を記録した。[SHA256SUMS](SHA256SUMS)はこのディレクトリで `shasum -a 256 -c SHA256SUMS` を実行して確認できる。保存時に9点すべてがコピー元とバイト単位で一致することを確認した。
+[manifest.json](manifest.json) records filenames, byte counts, and SHA-256 hashes. Check [SHA256SUMS](SHA256SUMS) by running `shasum -a 256 -c SHA256SUMS` in this directory. At preservation time, all nine images matched their source files byte for byte.
 
-Codexはコピー、一覧・出典・検証記録の作成を担当した。画像の生成・編集は行っていない。
+Codex copied the files and created the inventory, source records, and verification records. It did not generate or edit the images.
 
-2026-09-26にユーザーの依頼で画像を分類・改名した。画像の内容は変更していない。元の名前はmanifestの `original_name` に残した。[全素材の一覧](../README.md)を参照。
+On 2026-09-26, the images were classified and renamed at the user's request. Their contents did not change. The manifest retains the original names in `original_name`. See the [complete asset inventory](../README.md).

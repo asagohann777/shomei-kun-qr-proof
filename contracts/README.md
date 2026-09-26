@@ -1,10 +1,12 @@
-# 所有者登録コントラクトと発行者CLI
+English | [日本語](README.ja.md)
 
-発行者がカードIDと許可ウォレットを発行し、許可された本人が一度だけ所有者登録する。発行者の変更、登録後の上書き、移転、削除は提供しない。登録者の署名はUI担当のMetaMask連携で行う。
+# Owner registration contract and issuer CLI
 
-## ローカル検証
+The issuer creates card IDs, and a wallet registers each card once. New demo cards allow registration from any wallet. The contract also retains its earlier restricted-wallet capability. The current requirement uses ENS only for optional search and name display, not to restrict registration. Issuer replacement, edits after registration, transfers, and deletion are not supported. The UI's MetaMask integration handles the registering user's signature.
 
-Node.js 22を使用する。CLIの端末操作試験はPython 3の標準ライブラリ `pty` も使用する。
+## Verify locally
+
+Use Node.js 22. CLI terminal tests also use Python 3's standard-library `pty` module.
 
 ```sh
 cd contracts
@@ -16,75 +18,77 @@ npm test
 npm run issuer -- --help
 ```
 
-Solidity 0.8.30、Hardhat 2.29.1、EVM Parisに固定。コンパイラはnpmで固定したローカルsolcを使う。`abi/OwnershipRegistry.json` はABI・配置bytecode・runtime bytecodeを含む生成成果物。`check:abi` は再コンパイル結果と一致することを検証する。
+The project pins Solidity 0.8.30, Hardhat 2.29.1, and EVM Paris. It uses the local solc version pinned through npm. The generated `abi/OwnershipRegistry.json` contains the ABI, deployment bytecode, and runtime bytecode. `check:abi` checks that recompilation produces the same output.
 
-テストはローカルHardhat EVMで権限、ID、名前長、同時登録、CLIの送信前保存・中断・再開を検証する。MultiBaasのHTTP試験は仕様に基づくfixtureであり、Curvegridへの接続実績ではない。実接続の応答形式と権限は別途検証する。
+Tests use a local Hardhat EVM to check permissions, IDs, nickname length, concurrent registration, and the CLI's save-before-send, interruption, and resume behavior. MultiBaas HTTP tests use specification-based fixtures. They do not prove a real Curvegrid connection. Verify live response formats and permissions separately.
 
-## 発行者の設定
+## Configure the issuer
 
-以下を環境変数で設定する。`.env` は自動読込みしない。APIキー・復号パスワードをコマンド履歴やGitへ保存しない。
+Set the following environment variables. The CLI does not load `.env` automatically. Do not store API keys or decryption passwords in command history or Git.
 
-| 変数 | 値 |
+| Variable | Value |
 | --- | --- |
-| `MULTIBAAS_BASE_URL` | HTTPSの管理API URL。末尾は `/api/v0` |
-| `MULTIBAAS_ADMIN_API_KEY` | Library登録、配置準備、リンク、参照、issue準備の権限を持つ管理キー |
-| `CURVEGRID_PUBLIC_WEB3_RPC_URL` | 対象チェーンの公開用Web3 RPC |
-| `CHAIN_ID` | 実際のチェーンID |
-| `REGISTRY_ISSUER` | ローカルキーストアの発行者アドレス |
-| `REGISTRY_CONTRACT_LABEL` | MultiBaas Libraryのラベル |
-| `REGISTRY_CONTRACT_VERSION` | Libraryのバージョン |
-| `REGISTRY_ADDRESS` | 配置結果のコントラクトアドレス。issue/showで必要 |
-| `PUBLIC_API_ORIGIN` | 公開確認APIのOrigin |
-| `ISSUER_KEYSTORE_PATH` | 暗号化JSONキーストアの場所。`--keystore`でも指定可 |
+| `MULTIBAAS_BASE_URL` | HTTPS management API URL ending in `/api/v0` |
+| `MULTIBAAS_ADMIN_API_KEY` | Admin key permitted to register Library entries, prepare deployment, link, read, and prepare issuance |
+| `CURVEGRID_PUBLIC_WEB3_RPC_URL` | Public Web3 RPC for the target chain |
+| `CHAIN_ID` | Actual chain ID |
+| `REGISTRY_ISSUER` | Issuer address in the local keystore |
+| `REGISTRY_CONTRACT_LABEL` | MultiBaas Library label |
+| `REGISTRY_CONTRACT_VERSION` | Library version |
+| `REGISTRY_ADDRESS` | Deployed contract address, required for issue and show |
+| `PUBLIC_API_ORIGIN` | Public verification API origin |
+| `ISSUER_KEYSTORE_PATH` | Encrypted JSON keystore path; also accepted through `--keystore` |
 
-キーストアは本人が管理する暗号化Ethereum JSONキーストアを使用する。復号パスワードは端末で非表示入力する。秘密鍵の生成・取得・保管はこのCLIの機能ではない。
+Use an encrypted Ethereum JSON keystore managed by its owner. The terminal hides the decryption password as you enter it. This CLI does not generate, retrieve, or store private keys.
 
-## 配置と発行
+## Deploy and issue
 
-以下は実際にチェーンへ書き込む操作。設定と配置許可を確認した担当者が実行する。
+The following operations write to the chain. An operator must confirm the settings and deployment authorization before running them.
 
 ```sh
 mkdir -m 700 .issuer-state
 npm run issuer -- deploy --state .issuer-state/deploy.json --keystore /secure/issuer.keystore.json
 ```
 
-`pending` の場合は同じstateで確認を続ける。`complete` に含まれるcontractを `REGISTRY_ADDRESS` に設定する。ABIリンクの開始ブロックは元の配置receiptから取得する。
+For `pending`, continue checking with the same state. Set `REGISTRY_ADDRESS` to the contract in the `complete` result. Obtain the ABI link's starting block from the original deployment receipt.
 
 ```sh
 npm run issuer -- resume --state .issuer-state/deploy.json
-npm run issuer -- issue --card-id demo-001 --wallet 0x1111111111111111111111111111111111111111 --state .issuer-state/demo-001.json --keystore /secure/issuer.keystore.json
+npm run issuer -- issue --card-id demo-001 --state .issuer-state/demo-001.json --keystore /secure/issuer.keystore.json
 npm run issuer -- show --card-id demo-001
 npm run issuer -- resume --state .issuer-state/demo-001.json
 ```
 
-`issue` のwalletは実際の登録許可先に置き換える。既発行で許可先が同じなら新しい取引を送らず `already-issued` を返す。異なる許可先には変更できない。返却するcardUrlは確認API URLで、UIのQRリンクではない。
+Omit recipient flags to issue an unrestricted card. If a card already exists with the same allowed wallet, the CLI returns `already-issued` without sending a new transaction. The allowed wallet cannot be changed. The returned cardUrl is a verification API URL, not the UI's QR link.
 
-## 中断からの再開
+## Resume after interruption
 
-署名前にチェーン、発行者、calldata、宛先、送金額を照合する。RPCからnonce、gas、手数料を取得し、署名済み取引を0600のstateへ原子的に保存してから送信する。
+Before signing, the CLI checks the chain, issuer, calldata, destination, and transfer value. It obtains the nonce, gas, and fees from RPC. It atomically saves the signed transaction to a state file with mode 0600 before sending it.
 
-stateには秘密鍵を含めない。ただし署名済み取引を再送できるため、公開してはならない。`.issuer-state/` はGit管理外。stateを移す場合も同等のアクセス制限を保つ。
+The state contains no private key, but it can be used to rebroadcast the signed transaction. Do not publish it. `.issuer-state/` is excluded from Git. Keep equivalent access restrictions when moving state files.
 
-`resume` は同じhashを照会する。配置済みならABIリンクを再開する。正常な照会で取引が見つからず `not-seen` の場合だけ、担当者の判断で同じ署名済み取引を再送できる。
+`resume` checks the same hash. For a deployed contract, it resumes ABI linking. Only when a successful lookup cannot find the transaction and returns `not-seen` may an operator choose to rebroadcast the same signed transaction.
 
 ```sh
 npm run issuer -- resume --state .issuer-state/deploy.json --rebroadcast
 ```
 
-通信失敗では再送しない。nonceが消費済みなら停止する。新しいstateでやり直す前に発行者アカウントの履歴を確認する。同じ発行者で複数の配置・発行コマンドを並行実行しない。
+Do not resend after a communication failure. Stop if the nonce has already been consumed. Check the issuer account's history before starting again with a new state file. Do not run multiple deployment or issuance commands concurrently with the same issuer.
 
-同じstateへの同時実行は `.lock` で拒否する。異常終了でlockが残ったときは、発行者プロセスが残っていないことを確認してからlockだけを削除する。stateは削除しない。
+A `.lock` prevents concurrent operations on the same state. If a crash leaves the lock behind, confirm that no issuer process remains, then remove only the lock. Do not delete the state.
 
-CLIは上流の生エラー、キー、署名済み取引を出力しない。失敗時は設定・権限・保存済みstate・MultiBaas管理画面を確認し、`resume` で取引状態を確認する。
+The CLI does not print raw upstream errors, keys, or signed transactions. On failure, check the configuration, permissions, saved state, and MultiBaas dashboard. Use `resume` to check the transaction state.
 
-## MultiBaas形式の根拠
+## Basis for MultiBaas formats
 
-[公式SDK](https://github.com/curvegrid/multibaas-sdk-typescript/tree/main/docs) の `ContractOverview`、`ListContractVersions200ResponseAllOfResult`、`Contract`、`Address`、`EventIndexingStatus`、`TransactionToSignTx` に基づく。任意の404を不存在として扱わず、一覧取得が成功した場合にだけ未登録を判定する。既存LibraryのABI・bytecodeが異なる場合や、リンク済みバージョン・索引開始ブロックが異なる場合は停止する。
+The implementation follows `ContractOverview`, `ListContractVersions200ResponseAllOfResult`, `Contract`, `Address`, `EventIndexingStatus`, and `TransactionToSignTx` in the [official SDK](https://github.com/curvegrid/multibaas-sdk-typescript/tree/main/docs). It does not treat arbitrary 404 responses as proof of absence. It reports an unregistered entry only after a successful listing request. It stops if an existing Library entry has a different ABI or bytecode, or if the linked version or indexing start block differs.
 
-## デモの全員登録
+## Unrestricted demo registration
 
-`issue --card-id ID --state FILE --keystore FILE` のように `--wallet` を省略すると全員許可で発行する。コントラクト1.1.0ではallowedWalletのゼロアドレスが全員許可を示す。任意の本人ウォレットが初回登録でき、所有者は署名した送信者になる。登録済みカードの上書きはできない。従来の `--wallet ADDRESS` は指定先に限定する場合だけ使う。
+Omitting `--wallet`, as in `issue --card-id ID --state FILE --keystore FILE`, allows any wallet to register. Contract 1.1.0 uses the zero address in allowedWallet to represent this permission. Any user's wallet may perform the first registration, and the signed transaction's sender becomes the owner. An existing registration cannot be overwritten.
 
-## Optional ENS recipient
+## Legacy recipient restrictions
 
-Use `--recipient-ens NAME` instead of `--wallet ADDRESS` when issuing a card. Set `ENS_SEPOLIA_RPC_URL` for Sepolia resolution. The CLI requires address confirmation and resolves again before signing. Omit both flags for unrestricted issuance. Resume uses the saved recipient without a new ENS lookup. See [ENS integration](../specs/ENS_INTEGRATION.md) for configuration and the PC demo procedure.
+The CLI still accepts `--wallet ADDRESS` to restrict registration and `--recipient-ens NAME` to resolve a restricted recipient on Sepolia. These options remain in the implementation pending removal; they are not part of the current demo requirement. Do not use either option when issuing new demo cards.
+
+For the retained ENS option, `ENS_SEPOLIA_RPC_URL` configures resolution. The CLI requires address confirmation and resolves again before signing. Resume uses the saved recipient without a new lookup. See [ENS integration](../specs/ENS_INTEGRATION.md) for the current search and display requirements and the status of legacy behavior.

@@ -1,3 +1,5 @@
+English | [日本語](README.ja.md)
+
 <p align="center">
   <img src="docs/submission/2026-09-26/branding/shomei-kun-icon.png" alt="Shomei-kun logo" width="180">
 </p>
@@ -14,7 +16,7 @@ Shomei-kun QR Proof lets you scan a card's QR code to see which wallet it is reg
 
 QR scanning is the main entry point. You can also search by ENS name or wallet address. If the card is unregistered, enter a nickname and approve the registration in MetaMask. If it is already registered, the app shows its registered owner and transaction details. Viewing a record does not require a wallet connection. The interface supports Japanese and English.
 
-ENS names resolve on Sepolia; card records remain on Curvegrid Testnet. Search `shomeikun.eth` to see its wallet’s registered cards, then open a card’s registration record. The registration screen also shows a connected wallet’s Primary name when reverse and forward resolution agree. Names are display labels; ownership and permissions remain address-based.
+ENS names resolve on Sepolia; card records remain on Curvegrid Testnet. Search `shomeikun.eth` to see its wallet's registered cards, then open a card's registration record. The registration screen also shows a connected wallet's Primary name when reverse and forward resolution agree. Names are display labels; ownership and permissions remain address-based.
 
 The card ID, the registering wallet address, and the nickname are recorded on the blockchain. Anyone can return to the record through the same QR code. This demo supports one-time registration, with no editing, deletion, or ownership transfer after registration.
 
@@ -59,7 +61,7 @@ Here, we apply that approach to physical cards, QR codes, and wallet-based regis
 | Scope | Work |
 | --- | --- |
 | Pre-existing work | The Shomei-kun concept, photo and video registration, album management, visibility settings, sharing through URLs, and the use of blockchain as external evidence |
-| Developed in this repository | Card ID issuance, QR reading, wallet-based owner registration, nickname recording, public record viewing, Japanese and English UI, QR reading through the camera or photos, optional ENS recipient issuance, ENS/address search, and verified Primary name display |
+| Developed in this repository | Card ID issuance, QR reading, wallet-based owner registration, nickname recording, public record viewing, Japanese and English UI, QR reading through the camera or photos, unrestricted issuance, ENS/address search, and verified Primary name display |
 
 The description of existing features is based on materials provided by the project. See [pre-existing work](specs/PRE_EXISTING_WORK.md) for sources and reuse details, and the [development log](specs/HACKATHON_CHANGES.md) for implementation and verification records.
 
@@ -67,7 +69,7 @@ The description of existing features is based on materials provided by the proje
 
 This project is being prepared for the Continuity track. Following the [official rules](https://ethglobal.com/events/tokyo2026/info/details), we document pre-existing work separately from new functionality. The development log and commit history identify the work carried out during the hackathon. Work whose timing has not been verified is not claimed as hackathon-period work.
 
-Continuity includes "Extend Open Source" and “Ship a Feature.” The specific category and eligibility for each partner prize will be checked at submission.
+Continuity includes "Extend Open Source" and "Ship a Feature." The specific category and eligibility for each partner prize will be checked at submission.
 
 ## Implementation and development records
 

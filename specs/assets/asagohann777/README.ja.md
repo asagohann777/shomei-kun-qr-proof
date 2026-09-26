@@ -1,16 +1,16 @@
-English | [日本語](README.ja.md)
+[English](README.md) | 日本語
 
-# Design materials by Ojiichan Konbini
+# おじいちゃんコンビニのデザイン資料
 
-The creator is Ojiichan Konbini, GitHub ID `asagohann777`. This directory preserves 33 work-in-progress designs and assets received from the user. They were grouped by content and renamed on 2026-09-26. The images were not recompressed or edited, and the originals in Downloads were not changed.
+制作者はおじいちゃんコンビニ、GitHub IDは `asagohann777`。ユーザーから受領した制作途中の図案・素材33点を保存している。2026-09-26に内容別に分類・改名した。画像は再圧縮・加工せず、Downloadsの原本も変更していない。
 
-Codex assigned descriptive filenames after visual inspection. `ja` means Japanese and `en` means English. Numbers distinguish alternatives, not creation order or selection priority. Creation dates, timing relative to the hackathon, AI use for each image, and public licensing have not been verified.
+ファイル名はCodexの目視分類による整理名。`ja` は日本語、`en` は英語、番号は別案の識別用であり、制作順や採用順位ではない。制作日時、大会期間との対応、各画像でのAI使用範囲、公開ライセンスは未確認。
 
-## Screen designs and assets
+## 画面図案と素材
 
-The directory contains 19 screen designs in `screens/`, 11 backgrounds in `backgrounds/`, and one logo, QR illustration, and card in `logos/`, `illustrations/`, and `cards/` respectively.
+画面図案19点は `screens/`、背景11点は `backgrounds/`、ロゴ・QRイラスト・カード各1点は `logos/`・`illustrations/`・`cards/` に保存。
 
-| Saved path | Original filename |
+| 保存先 | 元ファイル名 |
 | --- | --- |
 | [backgrounds/atrium-with-text.jpg](backgrounds/atrium-with-text.jpg) | S__32849928.jpg |
 | [backgrounds/atrium.jpg](backgrounds/atrium.jpg) | S__32849931.jpg |
@@ -47,21 +47,22 @@ The directory contains 19 screen designs in `screens/`, 11 backgrounds in `backg
 | [screens/wallet-approval-ja-01.jpg](screens/wallet-approval-ja-01.jpg) | S__32858119.jpg |
 | [screens/registration-confirm-ja-02.jpg](screens/registration-confirm-ja-02.jpg) | S__32858117.jpg |
 
-## Receipt records
+## 受領記録
 
-- [Nine screen designs received on 2026-09-25](2026-09-25/README.md). [Preserved design conversation](../../../docs/prompts/asagohann777-design-2026-09-25.md).
-- [Additional screen designs received on 2026-09-26](2026-09-26/README.md). Eight new images and four existing images. Creation prompts had not been received.
-- [Request to preserve 14 assets on 2026-09-26](../../../docs/prompts/2026-09-26/021211-868626-51f78af96f3c4863a9341b595e738b68.json). Creation prompts had not been received.
-- [Request to preserve and apply two revised screen designs on 2026-09-26](../../../docs/prompts/2026-09-26/030149-558583-88844b83137242ce95077ad10fe06a8f.json). These revise approval and registration review. Creation prompts had not been received. Earlier designs are retained.
+- [2026-09-25の画面図案9点](2026-09-25/README.md)。[制作会話の保存記録](../../../docs/prompts/asagohann777-design-2026-09-25.md)。
+- [2026-09-26の追加画面図案](2026-09-26/README.md)。新規8点と既存4点。制作プロンプトは未受領。
+- [2026-09-26の素材14点の保存依頼](../../../docs/prompts/2026-09-26/021211-868626-51f78af96f3c4863a9341b595e738b68.json)。制作プロンプトは未受領。
 
-The manifest's `description` fields describe the new assets. The logo and QR illustration are JPEGs with white backgrounds. The checkerboard around the card consists of JPEG pixels, not transparency.
+- [2026-09-26の画面修正図案2点の保存・UI反映依頼](../../../docs/prompts/2026-09-26/030149-558583-88844b83137242ce95077ad10fe06a8f.json)。承認画面と登録確認画面の修正図案。制作プロンプトは未受領。既存図案も保持。
 
-## Verification
+新しい素材の内容はmanifestの `description` に記録した。ロゴとQRイラストは白背景のJPEG。カード周囲の市松模様もJPEGの画素であり、透明部分ではない。
 
-[manifest.json](manifest.json) records old names, saved paths, receipt batches, sizes, and SHA-256 hashes. All 33 images were checked for content equality. Run `shasum -a 256 -c SHA256SUMS` in this directory to repeat the check.
+## 検証
 
-Codex handled preservation, classification, renaming, link updates, comparison, and records. It did not generate or edit the images.
+[manifest.json](manifest.json)に旧名・保存先・受領バッチ・容量・SHA-256を記録した。全33点の内容一致を確認した。このディレクトリで `shasum -a 256 -c SHA256SUMS` を実行して再確認できる。
 
-## Additional report on the creation process
+Codexは保存・分類・改名・参照リンク更新・照合・記録作成を担当した。画像の生成・編集は行っていない。
 
-[Prompt report 1, sections 1 through 28](../../../docs/prompts/asagohann777-prompt-report-1-2026-09-26.md) was received on 2026-09-26. It describes human instructions and AI generation and revision from UI drafts through asset separation. The earlier notes that prompts had not been received describe the state when each batch was saved. The correspondence between the report, each image, and individual prompts has not been verified. Distinguish the report's descriptions of transparent assets from the actual JPEGs received.
+## 制作経緯の追加報告
+
+2026-09-26に[「プロンプト報告1」（1〜28項）](../../../docs/prompts/asagohann777-prompt-report-1-2026-09-26.md)を受領した。UI原案から素材分離までの人間の指示とAIによる生成・修正をまとめた報告。上記の「未受領」は各素材の保存時点の記録であり、今回の報告と各画像・個別プロンプトの対応は未確認。透過素材という報告上の記述と、受領したJPEGの状態は区別する。
