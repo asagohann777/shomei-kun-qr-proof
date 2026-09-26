@@ -231,7 +231,7 @@
 
   .process-copy { text-align: center; font-size: 14px; color: #47617d; line-height: 1.8; margin-top: 14px; }
   .page > .process-copy + .info-panel { margin-top: 24px; }
-  .entry-page .scan-intro { text-align: center; width: 240px; max-width: 85%; margin: 40px auto 24px; padding: 4px; background: #ffffffd9; border: 1px solid white; border-radius: 28px; box-shadow: inset 0 0 12px #fff, 0 0 18px #69ddff80; backdrop-filter: blur(8px); }
+  .entry-page .scan-intro { text-align: center; width: 240px; max-width: 85%; margin: 40px auto 24px; padding: 4px; background: #ffffffd9; border: 1px solid white; border-radius: 28px; box-shadow: inset 0 0 12px #fff, 0 0 18px #69ddff80; backdrop-filter: blur(8px); animation: intro-qr-breathe 4s ease-in-out infinite; }
   .scan-intro .intro-qr { width: 100%; max-width: none; border-radius: 24px; }
   .scan-intro .trading-card { width: 60%; }
   .camera-page { position: relative; padding-top: 55px; }
@@ -278,6 +278,11 @@
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+@keyframes intro-qr-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+@media (prefers-reduced-motion: reduce) {
+  .entry-page .scan-intro { animation: none; }
 }
 
 @keyframes orbit-turn { to { transform: rotate(360deg); } }

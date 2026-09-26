@@ -408,3 +408,11 @@ Codexがユーザーの指示に従い `public/app.js` の結果画面からホ�
 ## 2026-09-26: ホームボタン・ロゴ修正版の公開
 
 ユーザーの指示でcommit `f4ccac9` をorigin/mainへpushし、UIモックをversion `81afa823-0c34-4bbc-826f-8a0a9c759f75` へ更新した。公開JS/CSSとビルドのバイト一致、Chromium/WebKitでホームボタン削除・詳細表示・ロゴ経由の画面遷移を確認。公開ロゴ画面を `prototypes/mobile-ui/artifacts/public-logo-fixed-*` に保存した。Codexが公開と検証を担当。実接続Workerは更新していない。
+
+## 2026-09-26: トップページQRの拡大・縮小
+
+ユーザーが控えめな拡大・縮小を指定し、Codexが `prototypes/mobile-ui/styles/input.css` と採用計画を更新した。白い枠ごと4秒周期で等倍と1.035倍の間を往復し、動きを減らす設定では停止する。ビルド成功。生成CSSとトップページ相当のDOMをChromium/WebKitへ直接読み込み、周期の始点・中点・終点の倍率、320px幅での横はみ出しなし、動き抑制時の停止を確認した。ページ全体の操作フロー検証・デプロイは今回行っていない。大会期間との対応は未確認。
+
+## 2026-09-26: トップページQRアニメーションの公開
+
+ユーザーのデプロイ指示により、CodexがUIモックWorker `shomei-kun-ui-mock` をversion `868c8bae-286a-4cb3-a22d-a8abed90edf0` へ更新した。公開URLは https://shomei-kun-ui-mock.dptr.workers.dev 。公開CSSとローカルビルドのバイト一致を確認し、Chromium/WebKitの公開トップページで拡大・縮小の倍率と動きを減らす設定での停止を確認した。実接続Workerは更新していない。今回commit・pushは行っていない。大会期間との対応は未確認。
